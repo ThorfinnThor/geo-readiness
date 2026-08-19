@@ -61,9 +61,7 @@ def _norm(value: str | None) -> str:
 
 
 def _pick_language(profile: BusinessProfile, override: str | None) -> str:
-    lang = override or next(
-        (lg for lg in profile.languages if lg in SUPPORTED_LANGUAGES), "en"
-    )
+    lang = override or next((lg for lg in profile.languages if lg in SUPPORTED_LANGUAGES), "en")
     return lang if lang in SUPPORTED_LANGUAGES else "en"
 
 
