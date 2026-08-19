@@ -1,0 +1,23 @@
+# Local development database only.
+# Production uses Supabase Postgres — see docs/adr/0001-deployment-architecture.md.
+# This gives `docker compose up` a working Postgres for the worker + tests (E00 acceptance).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: geo-postgres
+    environment:
+      POSTGRES_USER: geo
+      POSTGRES_PASSWORD: geo
+      POSTGRES_DB: geo
+    ports:
+      - "5432:5432"
+    volumes:
+      - geo-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geo -d geo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  geo-pgdata:

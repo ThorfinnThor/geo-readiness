@@ -1,0 +1,43 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+*.egg-info/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Coverage / test output
+coverage/
+.coverage
+htmlcov/
+
+# Local data
+*.sqlite
+*.db
+tmp/
+
+# Machine-local Node CA workaround (this Node build ships an incomplete root set).
+.npmrc

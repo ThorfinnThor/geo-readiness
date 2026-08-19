@@ -1,0 +1,9 @@
+packages:
+  - "apps/web"
+
+# Native packages allowed to run install/build scripts.
+# esbuild → vitest; unrs-resolver → eslint import resolver; sharp → next/image.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

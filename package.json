@@ -1,0 +1,16 @@
+{
+  "name": "geo-readiness",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @geo/web dev",
+    "build": "pnpm --filter @geo/web build",
+    "lint": "pnpm --filter @geo/web lint",
+    "typecheck": "pnpm --filter @geo/web typecheck",
+    "test": "pnpm --filter @geo/web test"
+  }
+}
