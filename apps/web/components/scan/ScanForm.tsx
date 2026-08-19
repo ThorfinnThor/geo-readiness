@@ -32,8 +32,9 @@ export function ScanForm() {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2 sm:flex-row">
+    <form onSubmit={submit} className="flex flex-col gap-2 text-left">
+      <div className="flex items-center gap-2 rounded-xl border border-border-strong bg-surface/70 p-1.5 pl-3 shadow-lg backdrop-blur transition-colors focus-within:border-[color:var(--accent)]">
+        <span className="font-mono text-sm text-fg-subtle">https://</span>
         <input
           type="text"
           inputMode="url"
@@ -41,17 +42,18 @@ export function ScanForm() {
           onChange={(e) => setDomain(e.target.value)}
           placeholder="yourwebsite.com"
           aria-label="Website domain"
-          className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-base dark:border-neutral-700 dark:bg-neutral-900"
+          className="flex-1 bg-transparent font-mono text-base text-fg outline-none placeholder:text-fg-subtle"
         />
         <button
           type="submit"
           disabled={loading || domain.trim() === ""}
-          className="rounded-lg bg-neutral-900 px-5 py-2 font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900"
+          className="rounded-lg px-4 py-2 text-sm font-semibold text-[color:var(--accent-fg)] transition-transform hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100"
+          style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
         >
-          {loading ? "Starting…" : "Run free scan"}
+          {loading ? "Scanning…" : "Run scan"}
         </button>
       </div>
-      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+      {error && <p className="px-1 text-sm text-weak">{error}</p>}
     </form>
   );
 }

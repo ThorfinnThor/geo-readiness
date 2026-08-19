@@ -18,7 +18,9 @@ const DONE = new Set(["completed", "partial", "failed"]);
 export function ScanPending({ scanId, status }: { scanId: string; status: string }) {
   const router = useRouter();
   const [current, setCurrent] = useState(status);
+  const [step, setStep] = useState(0);
 
+  // Poll real status.
   useEffect(() => {
     if (DONE.has(current)) {
       router.refresh();
@@ -41,29 +43,72 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
     return () => clearInterval(timer);
   }, [scanId, current, router]);
 
+  // Advance the visual pipeline (stops one short until the scan actually completes).
+  useEffect(() => {
+    if (DONE.has(current)) return;
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 2)), 1400);
+    return () => clearInterval(t);
+  }, [current]);
+
   const failed = current === "failed";
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-24">
-      <h1 className="text-2xl font-semibold">
-        {failed ? "We couldn’t scan that site" : "Scanning your website…"}
-      </h1>
-      {failed ? (
-        <p className="text-neutral-500">
-          The site could not be reached or crawled. Please check the domain and try again.
-        </p>
-      ) : (
-        <>
-          <ol className="flex flex-col gap-2 text-sm text-neutral-500">
-            {STEPS.map((step) => (
-              <li key={step} className="flex items-center gap-2">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-neutral-400" />
-                {step}
-              </li>
-            ))}
+    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6">
+      <div className="rounded-2xl border border-border bg-surface/50 p-6">
+        <div className="mb-5 flex items-center gap-2 font-mono text-xs text-fg-subtle">
+          <span
+            className={`h-2 w-2 rounded-full ${failed ? "bg-weak" : "animate-pulse bg-excellent"}`}
+          />
+          {failed ? "scan failed" : "scanning…"}
+        </div>
+
+        {failed ? (
+          <div className="flex flex-col gap-3">
+            <h1 className="text-xl font-semibold">We couldn’t scan that site</h1>
+            <p className="text-sm text-fg-muted">
+              The site could not be reached or crawled. Check the domain and try again.
+            </p>
+          </div>
+        ) : (
+          <ol className="flex flex-col gap-3 font-mono text-sm">
+            {STEPS.map((label, i) => {
+              const done = i < step;
+              const active = i === step;
+              return (
+                <li key={label} className="flex items-center gap-3">
+                  <span
+                    className={
+                      done
+                        ? "text-excellent"
+                        : active
+                          ? "text-accent"
+                          : "text-fg-subtle/50"
+                    }
+                  >
+                    {done ? "✓" : active ? "▸" : "·"}
+                  </span>
+                  <span
+                    className={
+                      done
+                        ? "text-fg-muted line-through decoration-fg-subtle/40"
+                        : active
+                          ? "text-fg"
+                          : "text-fg-subtle/60"
+                    }
+                  >
+                    {label}
+                    {active && <span className="ml-1 animate-pulse">…</span>}
+                  </span>
+                </li>
+              );
+            })}
           </ol>
-          <p className="text-xs text-neutral-400">This usually takes under a minute.</p>
-        </>
+        )}
+      </div>
+      {!failed && (
+        <p className="text-center font-mono text-xs text-fg-subtle">
+          this usually takes under a minute
+        </p>
       )}
     </main>
   );
