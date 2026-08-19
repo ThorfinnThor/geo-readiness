@@ -1,0 +1,92 @@
+"""End-to-end scan pipeline (in-memory, deterministic)."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from dataclasses import dataclass
+from urllib.parse import urlsplit
+
+from geo_worker.actions import Action, compute_actions
+from geo_worker.clusters import GeneratedCluster, generate_clusters
+from geo_worker.coverage import CoverageReport, compute_coverage
+from geo_worker.crawler import crawl
+from geo_worker.crawler.types import FetchFn, RenderFn
+from geo_worker.profile import BusinessProfile, build_profile
+from geo_worker.scoring import ReadinessResult, compute_readiness
+from geo_worker.scoring.types import CrawlMeta
+from geo_worker.security import FULL_LIMITS, QUICK_LIMITS, CrawlLimits
+from geo_worker.security.resolver import Resolver, system_resolver
+
+
+@dataclass
+class ScanResult:
+    canonical_domain: str
+    scan_type: str
+    methodology_version: str
+    pages_analyzed: int
+    profile: BusinessProfile
+    clusters: list[GeneratedCluster]
+    coverage: CoverageReport
+    readiness: ReadinessResult
+    actions: list[Action]
+    crawl_status: str
+
+
+def _limits_for(scan_type: str) -> CrawlLimits:
+    return FULL_LIMITS if scan_type == "full" else QUICK_LIMITS
+
+
+def run_pipeline(
+    start_url: str,
+    *,
+    scan_type: str = "quick",
+    methodology_version: str = "geo-readiness-v1",
+    fetch_fn: FetchFn,
+    resolver: Resolver = system_resolver,
+    allow_raw_ip: bool = False,
+    render_fn: RenderFn | None = None,
+    should_cancel: Callable[[], bool] | None = None,
+    confirmed_name: str | None = None,
+) -> ScanResult:
+    """Run the full scan and return every engine output in memory."""
+    limits = _limits_for(scan_type)
+    crawl_result = crawl(
+        start_url,
+        limits=limits,
+        fetch_fn=fetch_fn,
+        resolver=resolver,
+        allow_raw_ip=allow_raw_ip,
+        render_fn=render_fn,
+        should_cancel=should_cancel,
+    )
+    pages = crawl_result.pages
+    canonical_domain = urlsplit(start_url).hostname or start_url
+
+    profile = build_profile(pages, canonical_domain, confirmed_name)
+    clusters = generate_clusters(profile, methodology_version, scan_type)
+    coverage = compute_coverage(clusters, pages, profile)
+
+    fetched = crawl_result.metrics.pages_fetched
+    errors = crawl_result.metrics.errors
+    crawl_meta = CrawlMeta(
+        pages_requested=limits.max_pages,
+        pages_crawled=fetched,
+        homepage_reachable=crawl_result.homepage_reachable,
+        robots_blocked_core=crawl_result.robots_blocked_core,
+        valid_response_ratio=(fetched / (fetched + errors)) if (fetched + errors) else 1.0,
+    )
+    readiness = compute_readiness(pages, profile, coverage, crawl_meta, methodology_version)
+    actions = compute_actions(readiness, profile, coverage, clusters, pages)
+
+    return ScanResult(
+        canonical_domain=canonical_domain,
+        scan_type=scan_type,
+        methodology_version=methodology_version,
+        pages_analyzed=len(pages),
+        profile=profile,
+        clusters=clusters,
+        coverage=coverage,
+        readiness=readiness,
+        actions=actions,
+        crawl_status=str(crawl_result.status),
+    )

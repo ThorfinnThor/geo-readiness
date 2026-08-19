@@ -1,0 +1,461 @@
+{
+  "meta": {
+    "canonical_domain": "acme-solar.example",
+    "scan_type": "full",
+    "methodology_version": "geo-readiness-v1",
+    "pages_analyzed": 10,
+    "clusters_evaluated": 13,
+    "confidence_score": 71.0,
+    "confidence_band": "Moderate"
+  },
+  "overall_score": 83.78,
+  "overall_level": "Strong",
+  "components": [
+    {
+      "key": "entity_clarity",
+      "name": "Entity Clarity",
+      "score": 100.0,
+      "level": "Excellent"
+    },
+    {
+      "key": "offer_clarity",
+      "name": "Offer Clarity",
+      "score": 79.58,
+      "level": "Good"
+    },
+    {
+      "key": "prompt_coverage",
+      "name": "Prompt Coverage",
+      "score": 99.09,
+      "level": "Excellent"
+    },
+    {
+      "key": "sourceability",
+      "name": "Sourceability",
+      "score": 71.0,
+      "level": "Good"
+    },
+    {
+      "key": "structured_data",
+      "name": "Structured Data",
+      "score": 55.0,
+      "level": "Needs improvement"
+    },
+    {
+      "key": "evidence_trust",
+      "name": "Evidence & Trust",
+      "score": 86.0,
+      "level": "Strong"
+    },
+    {
+      "key": "technical_access",
+      "name": "Technical Accessibility",
+      "score": 66.0,
+      "level": "Good"
+    }
+  ],
+  "strengths": [
+    "Entity Clarity is strong (100/100)",
+    "Prompt Coverage is strong (99.09/100)",
+    "Evidence & Trust is strong (86/100)"
+  ],
+  "gaps": [
+    "Structured Data needs work (55/100)",
+    "Technical Accessibility needs work (66/100)",
+    "Sourceability needs work (71/100)"
+  ],
+  "business_profile": {
+    "brand_name": "Acme Solar",
+    "needs_confirmation": false,
+    "legal_name": "Acme Solar GmbH",
+    "services": [
+      "photovoltaik",
+      "stromspeicher"
+    ],
+    "products": [
+      "solarmodul"
+    ],
+    "locations": [
+      "Ulm"
+    ],
+    "countries": [
+      "DE"
+    ],
+    "languages": [
+      "de"
+    ]
+  },
+  "actions": [
+    {
+      "rule_id": "RDY-005",
+      "title": "Add or complete structured data",
+      "category": "structured_data",
+      "severity": "high",
+      "priority_score": 0.1198,
+      "problem": "Organization/offer structured data is missing or incomplete.",
+      "recommendation": "Add valid Organization + Service/Product JSON-LD with core fields.",
+      "expected_signal": "Higher Structured Data score.",
+      "how_to_verify": "Re-scan: Organization and Service/Product markup are detected.",
+      "evidence": [
+        "structured_data_score=55.0",
+        "valid_org_identity_strength=1.0"
+      ]
+    }
+  ],
+  "clusters": [
+    {
+      "cluster_key": "6cef642b43deec7ca191a131c8a272b62975f7c29db2a4362e03ab05e57693e9",
+      "intent": "local",
+      "label": "photovoltaik",
+      "priority": 0.9175,
+      "coverage_score": 95.0,
+      "sample_prompt": "Welche Anbieter gibt es für photovoltaik in Ulm?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "location_presence",
+          "weight": 25,
+          "strength": 0.8
+        },
+        {
+          "name": "service_location_link",
+          "weight": 25,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 10,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 10,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "7c259805a56276c633753173c2643a0b99f94879a446630794b47ffe307054f7",
+      "intent": "local",
+      "label": "stromspeicher",
+      "priority": 0.8675,
+      "coverage_score": 95.0,
+      "sample_prompt": "Welche Anbieter gibt es für stromspeicher in Ulm?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "location_presence",
+          "weight": 25,
+          "strength": 0.8
+        },
+        {
+          "name": "service_location_link",
+          "weight": 25,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 10,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 10,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "33190bcef3d557cbc16959a0b54c2d3a149dcf08537a14012dd4767d3c516de2",
+      "intent": "recommendation",
+      "label": "stromspeicher",
+      "priority": 0.84,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welcher Anbieter für stromspeicher ist empfehlenswert?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 40,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "95d9c319079e5629aaa8d422736997946d402a45715f75b57da2dd86e1d48210",
+      "intent": "recommendation",
+      "label": "photovoltaik",
+      "priority": 0.79,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welcher Anbieter für photovoltaik ist empfehlenswert?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 40,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "57e79763dacc93beabe96d6ac80777afc589d2a78883ccd01aba31d11e6ae289",
+      "intent": "comparison",
+      "label": "solarmodul",
+      "priority": 0.7575,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welche solarmodul-Anbieter sollte man vergleichen?",
+      "requirements": [
+        {
+          "name": "product_presence",
+          "weight": 45,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "b1606e7f530310d66d7675e63002057f6cb7f74d4945ed573079602654095788",
+      "intent": "best_of",
+      "label": "photovoltaik",
+      "priority": 0.7575,
+      "coverage_score": 100.0,
+      "sample_prompt": "Was sind die besten Anbieter für photovoltaik?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 25,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "373da10d9d4051e89b63e1ff7afdf2daa63f5d2b507af4d8fbb3f607145bf4e5",
+      "intent": "category_discovery",
+      "label": "stromspeicher",
+      "priority": 0.745,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welche Anbieter gibt es für stromspeicher?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 45,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "fbb1cacc6983e1dfaa00391e2ae217b6c5e3053b33b88f8313c01ecbfebf3e57",
+      "intent": "pricing",
+      "label": "solarmodul",
+      "priority": 0.74,
+      "coverage_score": 100.0,
+      "sample_prompt": "Was kostet solarmodul?",
+      "requirements": [
+        {
+          "name": "pricing_presence",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "product_presence",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "5c7468afdbd34a0bca987313e233b9be5b945ec0e656f4da82b4c4fac908b849",
+      "intent": "combined_service",
+      "label": "photovoltaik",
+      "priority": 0.725,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welche Anbieter bieten photovoltaik und stromspeicher aus einer Hand?",
+      "requirements": [
+        {
+          "name": "services_link",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "service_a_presence",
+          "weight": 25,
+          "strength": 1.0
+        },
+        {
+          "name": "service_b_presence",
+          "weight": 25,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "f745805a61a079d2c61f3eb09456801ead81846478377d73361893467fc69b09",
+      "intent": "category_discovery",
+      "label": "photovoltaik",
+      "priority": 0.695,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welche Anbieter gibt es für photovoltaik?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 45,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "cff21c3d0040128c61eb760f512e92adc7c3e370c8cb5b8f96e14a8e73086a54",
+      "intent": "alternative",
+      "label": "solarmodul",
+      "priority": 0.6925,
+      "coverage_score": 100.0,
+      "sample_prompt": "Welche Alternativen gibt es zu solarmodul?",
+      "requirements": [
+        {
+          "name": "product_presence",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "9c14f9865adceb6cdb35b41cea53490c41da11bc765440acd384c8f26196b77b",
+      "intent": "trust",
+      "label": "photovoltaik",
+      "priority": 0.6625,
+      "coverage_score": 100.0,
+      "sample_prompt": "Woran erkennt man einen seriösen Anbieter für photovoltaik?",
+      "requirements": [
+        {
+          "name": "company_identity",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "trust_signals",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "25a00bed90972f0cb794e1c007d623e47fbaadfdcc7673f7f4be014c38a45502",
+      "intent": "branded",
+      "label": "Acme Solar",
+      "priority": 0.59,
+      "coverage_score": 100.0,
+      "sample_prompt": "Was bietet Acme Solar an?",
+      "requirements": [
+        {
+          "name": "company_identity",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "brand_presence",
+          "weight": 50,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    }
+  ],
+  "disclaimer": "Measures website readiness and sourceability. Does not measure actual rankings or visibility in ChatGPT or other AI platforms."
+}
