@@ -1,0 +1,40 @@
+{
+  "count_nouns": [
+    "Kunden",
+    "Mitarbeiter",
+    "Standorte",
+    "Filialen",
+    "Projekte",
+    "Installationen",
+    "Nutzer",
+    "Studien",
+    "Bewertungen",
+    "Partner",
+    "Länder",
+    "Mitglieder"
+  ],
+  "measurement_units": [
+    "kg",
+    "g",
+    "mg",
+    "km",
+    "m",
+    "cm",
+    "mm",
+    "m²",
+    "GB",
+    "MB",
+    "TB",
+    "kWh",
+    "kWp",
+    "kW",
+    "Sekunden",
+    "Minuten",
+    "Stunden",
+    "Tage",
+    "Wochen",
+    "Monate",
+    "Jahre"
+  ],
+  "percent_words": ["Prozent"]
+}

@@ -86,9 +86,10 @@ def extract_page(html: str, final_url: str) -> ExtractedPage:
     body = tree.css_first("body")
     visible_text = _normalize_ws(body.text(separator=" ", strip=True)) if body else ""
 
-    # V2 additive signals (main content + structure). Computed after visible_text,
-    # so the tree pruning it performs cannot affect V1 output.
-    signals = extract_page_signals(tree)
+    # V2 additive signals (main content + structure + quantitative + citations).
+    # Computed after visible_text, so the tree pruning it performs cannot affect
+    # V1 output.
+    signals = extract_page_signals(tree, final_url)
 
     page = ExtractedPage(
         final_url=final_url,

@@ -11,6 +11,8 @@ from __future__ import annotations
 from selectolax.parser import HTMLParser, Node
 
 from ..types import PageSignalEvidence, PageSignals
+from .citations import extract_citations
+from .quantitative import extract_quantitative
 
 _NON_CONTENT = "nav, footer, header, aside, script, style, noscript, template"
 _MIN_LIST_ITEMS = 3
@@ -47,8 +49,8 @@ def _is_data_table(table: Node) -> tuple[bool, bool]:
     return is_data, (is_data and max_cols >= 3)
 
 
-def extract_page_signals(tree: HTMLParser) -> PageSignals:
-    """Build the structural PageSignals from the (already script-stripped) tree."""
+def extract_page_signals(tree: HTMLParser, final_url: str = "") -> PageSignals:
+    """Build the additive PageSignals from the (already script-stripped) tree."""
     signals = PageSignals()
     main = _select_main(tree)
     if main is None:
@@ -114,6 +116,27 @@ def extract_page_signals(tree: HTMLParser) -> PageSignals:
     for q in quotes:
         if q.css_first("cite") is not None or q.attributes.get("cite"):
             signals.attributed_quote_count += 1
+
+    # Quantified information (§22–28) over the main content.
+    quant = extract_quantitative(signals.main_text)
+    signals.percentage_count = quant.percentage_count
+    signals.currency_value_count = quant.currency_value_count
+    signals.measurement_count = quant.measurement_count
+    signals.quantified_count_count = quant.quantified_count_count
+    signals.quantified_information_count = quant.total
+    for kind, snippet in quant.evidence:
+        if len(evidence) < _MAX_EVIDENCE:
+            evidence.append(PageSignalEvidence(signal=f"quantified_{kind}", snippet=snippet))
+
+    # Main-content external citations (§29–31).
+    cites = extract_citations(main, final_url)
+    signals.external_citation_count = cites.external_citation_count
+    signals.external_citation_domains = cites.external_citation_domains
+    for host, anchor in cites.evidence:
+        if len(evidence) < _MAX_EVIDENCE:
+            evidence.append(
+                PageSignalEvidence(signal="external_citation", value=host, snippet=anchor)
+            )
 
     signals.evidence = evidence
     return signals
