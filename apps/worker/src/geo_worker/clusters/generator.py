@@ -194,11 +194,12 @@ def generate_clusters(
     methodology_version: str,
     scan_type: str = "quick",
     language: str | None = None,
+    prompt_version: str = "v1",
 ) -> list[GeneratedCluster]:
     """Generate deterministic, capped, prompt-bearing clusters from a profile."""
     locale = _pick_language(profile, language)
-    taxonomy = load_taxonomy()
-    template_set = load_template_set(locale)
+    taxonomy = load_taxonomy(prompt_version)
+    template_set = load_template_set(locale, prompt_version)
     evidence = _evidence_lookup(profile)
     max_clusters = FULL_MAX_CLUSTERS if scan_type == "full" else QUICK_MAX_CLUSTERS
 

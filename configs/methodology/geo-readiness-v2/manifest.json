@@ -1,0 +1,15 @@
+{
+  "methodologyVersion": "geo-readiness-v2",
+  "crawlPolicyVersion": "1",
+  "profileRuleVersion": "1",
+  "clusterTaxonomyVersion": "1",
+  "clusterTemplateVersion": "1",
+  "coverageVersion": "2",
+  "scoreVersion": "2",
+  "actionRuleVersion": "2",
+  "sourceabilitySignalVersion": "2",
+  "topicalAlignmentVersion": "1",
+  "stageRollupVersion": "1",
+  "languageRulesVersion": "1",
+  "researchBasisVersion": "1"
+}

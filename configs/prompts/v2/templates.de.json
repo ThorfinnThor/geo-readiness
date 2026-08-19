@@ -1,0 +1,50 @@
+{
+  "language": "de",
+  "version": "1",
+  "templates": {
+    "category_discovery": [
+      { "id": "category_discovery_de_1", "text": "Welche Anbieter gibt es für {service}?", "placeholders": ["service"] },
+      { "id": "category_discovery_de_2", "text": "Welche {product_category}-Anbieter gibt es?", "placeholders": ["product_category"] }
+    ],
+    "recommendation": [
+      { "id": "recommendation_de_1", "text": "Welcher Anbieter für {service} ist empfehlenswert?", "placeholders": ["service"] },
+      { "id": "recommendation_de_2", "text": "Welche Lösung für {service} kann man empfehlen?", "placeholders": ["service"] }
+    ],
+    "best_of": [
+      { "id": "best_of_de_1", "text": "Was sind die besten Anbieter für {service}?", "placeholders": ["service"] }
+    ],
+    "comparison": [
+      { "id": "comparison_de_1", "text": "Welche {product_category}-Anbieter sollte man vergleichen?", "placeholders": ["product_category"] },
+      { "id": "comparison_de_2", "text": "Wie unterscheiden sich Anbieter für {service}?", "placeholders": ["service"] }
+    ],
+    "alternative": [
+      { "id": "alternative_de_1", "text": "Welche Alternativen gibt es zu {product}?", "placeholders": ["product"] }
+    ],
+    "local": [
+      { "id": "local_de_1", "text": "Welche Anbieter gibt es für {service} in {location}?", "placeholders": ["service", "location"] },
+      { "id": "local_de_2", "text": "Welche Anbieter für {service} in {location} sind empfehlenswert?", "placeholders": ["service", "location"] }
+    ],
+    "problem_solution": [
+      { "id": "problem_solution_de_1", "text": "Welche Anbieter helfen bei {problem}?", "placeholders": ["problem"] }
+    ],
+    "product_fit": [
+      { "id": "product_fit_de_1", "text": "Welche Lösung für {service} eignet sich für {audience}?", "placeholders": ["service", "audience"] }
+    ],
+    "trust": [
+      { "id": "trust_de_1", "text": "Woran erkennt man einen seriösen Anbieter für {service}?", "placeholders": ["service"] }
+    ],
+    "pricing": [
+      { "id": "pricing_de_1", "text": "Was kostet {service}?", "placeholders": ["service"] }
+    ],
+    "integration": [
+      { "id": "integration_de_1", "text": "Welche Anbieter für {service} bieten passende Schnittstellen?", "placeholders": ["service"] }
+    ],
+    "combined_service": [
+      { "id": "combined_service_de_1", "text": "Welche Anbieter bieten {service_a} und {service_b} aus einer Hand?", "placeholders": ["service_a", "service_b"] }
+    ],
+    "branded": [
+      { "id": "branded_de_1", "text": "Was bietet {brand} an?", "placeholders": ["brand"] },
+      { "id": "branded_de_2", "text": "Ist {brand} empfehlenswert?", "placeholders": ["brand"] }
+    ]
+  }
+}

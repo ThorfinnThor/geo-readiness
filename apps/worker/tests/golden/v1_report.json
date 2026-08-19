@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "canonical_domain": "golden.example",
+    "scan_type": "full",
+    "methodology_version": "geo-readiness-v1",
+    "pages_analyzed": 5,
+    "clusters_evaluated": 10,
+    "confidence_score": 68.0,
+    "confidence_band": "Low"
+  },
+  "overall_score": 67.88,
+  "overall_level": "Good",
+  "components": [
+    {
+      "key": "entity_clarity",
+      "name": "Entity Clarity",
+      "score": 85.0,
+      "level": "Strong"
+    },
+    {
+      "key": "offer_clarity",
+      "name": "Offer Clarity",
+      "score": 62.5,
+      "level": "Needs improvement"
+    },
+    {
+      "key": "prompt_coverage",
+      "name": "Prompt Coverage",
+      "score": 93.77,
+      "level": "Excellent"
+    },
+    {
+      "key": "sourceability",
+      "name": "Sourceability",
+      "score": 46.0,
+      "level": "Weak"
+    },
+    {
+      "key": "structured_data",
+      "name": "Structured Data",
+      "score": 51.75,
+      "level": "Needs improvement"
+    },
+    {
+      "key": "evidence_trust",
+      "name": "Evidence & Trust",
+      "score": 43.5,
+      "level": "Weak"
+    },
+    {
+      "key": "technical_access",
+      "name": "Technical Accessibility",
+      "score": 64.0,
+      "level": "Needs improvement"
+    }
+  ],
+  "strengths": [
+    "Prompt Coverage is strong (93.77/100)",
+    "Entity Clarity is strong (85/100)"
+  ],
+  "gaps": [
+    "Evidence & Trust needs work (43.5/100)",
+    "Sourceability needs work (46/100)",
+    "Structured Data needs work (51.75/100)"
+  ],
+  "business_profile": {
+    "brand_name": "BrightSolar",
+    "needs_confirmation": false,
+    "legal_name": "BrightSolar Inc.",
+    "services": [
+      "solar",
+      "solar installation"
+    ],
+    "products": [],
+    "locations": [
+      "Austin"
+    ],
+    "countries": [
+      "US"
+    ],
+    "languages": [
+      "en"
+    ]
+  },
+  "actions": [
+    {
+      "rule_id": "RDY-005",
+      "title": "Add or complete structured data",
+      "category": "structured_data",
+      "severity": "high",
+      "priority_score": 0.123,
+      "problem": "Organization/offer structured data is missing or incomplete.",
+      "recommendation": "Add valid Organization + Service/Product JSON-LD with core fields.",
+      "expected_signal": "Higher Structured Data score.",
+      "how_to_verify": "Re-scan: Organization and Service/Product markup are detected.",
+      "evidence": [
+        "structured_data_score=51.75",
+        "valid_org_identity_strength=1.0"
+      ]
+    },
+    {
+      "rule_id": "RDY-008",
+      "title": "Add trust and transparency evidence",
+      "category": "trust",
+      "severity": "medium",
+      "priority_score": 0.0896,
+      "problem": "Trust signals (identity, references, policies) are thin.",
+      "recommendation": "Add about, contact/imprint, references/case studies, and policy pages.",
+      "expected_signal": "Higher Evidence & Trust score.",
+      "how_to_verify": "Re-scan: transparency and reference signals are detected.",
+      "evidence": [
+        "evidence_trust_score=43.5",
+        "missing_page_types=['legal', 'case_study']"
+      ]
+    },
+    {
+      "rule_id": "RDY-004",
+      "title": "Make content more extractable and specific",
+      "category": "sourceability",
+      "severity": "medium",
+      "priority_score": 0.0857,
+      "problem": "Pages lack specific, attributable, first-party facts.",
+      "recommendation": "Add concrete facts, lists/specifications, dates, and clear Q&A answers.",
+      "expected_signal": "Higher Sourceability from specific, structured content.",
+      "how_to_verify": "Re-scan: Sourceability sub-scores improve.",
+      "evidence": [
+        "sourceability_score=46.0",
+        "weak_areas=['case_studies_examples', 'clear_answers_faq', 'dates_freshness', 'named_methodology_source', 'specific_factual_statements', 'tables_lists_spec_structure']"
+      ]
+    },
+    {
+      "rule_id": "RDY-002",
+      "title": "Add dedicated service/product pages",
+      "category": "offer",
+      "severity": "medium",
+      "priority_score": 0.068,
+      "problem": "Services are named but lack dedicated, detailed landing pages.",
+      "recommendation": "Give each primary service its own page with specific, factual detail.",
+      "expected_signal": "Higher Offer Clarity and stronger per-service evidence depth.",
+      "how_to_verify": "Re-scan: dedicated service/product pages are detected for each service.",
+      "evidence": [
+        "services=['solar', 'solar installation']",
+        "dedicated_pages_strength=0.3333"
+      ]
+    }
+  ],
+  "clusters": [
+    {
+      "cluster_key": "6b3e61120dcb3885fa2416dba415ea5d5d1686d3ea06284618f99eda9a8ad285",
+      "intent": "local",
+      "label": "solar installation",
+      "priority": 0.9175,
+      "coverage_score": 82.5,
+      "sample_prompt": "Which providers are there for solar installation in Austin?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "location_presence",
+          "weight": 25,
+          "strength": 0.8
+        },
+        {
+          "name": "service_location_link",
+          "weight": 25,
+          "strength": 0.5
+        },
+        {
+          "name": "company_identity",
+          "weight": 10,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 10,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "b6c54728e449397430e13e5f58ab5b2b3a78fb87140f016af7c5e04de02fc102",
+      "intent": "local",
+      "label": "solar",
+      "priority": 0.8675,
+      "coverage_score": 95.0,
+      "sample_prompt": "Which providers are there for solar in Austin?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 30,
+          "strength": 1.0
+        },
+        {
+          "name": "location_presence",
+          "weight": 25,
+          "strength": 0.8
+        },
+        {
+          "name": "service_location_link",
+          "weight": 25,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 10,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 10,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "57164ffec6689012ad87729746d3788148b3e9fe8ea61603a035d9ab2cd84601",
+      "intent": "recommendation",
+      "label": "solar",
+      "priority": 0.84,
+      "coverage_score": 100.0,
+      "sample_prompt": "Which provider for solar is recommended?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 40,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "7de5a9324f4fd47a34e2dda0d4676d9c2b945c828406489f4c13327de1fdf00a",
+      "intent": "recommendation",
+      "label": "solar installation",
+      "priority": 0.77,
+      "coverage_score": 100.0,
+      "sample_prompt": "Which provider for solar installation is recommended?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 40,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "f40c42b13c07b248e4fa972cfc100defe93c679a626fcc3859d364052c33cbee",
+      "intent": "best_of",
+      "label": "solar",
+      "priority": 0.7575,
+      "coverage_score": 100.0,
+      "sample_prompt": "What are the best providers for solar?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 25,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "ea755d212c8d625bcb07e12215ef92669b3d2e580ffd2fe8ad91907a8c8ec7ab",
+      "intent": "category_discovery",
+      "label": "solar",
+      "priority": 0.745,
+      "coverage_score": 100.0,
+      "sample_prompt": "Which providers are there for solar?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 45,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "c9f146de776102749f2fd1aa8f6fcc216fa76c4b31974d4b7551899f3eba265b",
+      "intent": "combined_service",
+      "label": "solar",
+      "priority": 0.725,
+      "coverage_score": 100.0,
+      "sample_prompt": "Which providers offer solar and solar installation from a single source?",
+      "requirements": [
+        {
+          "name": "services_link",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "service_a_presence",
+          "weight": 25,
+          "strength": 1.0
+        },
+        {
+          "name": "service_b_presence",
+          "weight": 25,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "8fe8354ef4756d9e9523b4ddebd603138e80d9da56b20f9998ba5813ff56346e",
+      "intent": "category_discovery",
+      "label": "solar installation",
+      "priority": 0.675,
+      "coverage_score": 100.0,
+      "sample_prompt": "Which providers are there for solar installation?",
+      "requirements": [
+        {
+          "name": "service_presence",
+          "weight": 45,
+          "strength": 1.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 35,
+          "strength": 1.0
+        },
+        {
+          "name": "company_identity",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    },
+    {
+      "cluster_key": "eeed205625b231c982ed98d96013e77d718ca69754e2fdcf032d90bf269a9f5c",
+      "intent": "trust",
+      "label": "solar",
+      "priority": 0.6625,
+      "coverage_score": 60.0,
+      "sample_prompt": "How do you recognize a trustworthy provider for solar?",
+      "requirements": [
+        {
+          "name": "company_identity",
+          "weight": 40,
+          "strength": 1.0
+        },
+        {
+          "name": "trust_signals",
+          "weight": 40,
+          "strength": 0.0
+        },
+        {
+          "name": "evidence_depth",
+          "weight": 20,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": [
+        "trust_signals"
+      ]
+    },
+    {
+      "cluster_key": "13cdf7f92b001bb64521d9100ca7dcafbeb25c1ec554be77ae43b1580bbcc50b",
+      "intent": "branded",
+      "label": "BrightSolar",
+      "priority": 0.57,
+      "coverage_score": 100.0,
+      "sample_prompt": "What does BrightSolar offer?",
+      "requirements": [
+        {
+          "name": "company_identity",
+          "weight": 50,
+          "strength": 1.0
+        },
+        {
+          "name": "brand_presence",
+          "weight": 50,
+          "strength": 1.0
+        }
+      ],
+      "missing_requirements": []
+    }
+  ],
+  "disclaimer": "Measures website readiness and sourceability. Does not measure actual rankings or visibility in ChatGPT or other AI platforms."
+}

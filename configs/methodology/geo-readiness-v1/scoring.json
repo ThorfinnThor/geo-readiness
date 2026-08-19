@@ -1,0 +1,11 @@
+{
+  "componentWeights": {
+    "entity_clarity": 0.2,
+    "offer_clarity": 0.2,
+    "prompt_coverage": 0.2,
+    "sourceability": 0.15,
+    "structured_data": 0.1,
+    "evidence_trust": 0.1,
+    "technical_access": 0.05
+  }
+}

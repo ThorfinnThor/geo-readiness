@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "intents": [
+    { "key": "category_discovery", "commercial_intent": 0.7, "branded": false },
+    { "key": "recommendation", "commercial_intent": 0.9, "branded": false },
+    { "key": "best_of", "commercial_intent": 0.8, "branded": false },
+    { "key": "comparison", "commercial_intent": 0.8, "branded": false },
+    { "key": "alternative", "commercial_intent": 0.7, "branded": false },
+    { "key": "local", "commercial_intent": 0.85, "branded": false },
+    { "key": "problem_solution", "commercial_intent": 0.75, "branded": false },
+    { "key": "product_fit", "commercial_intent": 0.7, "branded": false },
+    { "key": "trust", "commercial_intent": 0.6, "branded": false },
+    { "key": "pricing", "commercial_intent": 0.8, "branded": false },
+    { "key": "integration", "commercial_intent": 0.6, "branded": false },
+    { "key": "combined_service", "commercial_intent": 0.75, "branded": false },
+    { "key": "branded", "commercial_intent": 0.5, "branded": true }
+  ]
+}

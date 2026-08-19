@@ -1,4 +1,8 @@
-"""Load taxonomy and template configs from the repo configs directory."""
+"""Load versioned taxonomy and template configs (V2 §8).
+
+Prompt config is methodology-versioned: configs/prompts/<version>/… . V1 scans
+must never pick up a future V2 template, so the version is explicit.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +14,8 @@ from geo_worker.config import get_settings
 
 from .types import Taxonomy, TemplateSet
 
-_MARKER = Path("prompts") / "intent-taxonomy.json"
+DEFAULT_PROMPT_VERSION = "v1"
+_MARKER = Path("prompts") / "v1" / "intent-taxonomy.json"
 
 
 def configs_dir() -> Path:
@@ -27,12 +32,12 @@ def configs_dir() -> Path:
 
 
 @cache
-def load_taxonomy() -> Taxonomy:
-    path = configs_dir() / "prompts" / "intent-taxonomy.json"
+def load_taxonomy(version: str = DEFAULT_PROMPT_VERSION) -> Taxonomy:
+    path = configs_dir() / "prompts" / version / "intent-taxonomy.json"
     return Taxonomy.model_validate(json.loads(path.read_text(encoding="utf-8")))
 
 
 @cache
-def load_template_set(language: str) -> TemplateSet:
-    path = configs_dir() / "prompts" / f"templates.{language}.json"
+def load_template_set(language: str, version: str = DEFAULT_PROMPT_VERSION) -> TemplateSet:
+    path = configs_dir() / "prompts" / version / f"templates.{language}.json"
     return TemplateSet.model_validate(json.loads(path.read_text(encoding="utf-8")))

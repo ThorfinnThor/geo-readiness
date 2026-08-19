@@ -1,0 +1,39 @@
+{
+  "componentWeights": {
+    "entity_clarity": 0.2,
+    "offer_clarity": 0.2,
+    "prompt_coverage": 0.2,
+    "sourceability": 0.15,
+    "structured_data": 0.1,
+    "evidence_trust": 0.1,
+    "technical_access": 0.05
+  },
+  "coverage": {
+    "requirementsWeight": 0.7,
+    "topicalAlignmentWeight": 0.3,
+    "classification": "product_heuristic"
+  },
+  "stageRollups": {
+    "retrieval_readiness": {
+      "technical_access": 0.3,
+      "prompt_coverage": 0.3,
+      "entity_clarity": 0.15,
+      "offer_clarity": 0.15,
+      "structured_data": 0.1
+    },
+    "citation_readiness": {
+      "sourceability": 0.3,
+      "evidence_trust": 0.25,
+      "prompt_coverage": 0.2,
+      "structured_data": 0.15,
+      "entity_clarity": 0.1
+    },
+    "answer_extractability": {
+      "sourceability": 0.45,
+      "prompt_coverage": 0.25,
+      "offer_clarity": 0.15,
+      "structured_data": 0.1,
+      "evidence_trust": 0.05
+    }
+  }
+}
