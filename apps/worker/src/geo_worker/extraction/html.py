@@ -13,6 +13,7 @@ from selectolax.parser import HTMLParser
 from .classify import classify_page
 from .hashing import content_hash
 from .jsonld import extract_jsonld
+from .signals import extract_page_signals
 from .types import ExtractedPage, Link
 
 _SKIP_SCHEMES = ("mailto:", "tel:", "javascript:", "data:")
@@ -79,11 +80,15 @@ def extract_page(html: str, final_url: str) -> ExtractedPage:
 
     internal_links, external_links = _extract_links(tree, final_url)
 
-    # Visible text: strip non-content nodes, then flatten the body text.
+    # Visible text (V1 semantics, unchanged): strip non-content nodes, flatten body.
     for node in tree.css("script, style, noscript, template"):
         node.decompose()
     body = tree.css_first("body")
     visible_text = _normalize_ws(body.text(separator=" ", strip=True)) if body else ""
+
+    # V2 additive signals (main content + structure). Computed after visible_text,
+    # so the tree pruning it performs cannot affect V1 output.
+    signals = extract_page_signals(tree)
 
     page = ExtractedPage(
         final_url=final_url,
@@ -100,6 +105,7 @@ def extract_page(html: str, final_url: str) -> ExtractedPage:
         open_graph=open_graph,
         internal_links=internal_links,
         external_links=external_links,
+        signals=signals,
     )
     page.page_type = classify_page(final_url, title, headings)
     page.content_hash = content_hash(page)
