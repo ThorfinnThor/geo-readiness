@@ -19,6 +19,9 @@ class Settings(BaseSettings):
 
     database_url_async: str = Field(default="postgresql+asyncpg://geo:geo@localhost:5432/geo")
 
+    # Path to the versioned methodology/prompt config dir; auto-located if unset.
+    configs_dir: str | None = Field(default=None)
+
     # Free Scan Economics Guard (§38) — all server-side.
     free_max_pages: int = Field(default=12)
     free_max_render: int = Field(default=2)

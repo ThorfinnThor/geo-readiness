@@ -1,0 +1,50 @@
+{
+  "language": "en",
+  "version": "1",
+  "templates": {
+    "category_discovery": [
+      { "id": "category_discovery_en_1", "text": "Which providers are there for {service}?", "placeholders": ["service"] },
+      { "id": "category_discovery_en_2", "text": "Which {product_category} providers exist?", "placeholders": ["product_category"] }
+    ],
+    "recommendation": [
+      { "id": "recommendation_en_1", "text": "Which provider for {service} is recommended?", "placeholders": ["service"] },
+      { "id": "recommendation_en_2", "text": "Which {service} solution would you recommend?", "placeholders": ["service"] }
+    ],
+    "best_of": [
+      { "id": "best_of_en_1", "text": "What are the best providers for {service}?", "placeholders": ["service"] }
+    ],
+    "comparison": [
+      { "id": "comparison_en_1", "text": "Which {product_category} providers should be compared?", "placeholders": ["product_category"] },
+      { "id": "comparison_en_2", "text": "How do providers for {service} differ?", "placeholders": ["service"] }
+    ],
+    "alternative": [
+      { "id": "alternative_en_1", "text": "What are the alternatives to {product}?", "placeholders": ["product"] }
+    ],
+    "local": [
+      { "id": "local_en_1", "text": "Which providers are there for {service} in {location}?", "placeholders": ["service", "location"] },
+      { "id": "local_en_2", "text": "Which {service} providers in {location} are recommended?", "placeholders": ["service", "location"] }
+    ],
+    "problem_solution": [
+      { "id": "problem_solution_en_1", "text": "Which providers help with {problem}?", "placeholders": ["problem"] }
+    ],
+    "product_fit": [
+      { "id": "product_fit_en_1", "text": "Which {service} solution is a good fit for {audience}?", "placeholders": ["service", "audience"] }
+    ],
+    "trust": [
+      { "id": "trust_en_1", "text": "How do you recognize a trustworthy provider for {service}?", "placeholders": ["service"] }
+    ],
+    "pricing": [
+      { "id": "pricing_en_1", "text": "How much does {service} cost?", "placeholders": ["service"] }
+    ],
+    "integration": [
+      { "id": "integration_en_1", "text": "Which providers for {service} offer suitable integrations?", "placeholders": ["service"] }
+    ],
+    "combined_service": [
+      { "id": "combined_service_en_1", "text": "Which providers offer {service_a} and {service_b} from a single source?", "placeholders": ["service_a", "service_b"] }
+    ],
+    "branded": [
+      { "id": "branded_en_1", "text": "What does {brand} offer?", "placeholders": ["brand"] },
+      { "id": "branded_en_2", "text": "Is {brand} recommended?", "placeholders": ["brand"] }
+    ]
+  }
+}
