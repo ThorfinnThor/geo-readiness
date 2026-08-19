@@ -89,7 +89,7 @@ def extract_page(html: str, final_url: str) -> ExtractedPage:
     # V2 additive signals (main content + structure + quantitative + citations).
     # Computed after visible_text, so the tree pruning it performs cannot affect
     # V1 output.
-    signals = extract_page_signals(tree, final_url)
+    signals = extract_page_signals(tree, final_url, json_ld)
 
     page = ExtractedPage(
         final_url=final_url,

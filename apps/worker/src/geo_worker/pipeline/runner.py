@@ -12,6 +12,7 @@ from geo_worker.clusters import GeneratedCluster
 from geo_worker.coverage import CoverageReport
 from geo_worker.crawler import crawl
 from geo_worker.crawler.types import FetchFn, RenderFn
+from geo_worker.extraction.signals.dates import validate_page_dates
 from geo_worker.methodology import compute_methodology_hash, get_methodology
 from geo_worker.profile import BusinessProfile, build_profile
 from geo_worker.scoring import ReadinessResult
@@ -72,6 +73,10 @@ def run_pipeline(
     )
     pages = crawl_result.pages
     canonical_domain = urlsplit(start_url).hostname or start_url
+
+    # Validate page dates against the pinned as_of (future/invalid flags, §36).
+    for page in pages:
+        validate_page_dates(page.signals, measurement_as_of)
 
     # Dispatch by methodology version (fail-closed on unknown versions).
     methodology = get_methodology(methodology_version)

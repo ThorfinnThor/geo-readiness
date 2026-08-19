@@ -11,7 +11,10 @@ from __future__ import annotations
 from selectolax.parser import HTMLParser, Node
 
 from ..types import PageSignalEvidence, PageSignals
+from .answers import extract_answers
+from .authorship import extract_authors
 from .citations import extract_citations
+from .dates import extract_dates
 from .quantitative import extract_quantitative
 
 _NON_CONTENT = "nav, footer, header, aside, script, style, noscript, template"
@@ -49,8 +52,11 @@ def _is_data_table(table: Node) -> tuple[bool, bool]:
     return is_data, (is_data and max_cols >= 3)
 
 
-def extract_page_signals(tree: HTMLParser, final_url: str = "") -> PageSignals:
+def extract_page_signals(
+    tree: HTMLParser, final_url: str = "", json_ld: list[dict] | None = None
+) -> PageSignals:
     """Build the additive PageSignals from the (already script-stripped) tree."""
+    json_ld = json_ld or []
     signals = PageSignals()
     main = _select_main(tree)
     if main is None:
@@ -137,6 +143,16 @@ def extract_page_signals(tree: HTMLParser, final_url: str = "") -> PageSignals:
             evidence.append(
                 PageSignalEvidence(signal="external_citation", value=host, snippet=anchor)
             )
+
+    # Authorship (§33), dates (§35), direct answerability (§38).
+    signals.author_names, signals.organization_author_present = extract_authors(tree, json_ld)
+    (
+        signals.date_published,
+        signals.date_modified,
+        signals.visible_date,
+        signals.inconsistent_dates,
+    ) = extract_dates(tree, json_ld)
+    signals.faq_answer_count = extract_answers(main, json_ld)
 
     signals.evidence = evidence
     return signals
