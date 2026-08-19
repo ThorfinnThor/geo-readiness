@@ -62,6 +62,33 @@
   }
 }
 
+/* Explicit toggle wins over the system preference in both directions. */
+:root[data-theme="dark"] {
+  --bg: #07080b;
+  --bg-2: #0a0c11;
+  --grid: rgba(255, 255, 255, 0.035);
+  --glow-a: rgba(124, 92, 255, 0.18);
+  --glow-b: rgba(34, 211, 238, 0.12);
+
+  --surface: #0e1017;
+  --surface-2: #14171f;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --fg: #eef1f6;
+  --fg-muted: #9aa3b2;
+  --fg-subtle: #626b7b;
+
+  --accent: #8b6dff;
+  --accent-2: #22d3ee;
+  --accent-fg: #0a0a0f;
+
+  --excellent: #34d399;
+  --good: #38bdf8;
+  --warn: #fbbf24;
+  --weak: #fb7185;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

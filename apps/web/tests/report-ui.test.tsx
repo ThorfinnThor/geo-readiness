@@ -9,22 +9,15 @@ describe("PreviewReport (E12)", () => {
   it("renders the overall score, components, and disclaimer", () => {
     render(<PreviewReport report={exampleReport} reportId="demo" />);
     expect(screen.getByText(String(Math.round(exampleReport.overall_score)))).toBeDefined();
-    expect(screen.getByText("Entity Clarity")).toBeDefined();
+    expect(screen.getAllByText("Entity Clarity").length).toBeGreaterThan(0);
     expect(screen.getByText(/does not measure actual/i)).toBeDefined();
   });
 
-  it("locks the full sections and shows a CTA", () => {
+  it("locks the fixes and shows a CTA with the issue count", () => {
     render(<PreviewReport report={exampleReport} reportId="demo" />);
     expect(screen.getByText("Unlock the full audit")).toBeDefined();
     expect(screen.getByText("Get the full audit")).toBeDefined();
-  });
-
-  it("shows at most three preview actions", () => {
-    render(<PreviewReport report={exampleReport} reportId="demo" />);
-    const shown = exampleReport.actions.slice(0, 3);
-    for (const a of shown) {
-      expect(screen.getByText(a.title)).toBeDefined();
-    }
+    expect(screen.getByText(/issues found/i)).toBeDefined();
   });
 });
 

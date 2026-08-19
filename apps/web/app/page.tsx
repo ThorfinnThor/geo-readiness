@@ -15,9 +15,9 @@ const SIGNALS: [string, string][] = [
 ];
 
 const QUESTIONS: [string, number][] = [
-  ["Welche Anbieter gibt es für Photovoltaik in Ulm?", 95],
-  ["Welche Lösung für Stromspeicher eignet sich für Gewerbe?", 88],
-  ["Was kostet eine Photovoltaik-Anlage?", 42],
+  ["Which solar installers serve Austin, TX?", 95],
+  ["Which battery storage system is right for a small business?", 88],
+  ["How much does a home solar system cost?", 42],
 ];
 
 function Row({ k, v, ok }: { k: string; v: string; ok?: boolean }) {
@@ -38,7 +38,7 @@ function Inspector() {
         <span className="h-2.5 w-2.5 rounded-full bg-warn/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-excellent/70" />
         <span className="ml-2 font-mono text-xs text-fg-subtle">
-          readiness://acme-solar.example
+          readiness://brightsolar.example
         </span>
       </div>
 
@@ -60,16 +60,16 @@ function Inspector() {
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <Row k="entity" v="Acme Solar GmbH" ok />
-          <Row k="offers" v="photovoltaik · stromspeicher" ok />
-          <Row k="location" v="Ulm, DE" ok />
+          <Row k="entity" v="BrightSolar Inc." ok />
+          <Row k="offers" v="solar panels · battery storage" ok />
+          <Row k="location" v="Austin, TX" ok />
         </div>
 
         <div className="my-4 border-t border-dashed border-border" />
 
         <div className="flex flex-col gap-2">
           <span className="text-xs text-fg-subtle">ai search asks →</span>
-          <p className="text-sm text-fg">“Welche Anbieter für Photovoltaik in Ulm?”</p>
+          <p className="text-sm text-fg">“Which solar installers serve Austin, TX?”</p>
           <div className="flex items-center gap-3">
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
               <span className="block h-full rounded-full bg-excellent" style={{ width: "95%" }} />
@@ -121,17 +121,17 @@ export default function HomePage() {
       <main className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:py-16">
         <section className="flex flex-col gap-6">
           <span className="font-mono text-xs uppercase tracking-[0.22em] text-fg-subtle">
-            AI search readiness
+            AI search readiness audit
           </span>
-          <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
-            AI search doesn’t rank your pages.
+          <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight sm:text-[3.4rem]">
+            Your website,
             <br />
-            It tries to <span className="brand-gradient">understand</span> them.
+            read by machines.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
-            We crawl your site, extract the entity, offers and locations a machine would,
-            generate the exact questions AI search asks about businesses like yours — then
-            score whether your pages actually answer them.
+            AI answer engines don’t rank pages — they extract facts. We read your site the way
+            they do, generate the questions they ask about your business, and score whether your
+            pages actually answer them.
           </p>
 
           <div className="flex flex-col gap-3">
