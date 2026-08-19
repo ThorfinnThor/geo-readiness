@@ -1,0 +1,130 @@
+"""Deterministic business-profile tests (E06)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from geo_worker.extraction import extract_page
+from geo_worker.extraction.types import ExtractedPage, Link
+from geo_worker.profile import build_profile
+
+FIXTURES = Path(__file__).parent / "fixtures" / "html"
+
+
+def _evidence_fields(profile) -> set[str]:
+    return {e.field_name for e in profile.evidence}
+
+
+def test_confident_brand_with_corroborating_signals() -> None:
+    home = ExtractedPage(
+        final_url="https://flowmetrics.example/",
+        title="FlowMetrics — Analytics for Teams",
+        h1="FlowMetrics",
+        page_type="home",
+        language="en",
+        open_graph={"og:site_name": "FlowMetrics"},
+        json_ld=[
+            {
+                "@type": "Organization",
+                "name": "FlowMetrics",
+                "legalName": "FlowMetrics Inc.",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Berlin",
+                    "addressCountry": "DE",
+                },
+            }
+        ],
+    )
+    about = ExtractedPage(
+        final_url="https://flowmetrics.example/about",
+        title="About FlowMetrics",
+        h1="About FlowMetrics",
+        page_type="about",
+    )
+
+    profile = build_profile([home, about], "flowmetrics.example")
+
+    assert profile.brand_name == "FlowMetrics"
+    assert profile.needs_confirmation is False
+    assert profile.brand_confidence >= 0.8
+    assert profile.legal_name == "FlowMetrics Inc."
+    assert profile.countries == ["DE"]
+    assert profile.locations == ["Berlin"]
+    assert profile.languages == ["en"]
+    assert "brand_name" in _evidence_fields(profile)
+
+
+def test_ambiguous_names_resolve_to_unknown() -> None:
+    home = ExtractedPage(
+        final_url="https://portal.example/",
+        title="Welcome",
+        h1="Welcome",
+        page_type="home",
+        json_ld=[
+            {"@type": "Organization", "name": "Alpha Systems"},
+            {"@type": "Organization", "name": "Beta Holdings"},
+        ],
+    )
+    profile = build_profile([home], "portal.example")
+    assert profile.brand_name is None
+    assert profile.needs_confirmation is True
+
+
+def test_confirmed_name_overrides() -> None:
+    home = ExtractedPage(final_url="https://portal.example/", page_type="home")
+    profile = build_profile([home], "portal.example", confirmed_name="Alpha Systems")
+    assert profile.brand_name == "Alpha Systems"
+    assert profile.brand_confidence == 1.0
+    assert profile.needs_confirmation is False
+
+
+def test_services_and_products_with_evidence() -> None:
+    page = ExtractedPage(
+        final_url="https://x.example/",
+        title="X",
+        page_type="home",
+        json_ld=[{"@type": "Service", "name": "SEO Audit"}],
+        internal_links=[
+            Link(href="https://x.example/leistungen/beratung", text="Beratung"),
+            Link(href="https://x.example/produkte/widget", text="Widget"),
+        ],
+    )
+    profile = build_profile([page], "x.example")
+
+    assert profile.services == ["beratung", "seo audit"]
+    assert profile.products == ["widget"]
+    fields = _evidence_fields(profile)
+    assert "service" in fields
+    assert "product" in fields
+
+
+def test_profile_is_deterministic() -> None:
+    pages = [
+        ExtractedPage(
+            final_url="https://flowmetrics.example/",
+            title="FlowMetrics — Analytics",
+            h1="FlowMetrics",
+            page_type="home",
+            open_graph={"og:site_name": "FlowMetrics"},
+            json_ld=[{"@type": "Organization", "name": "FlowMetrics"}],
+        )
+    ]
+    a = build_profile(pages, "flowmetrics.example")
+    b = build_profile(pages, "flowmetrics.example")
+    assert a.profile_hash == b.profile_hash
+    assert a.brand_name == b.brand_name
+
+
+def test_local_business_fixture_evidence() -> None:
+    html = (FIXTURES / "local_business.html").read_text(encoding="utf-8")
+    page = extract_page(html, "https://mueller-solar.example/")
+    profile = build_profile([page], "mueller-solar.example")
+
+    assert profile.languages == ["de", "en"]
+    assert profile.countries == ["DE"]
+    assert profile.locations == ["Ulm"]
+    fields = _evidence_fields(profile)
+    assert {"language", "country", "location"} <= fields
+    # A lone homepage JSON-LD name without corroboration stays conservative.
+    assert profile.needs_confirmation is True
