@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Callable
 from dataclasses import dataclass
 from urllib.parse import urlsplit
@@ -11,7 +12,7 @@ from geo_worker.clusters import GeneratedCluster
 from geo_worker.coverage import CoverageReport
 from geo_worker.crawler import crawl
 from geo_worker.crawler.types import FetchFn, RenderFn
-from geo_worker.methodology import get_methodology
+from geo_worker.methodology import compute_methodology_hash, get_methodology
 from geo_worker.profile import BusinessProfile, build_profile
 from geo_worker.scoring import ReadinessResult
 from geo_worker.scoring.types import CrawlMeta
@@ -31,6 +32,8 @@ class ScanResult:
     readiness: ReadinessResult
     actions: list[Action]
     crawl_status: str
+    as_of: dt.datetime
+    methodology_hash: str
 
 
 def _limits_for(scan_type: str) -> CrawlLimits:
@@ -48,8 +51,15 @@ def run_pipeline(
     render_fn: RenderFn | None = None,
     should_cancel: Callable[[], bool] | None = None,
     confirmed_name: str | None = None,
+    as_of: dt.datetime | None = None,
 ) -> ScanResult:
-    """Run the full scan and return every engine output in memory."""
+    """Run the full scan and return every engine output in memory.
+
+    `as_of` is resolved once and pinned (reproducibility, V2 §11): the same
+    crawl + same as_of + same methodology hash yields the same result. Freshness
+    scoring (a later phase) reads this instead of calling datetime.now itself.
+    """
+    measurement_as_of = as_of or dt.datetime.now(dt.UTC)
     limits = _limits_for(scan_type)
     crawl_result = crawl(
         start_url,
@@ -65,6 +75,9 @@ def run_pipeline(
 
     # Dispatch by methodology version (fail-closed on unknown versions).
     methodology = get_methodology(methodology_version)
+    methodology_hash = compute_methodology_hash(
+        methodology_version, methodology.prompt_config_version
+    )
 
     profile = build_profile(pages, canonical_domain, confirmed_name)
     clusters = methodology.generate_clusters(
@@ -97,4 +110,6 @@ def run_pipeline(
         readiness=readiness,
         actions=actions,
         crawl_status=str(crawl_result.status),
+        as_of=measurement_as_of,
+        methodology_hash=methodology_hash,
     )

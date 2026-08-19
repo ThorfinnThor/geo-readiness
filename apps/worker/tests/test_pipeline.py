@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import datetime as dt
+import re
+
 from geo_worker.crawler.types import RawResponse
+from geo_worker.methodology import compute_methodology_hash
 from geo_worker.pipeline import build_report, run_pipeline
 
 PUBLIC = "93.184.216.34"
+FIXED_AS_OF = dt.datetime(2026, 8, 19, 12, 0, tzinfo=dt.UTC)
 
 ORG_JSONLD = (
     '<script type="application/ld+json">'
@@ -50,13 +55,14 @@ def _fetch(site):
     return fetch
 
 
-def _run():
+def _run(as_of: dt.datetime | None = None):
     site = _site()
     return run_pipeline(
         "https://ex.example/",
         scan_type="quick",
         fetch_fn=_fetch(site),
         resolver=lambda _h: [PUBLIC],
+        as_of=as_of,
     )
 
 
@@ -77,3 +83,18 @@ def test_report_is_deterministic() -> None:
     a = build_report(_run()).model_dump()
     b = build_report(_run()).model_dump()
     assert a == b
+
+
+def test_as_of_and_methodology_hash_are_pinned_and_reproducible() -> None:
+    # V2 §11: same crawl + same as_of + same methodology hash → same result.
+    a = _run(as_of=FIXED_AS_OF)
+    b = _run(as_of=FIXED_AS_OF)
+    assert a.as_of == FIXED_AS_OF == b.as_of
+    assert re.fullmatch(r"[0-9a-f]{64}", a.methodology_hash)
+    assert a.methodology_hash == compute_methodology_hash("geo-readiness-v1", "v1")
+    assert build_report(a).model_dump() == build_report(b).model_dump()
+
+
+def test_as_of_defaults_to_now_when_absent() -> None:
+    scan = _run()
+    assert scan.as_of.tzinfo is not None  # timezone-aware
