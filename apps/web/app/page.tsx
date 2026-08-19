@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ScanForm } from "@/components/scan/ScanForm";
 import { READINESS_DISCLAIMER } from "@/lib/readiness";
 
 export default function HomePage() {
@@ -15,11 +16,11 @@ export default function HomePage() {
         </p>
       </header>
 
-      {/* The live domain form (submitting a real scan) lands with the API
-          wiring; the preview/report UIs already render the report contract. */}
-      <div className="flex flex-wrap gap-3 rounded-xl border border-dashed border-neutral-300 p-6 text-sm dark:border-neutral-700">
-        <Link href="/scan/demo" className="font-medium underline">
-          See an example readiness preview →
+      <ScanForm />
+
+      <div className="text-sm">
+        <Link href="/scan/demo" className="text-neutral-500 underline">
+          Or see an example readiness preview →
         </Link>
       </div>
 
