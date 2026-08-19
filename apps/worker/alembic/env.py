@@ -12,7 +12,7 @@ from sqlalchemy.pool import NullPool
 from geo_worker.config import get_settings
 
 # Import models so their tables register on Base.metadata for autogenerate.
-from geo_worker.db import models  # noqa: F401
+from geo_worker.db import auth_models, models  # noqa: F401
 from geo_worker.db.base import Base
 
 config = context.config

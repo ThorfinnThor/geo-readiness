@@ -15,6 +15,13 @@ class UserStatus(enum.StrEnum):
     disabled = "disabled"
 
 
+class MemberRole(enum.StrEnum):
+    # Organization membership roles (E02 tenancy).
+    owner = "owner"
+    admin = "admin"
+    member = "member"
+
+
 class ProjectStatus(enum.StrEnum):
     active = "active"
     archived = "archived"
