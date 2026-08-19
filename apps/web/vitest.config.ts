@@ -13,5 +13,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include: ["tests/**/*.test.{ts,tsx}"],
+    // DB-backed integration tests run via `test:integration` (needs Postgres).
+    exclude: ["tests/integration/**", "node_modules/**"],
   },
 });
