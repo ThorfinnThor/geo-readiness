@@ -29,8 +29,9 @@ dist/
 .vscode/
 *.swp
 
-# Coverage / test output
-coverage/
+# Coverage / test output (root-level only — NOT the src/geo_worker/coverage pkg)
+/coverage/
+apps/*/coverage/
 .coverage
 htmlcov/
 
