@@ -35,6 +35,12 @@ src = ["src", "tests"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.isort]
+# Declare first-party explicitly: auto-detection is unstable across environments
+# (e.g. it can mis-group geo_worker.coverage because "coverage" is an installed
+# third-party package), causing local/CI ruff disagreement.
+known-first-party = ["geo_worker", "tests"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
