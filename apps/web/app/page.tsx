@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ScanForm } from "@/components/scan/ScanForm";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { RadialScore } from "@/components/report/shared";
 import { READINESS_DISCLAIMER } from "@/lib/readiness";
 
@@ -114,6 +115,7 @@ export default function HomePage() {
           <Link href="/scan/demo" className="hidden font-mono text-xs text-fg-subtle hover:text-fg sm:block">
             example →
           </Link>
+          <ThemeToggle />
         </nav>
       </header>
 

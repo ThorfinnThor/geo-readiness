@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { TopBar } from "@/components/TopBar";
+
 const STEPS = [
   "Checking domain",
   "Crawling key pages",
@@ -53,7 +55,9 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
   const failed = current === "failed";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6">
+    <>
+      <TopBar />
+      <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6">
       <div className="rounded-2xl border border-border bg-surface/50 p-6">
         <div className="mb-5 flex items-center gap-2 font-mono text-xs text-fg-subtle">
           <span
@@ -110,6 +114,7 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
           this usually takes under a minute
         </p>
       )}
-    </main>
+      </main>
+    </>
   );
 }

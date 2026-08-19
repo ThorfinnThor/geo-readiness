@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import type { ReportDocument } from "@/lib/report/types";
 import { ComponentCard, LevelChip, OverallHeader } from "@/components/report/shared";
+import { TopBar } from "@/components/TopBar";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -59,8 +60,10 @@ export function PreviewReport({
   const issueCount = report.actions.length;
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-10 sm:py-14">
-      <OverallHeader
+    <>
+      <TopBar />
+      <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-10 sm:py-14">
+        <OverallHeader
         domain={report.meta.canonical_domain}
         score={report.overall_score}
         level={report.overall_level}
@@ -155,6 +158,7 @@ export function PreviewReport({
       </section>
 
       <p className="border-t border-border pt-6 text-xs text-fg-subtle">{report.disclaimer}</p>
-    </main>
+      </main>
+    </>
   );
 }

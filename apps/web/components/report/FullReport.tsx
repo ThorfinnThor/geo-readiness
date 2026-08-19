@@ -7,6 +7,7 @@ import {
   OverallHeader,
   severityColor,
 } from "@/components/report/shared";
+import { TopBar } from "@/components/TopBar";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -27,8 +28,10 @@ function coverageColor(score: number): string {
 export function FullReport({ report }: { report: ReportDocument; reportId?: string }) {
   const p = report.business_profile;
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 print:py-4 sm:py-14">
-      <OverallHeader
+    <>
+      <TopBar />
+      <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 print:py-4 sm:py-14">
+        <OverallHeader
         domain={report.meta.canonical_domain}
         score={report.overall_score}
         level={report.overall_level}
@@ -143,7 +146,8 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
           <p className="text-xs">{report.disclaimer}</p>
         </div>
       </Section>
-    </main>
+      </main>
+    </>
   );
 }
 
