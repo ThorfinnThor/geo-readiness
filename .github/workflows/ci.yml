@@ -43,6 +43,22 @@ jobs:
     defaults:
       run:
         working-directory: apps/worker
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: geo
+          POSTGRES_PASSWORD: geo
+          POSTGRES_DB: geo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U geo -d geo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_ASYNC: postgresql+asyncpg://geo:geo@localhost:5432/geo
     steps:
       - uses: actions/checkout@v4
       - name: Install uv

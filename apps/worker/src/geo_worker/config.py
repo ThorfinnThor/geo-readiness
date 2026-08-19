@@ -17,9 +17,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="info")
     methodology_version: str = Field(default="geo-readiness-v1")
 
-    database_url_async: str = Field(
-        default="postgresql+asyncpg://geo:geo@localhost:5432/geo"
-    )
+    database_url_async: str = Field(default="postgresql+asyncpg://geo:geo@localhost:5432/geo")
 
     # Free Scan Economics Guard (§38) — all server-side.
     free_max_pages: int = Field(default=12)
