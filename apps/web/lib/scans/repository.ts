@@ -4,7 +4,10 @@ import { query } from "@/lib/db";
 import type { ReportDocument } from "@/lib/report/types";
 
 const ANON_EMAIL = "anonymous@geo.internal";
-const METHODOLOGY_VERSION = "geo-readiness-v1";
+// V2 is the default methodology as of the 2026-08-20 switch (calibrated against
+// the 35-site benchmark corpus). V1 stays reachable by explicit version + frozen
+// behind the worker's golden regression test.
+const METHODOLOGY_VERSION = "geo-readiness-v2";
 const QUICK_MAX_PAGES = 12;
 const QUICK_MAX_RENDERS = 2;
 

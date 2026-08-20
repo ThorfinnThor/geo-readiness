@@ -38,7 +38,14 @@ describe("FullReport (E13)", () => {
   });
 
   it("omits V2 stage sections for a V1 report", () => {
-    render(<FullReport report={exampleReport} reportId="demo" />);
+    // The default fixture is V2 now; synthesize a V1-shaped doc (no stages).
+    const v1: typeof exampleReport = {
+      ...exampleReport,
+      meta: { ...exampleReport.meta, methodology_version: "geo-readiness-v1" },
+      stages: [],
+      diagnostics: [],
+    };
+    render(<FullReport report={v1} reportId="demo" />);
     expect(screen.queryByText("Readiness stages")).toBeNull();
     expect(screen.queryByText("What's limiting each area")).toBeNull();
   });

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     app_env: str = Field(default="development")
     log_level: str = Field(default="info")
-    methodology_version: str = Field(default="geo-readiness-v1")
+    methodology_version: str = Field(default="geo-readiness-v2")
 
     database_url_async: str = Field(default="postgresql+asyncpg://geo:geo@localhost:5432/geo")
 

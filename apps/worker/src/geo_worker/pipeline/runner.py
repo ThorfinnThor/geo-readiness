@@ -45,7 +45,7 @@ def run_pipeline(
     start_url: str,
     *,
     scan_type: str = "quick",
-    methodology_version: str = "geo-readiness-v1",
+    methodology_version: str = "geo-readiness-v2",
     fetch_fn: FetchFn,
     resolver: Resolver = system_resolver,
     allow_raw_ip: bool = False,

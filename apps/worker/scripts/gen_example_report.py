@@ -67,6 +67,7 @@ def main() -> None:
     scan = run_pipeline(
         f"{BASE}/",
         scan_type="full",
+        methodology_version="geo-readiness-v2",  # the default as of the 2026-08-20 switch
         fetch_fn=fetch,
         resolver=lambda _h: [PUBLIC],
         as_of=AS_OF,

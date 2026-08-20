@@ -13,7 +13,7 @@ def test_package_version() -> None:
 
 def test_settings_defaults() -> None:
     settings = Settings()
-    assert settings.methodology_version == "geo-readiness-v1"
+    assert settings.methodology_version == "geo-readiness-v2"
     assert settings.free_max_pages == 12
     assert settings.free_max_render == 2
 

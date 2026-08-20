@@ -2,15 +2,15 @@
   "meta": {
     "canonical_domain": "brightsolar.example",
     "scan_type": "full",
-    "methodology_version": "geo-readiness-v1",
+    "methodology_version": "geo-readiness-v2",
     "pages_analyzed": 4,
     "clusters_evaluated": 8,
     "confidence_score": 60.65,
     "confidence_band": "Low",
-    "methodology_hash": "d2e1a06a80cd74b9ea763c71b51a40b1f0f737af694e432e7d426ce1ebe0236b",
+    "methodology_hash": "847c007e91d755059dd8352302ddd847442e7b2555b7b23549493cee4b4b3b4a",
     "as_of": "2026-01-01T00:00:00+00:00"
   },
-  "overall_score": 41.87,
+  "overall_score": 38.78,
   "overall_level": "Weak",
   "components": [
     {
@@ -28,13 +28,13 @@
     {
       "key": "prompt_coverage",
       "name": "Prompt Coverage",
-      "score": 75.4,
+      "score": 73.92,
       "level": "Good"
     },
     {
       "key": "sourceability",
       "name": "Sourceability",
-      "score": 22.5,
+      "score": 1.36,
       "level": "Weak"
     },
     {
@@ -46,7 +46,7 @@
     {
       "key": "evidence_trust",
       "name": "Evidence & Trust",
-      "score": 3.75,
+      "score": 7.5,
       "level": "Weak"
     },
     {
@@ -57,12 +57,12 @@
     }
   ],
   "strengths": [
-    "Prompt Coverage is strong (75.4/100)"
+    "Prompt Coverage is strong (73.92/100)"
   ],
   "gaps": [
-    "Evidence & Trust needs work (3.75/100)",
-    "Structured Data needs work (12.5/100)",
-    "Sourceability needs work (22.5/100)"
+    "Sourceability needs work (1.36/100)",
+    "Evidence & Trust needs work (7.5/100)",
+    "Structured Data needs work (12.5/100)"
   ],
   "business_profile": {
     "brand_name": "BrightSolar",
@@ -96,6 +96,21 @@
       ]
     },
     {
+      "rule_id": "RDY-004A",
+      "title": "Add concrete quantified information",
+      "category": "sourceability",
+      "severity": "high",
+      "priority_score": 0.1496,
+      "problem": "Pages lack specific figures where they would support the topic.",
+      "recommendation": "Add concrete prices, percentages, specifications, measurements, counts or outcome figures where they genuinely support the page.",
+      "expected_signal": "Higher quantified-information density on relevant pages.",
+      "how_to_verify": "Re-scan: quantified_information improves.",
+      "evidence": [
+        "quantified_information_strength=0.0",
+        "sourceability=1.36"
+      ]
+    },
+    {
       "rule_id": "RDY-001",
       "title": "Clarify business identity",
       "category": "entity",
@@ -112,33 +127,78 @@
       ]
     },
     {
+      "rule_id": "RDY-004B",
+      "title": "Attribute claims to identifiable sources",
+      "category": "sourceability",
+      "severity": "high",
+      "priority_score": 0.1396,
+      "problem": "Externally verifiable claims are not attributed to sources.",
+      "recommendation": "Attribute important externally verifiable claims to identifiable sources and link the supporting material where appropriate.",
+      "expected_signal": "Higher evidence attribution from named/linked sources.",
+      "how_to_verify": "Re-scan: evidence_attribution improves.",
+      "evidence": [
+        "evidence_attribution_strength=0.0",
+        "sourceability=1.36"
+      ]
+    },
+    {
+      "rule_id": "RDY-004C",
+      "title": "Present content in extractable structures",
+      "category": "sourceability",
+      "severity": "high",
+      "priority_score": 0.1396,
+      "problem": "Specifications, comparisons and processes are not in extractable structures.",
+      "recommendation": "Present genuine specifications, comparisons and processes using semantic tables, lists or definition structures where they fit.",
+      "expected_signal": "Higher semantic extractability from real structures.",
+      "how_to_verify": "Re-scan: semantic_extractability improves.",
+      "evidence": [
+        "semantic_extractability_strength=0.0",
+        "sourceability=1.36"
+      ]
+    },
+    {
+      "rule_id": "RDY-004D",
+      "title": "Add concise direct answers",
+      "category": "sourceability",
+      "severity": "high",
+      "priority_score": 0.1396,
+      "problem": "High-priority questions lack concise, extractable answers.",
+      "recommendation": "Add concise answer passages for high-priority customer questions. A dedicated FAQ page is not required.",
+      "expected_signal": "More direct-answer blocks for common questions.",
+      "how_to_verify": "Re-scan: direct_answerability improves.",
+      "evidence": [
+        "direct_answerability_strength=0.0",
+        "sourceability=1.36"
+      ]
+    },
+    {
       "rule_id": "RDY-008",
       "title": "Add trust and transparency evidence",
       "category": "trust",
       "severity": "high",
-      "priority_score": 0.1362,
+      "priority_score": 0.1309,
       "problem": "Trust signals (identity, references, policies) are thin.",
       "recommendation": "Add about, contact/imprint, references/case studies, and policy pages.",
       "expected_signal": "Higher Evidence & Trust score.",
       "how_to_verify": "Re-scan: transparency and reference signals are detected.",
       "evidence": [
-        "evidence_trust_score=3.75",
+        "evidence_trust_score=7.5",
         "missing_page_types=['about', 'contact', 'legal', 'case_study']"
       ]
     },
     {
-      "rule_id": "RDY-004",
-      "title": "Make content more extractable and specific",
+      "rule_id": "RDY-012",
+      "title": "Add accurate freshness metadata",
       "category": "sourceability",
-      "severity": "high",
-      "priority_score": 0.1097,
-      "problem": "Pages lack specific, attributable, first-party facts.",
-      "recommendation": "Add concrete facts, lists/specifications, dates, and clear Q&A answers.",
-      "expected_signal": "Higher Sourceability from specific, structured content.",
-      "how_to_verify": "Re-scan: Sourceability sub-scores improve.",
+      "severity": "medium",
+      "priority_score": 0.0997,
+      "problem": "Time-sensitive content lacks accurate publication/update metadata.",
+      "recommendation": "Add accurate publication/update metadata and visibly maintain time-sensitive content. Never change timestamps merely to look fresh.",
+      "expected_signal": "Valid, recent dates on freshness-relevant pages.",
+      "how_to_verify": "Re-scan: declared_freshness improves.",
       "evidence": [
-        "sourceability_score=22.5",
-        "weak_areas=['case_studies_examples', 'clear_answers_faq', 'dates_freshness', 'named_methodology_source', 'org_author_attribution', 'original_first_party', 'specific_factual_statements', 'tables_lists_spec_structure']"
+        "declared_freshness_strength=0.0",
+        "sourceability=1.36"
       ]
     },
     {
@@ -173,11 +233,11 @@
   ],
   "clusters": [
     {
-      "cluster_key": "3f61ece69c369a2b8e8672ada68dd36117b5a67dc9f96669e69e7ae68ffd6909",
+      "cluster_key": "c1508e506e8888de59aa05aca9d117a40299e43eedc24e54e3918dada07ed779",
       "intent": "recommendation",
       "label": "battery storage",
       "priority": 0.84,
-      "coverage_score": 80.0,
+      "coverage_score": 79.17,
       "sample_prompt": "Which provider for battery storage is recommended?",
       "requirements": [
         {
@@ -199,11 +259,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "9fc3279f7b2521c688fd2304b1629afb4218b07532a900737ae1e654baa1aa23",
+      "cluster_key": "f8b06894f3998972289b8fea1d33231aaee7bff9fa7d8aeb8eca3476a85308f4",
       "intent": "recommendation",
       "label": "solar panels",
       "priority": 0.79,
-      "coverage_score": 80.0,
+      "coverage_score": 79.18,
       "sample_prompt": "Which provider for solar panels is recommended?",
       "requirements": [
         {
@@ -225,11 +285,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "8be83d4c245ceb83d2e0de2fe257c683f92b327261d56e7cfb85490c1db4a015",
+      "cluster_key": "4a52615114d2637a6f6a4177ccf8b278f70da96c04f72e9f0de9299affd3cf9e",
       "intent": "best_of",
       "label": "battery storage",
       "priority": 0.7575,
-      "coverage_score": 79.5,
+      "coverage_score": 79.78,
       "sample_prompt": "What are the best providers for battery storage?",
       "requirements": [
         {
@@ -251,11 +311,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "0e1be9691f65213009139951ef02b167fdabe94ff229bd872b745a138d4fa961",
+      "cluster_key": "3b23b62fbb605ffee27d3b8409077f8079056cf2dfb938d25c13f3a06a6cc96a",
       "intent": "category_discovery",
       "label": "solar panels",
       "priority": 0.745,
-      "coverage_score": 81.5,
+      "coverage_score": 73.52,
       "sample_prompt": "Which providers are there for solar panels?",
       "requirements": [
         {
@@ -277,11 +337,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "c33c3a2d5ee9d4be42e3a6871b314da40df2dda3f958567de913f61dd84df029",
+      "cluster_key": "af5229757663ade543775dfa6392f32d90fe8977f9260c8edfc28f4dc9679d7a",
       "intent": "combined_service",
       "label": "battery storage",
       "priority": 0.725,
-      "coverage_score": 100.0,
+      "coverage_score": 90.3,
       "sample_prompt": "Which providers offer battery storage and solar panels from a single source?",
       "requirements": [
         {
@@ -303,11 +363,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "e3c726abcc47e87bd39bf084ae5e228ca1220cfbc95f18ae5563286948582f3a",
+      "cluster_key": "6e028bc9e88519b53fcd1876aea2f257ffe09554154cde492a345cd9d9cae36c",
       "intent": "category_discovery",
       "label": "battery storage",
       "priority": 0.695,
-      "coverage_score": 81.5,
+      "coverage_score": 73.48,
       "sample_prompt": "Which providers are there for battery storage?",
       "requirements": [
         {
@@ -329,11 +389,11 @@
       "missing_requirements": []
     },
     {
-      "cluster_key": "0862dab951ef4b312ee51b8893fd00bec01d47ba0a126ca0d8e4e783c5d9a801",
+      "cluster_key": "e3d37a32c82ff3b825e684d403bc94fbb47bb2afe2a7a44246c0ee850f63bfcd",
       "intent": "trust",
       "label": "battery storage",
       "priority": 0.6625,
-      "coverage_score": 38.0,
+      "coverage_score": 49.96,
       "sample_prompt": "How do you recognize a trustworthy provider for battery storage?",
       "requirements": [
         {
@@ -357,11 +417,11 @@
       ]
     },
     {
-      "cluster_key": "13cdf7f92b001bb64521d9100ca7dcafbeb25c1ec554be77ae43b1580bbcc50b",
+      "cluster_key": "bdf20b7a96c013ffa7b343c0a6a2fdb585f76ef3e5d1e86c7d5cf86621dc0f9f",
       "intent": "branded",
       "label": "BrightSolar",
       "priority": 0.49,
-      "coverage_score": 50.0,
+      "coverage_score": 56.82,
       "sample_prompt": "What does BrightSolar offer?",
       "requirements": [
         {
@@ -379,6 +439,38 @@
     }
   ],
   "disclaimer": "This audit measures deterministic website readiness for retrieval, citation and answer extraction using research-supported and heuristic proxies. It does not measure or guarantee rankings, citations, traffic or visibility in ChatGPT, Gemini, Perplexity or other AI platforms.",
-  "stages": [],
-  "diagnostics": []
+  "stages": [
+    {
+      "key": "retrieval_readiness",
+      "name": "Retrieval Readiness",
+      "score": 52.66,
+      "level": "Needs improvement",
+      "explanation": "Measures whether important pages are technically accessible, clearly associated with the business and aligned with likely information needs."
+    },
+    {
+      "key": "citation_readiness",
+      "name": "Citation Readiness",
+      "score": 23.69,
+      "level": "Weak",
+      "explanation": "Measures whether relevant pages contain specific, attributable and trustworthy evidence suitable for use as a source."
+    },
+    {
+      "key": "answer_extractability",
+      "name": "Answer Extractability",
+      "score": 28.09,
+      "level": "Weak",
+      "explanation": "Measures whether important information is presented in forms that can be cleanly extracted into answers, such as concise explanations, specifications, comparisons and procedures."
+    }
+  ],
+  "diagnostics": [
+    {
+      "component": "sourceability",
+      "strongest_signals": [],
+      "limiting_signals": [
+        "quantified_information",
+        "evidence_attribution"
+      ],
+      "explanation": "Sourceability is primarily limited by specific quantified information, source attribution."
+    }
+  ]
 }

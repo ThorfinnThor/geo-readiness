@@ -55,14 +55,16 @@ def _fetch(site):
     return fetch
 
 
-def _run(as_of: dt.datetime | None = None):
+def _run(as_of: dt.datetime | None = None, methodology_version: str | None = None):
     site = _site()
+    kwargs = {} if methodology_version is None else {"methodology_version": methodology_version}
     return run_pipeline(
         "https://ex.example/",
         scan_type="quick",
         fetch_fn=_fetch(site),
         resolver=lambda _h: [PUBLIC],
         as_of=as_of,
+        **kwargs,
     )
 
 
@@ -87,12 +89,21 @@ def test_report_is_deterministic() -> None:
 
 def test_as_of_and_methodology_hash_are_pinned_and_reproducible() -> None:
     # V2 §11: same crawl + same as_of + same methodology hash → same result.
-    a = _run(as_of=FIXED_AS_OF)
-    b = _run(as_of=FIXED_AS_OF)
+    # Pinned to v1 so the expected hash is a fixed literal, independent of the
+    # default methodology (which is v2 as of the 2026-08-20 switch).
+    a = _run(as_of=FIXED_AS_OF, methodology_version="geo-readiness-v1")
+    b = _run(as_of=FIXED_AS_OF, methodology_version="geo-readiness-v1")
     assert a.as_of == FIXED_AS_OF == b.as_of
     assert re.fullmatch(r"[0-9a-f]{64}", a.methodology_hash)
     assert a.methodology_hash == compute_methodology_hash("geo-readiness-v1", "v1")
     assert build_report(a).model_dump() == build_report(b).model_dump()
+
+
+def test_default_methodology_is_v2() -> None:
+    # The 2026-08-20 switch: an unqualified scan now runs V2 (stage scores present).
+    scan = _run(as_of=FIXED_AS_OF)
+    assert scan.methodology_version == "geo-readiness-v2"
+    assert scan.readiness.retrieval_readiness_score is not None
 
 
 def test_as_of_defaults_to_now_when_absent() -> None:
