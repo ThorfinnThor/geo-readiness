@@ -27,18 +27,28 @@ jobs:
       run:
         working-directory: apps/worker
     steps:
+      # Before the DB secret is configured (e.g. scheduled runs pre-deploy),
+      # no-op cleanly instead of failing red.
+      - name: Skip if worker DB not configured
+        if: ${{ env.DATABASE_URL_ASYNC == '' }}
+        run: echo "DATABASE_URL_ASYNC not set — worker not configured yet; skipping."
       - uses: actions/checkout@v4
+        if: ${{ env.DATABASE_URL_ASYNC != '' }}
       - name: Install uv
+        if: ${{ env.DATABASE_URL_ASYNC != '' }}
         uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
           enable-cache: true
           cache-dependency-glob: apps/worker/uv.lock
       - name: Sync (no dev)
+        if: ${{ env.DATABASE_URL_ASYNC != '' }}
         run: uv sync --frozen --no-dev
       - name: Migrate to head
+        if: ${{ env.DATABASE_URL_ASYNC != '' }}
         run: uv run alembic upgrade head
       - name: Recover stranded jobs + drain the queue
+        if: ${{ env.DATABASE_URL_ASYNC != '' }}
         run: uv run python scripts/process_jobs.py
     env:
       # Supabase session pooler (5432) — set in repo Settings → Secrets → Actions.
