@@ -2,7 +2,38 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+import datetime as dt
+import enum
+
+from pydantic import BaseModel, Field
+
+
+class SignalStatus(enum.StrEnum):
+    """Applicability of a signal (§65)."""
+
+    observed = "observed"
+    missing = "missing"
+    not_applicable = "not_applicable"
+    insufficient_evidence = "insufficient_evidence"
+
+
+class SignalAssessment(BaseModel):
+    key: str
+    status: SignalStatus
+    weight: int
+    strength: float | None  # None when not applicable / insufficient
+    explanation: str = ""
+
+
+class ComponentDiagnostic(BaseModel):
+    """Deterministic 'why not 100?' explanation for a component (§75–76)."""
+
+    component: str
+    strongest_signals: list[str] = Field(default_factory=list)
+    limiting_signals: list[str] = Field(default_factory=list)
+    assessed_weight_ratio: float = 1.0
+    explanation: str = ""
+
 
 # Overall blend weights (§16); must sum to 1.0.
 COMPONENT_WEIGHTS: dict[str, float] = {
@@ -62,3 +93,10 @@ class ReadinessResult(BaseModel):
     confidence_score: float
     components: list[ComponentScore] = []
     confidence_components: list[ConfidenceComponent] = []
+    # V2 additive (§74); V1 leaves these None/empty.
+    retrieval_readiness_score: float | None = None
+    citation_readiness_score: float | None = None
+    answer_extractability_score: float | None = None
+    methodology_hash: str | None = None
+    as_of: dt.datetime | None = None
+    component_diagnostics: list[ComponentDiagnostic] = Field(default_factory=list)

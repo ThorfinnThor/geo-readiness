@@ -314,6 +314,7 @@ def compute_readiness(
     coverage: CoverageReport,
     crawl_meta: CrawlMeta,
     methodology_version: str,
+    as_of: object = None,  # accepted for a uniform dispatch signature; V1 ignores it
 ) -> ReadinessResult:
     """Compute the full readiness snapshot (§16–24). Confidence is separate."""
     idx = _ScoreIndex.build(pages, profile)

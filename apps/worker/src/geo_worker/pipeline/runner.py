@@ -100,7 +100,7 @@ def run_pipeline(
         valid_response_ratio=(fetched / (fetched + errors)) if (fetched + errors) else 1.0,
     )
     readiness = methodology.compute_readiness(
-        pages, profile, coverage, crawl_meta, methodology_version
+        pages, profile, coverage, crawl_meta, methodology_version, as_of=measurement_as_of
     )
     actions = methodology.compute_actions(readiness, profile, coverage, clusters, pages)
 
