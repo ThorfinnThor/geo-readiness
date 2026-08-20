@@ -1,0 +1,16 @@
+# Build context is the repo root; keep the worker image lean.
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/node_modules
+**/.next
+**/.git
+**/.env
+**/.env.*
+apps/worker/benchmark_out
+apps/web
+docs
+*.md

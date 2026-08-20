@@ -9,8 +9,8 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from geo_worker.db.enums import JobStatus, JobType
-from geo_worker.db.models import Job
+from geo_worker.db.enums import JobStatus, JobType, ScanStatus
+from geo_worker.db.models import Job, Scan
 
 DEFAULT_LEASE_SECONDS = 300
 
@@ -65,6 +65,56 @@ async def lease_next_job(
     job.lease_until = now + dt.timedelta(seconds=lease_seconds)
     await session.flush()
     return job
+
+
+async def recover_stale_jobs(session: AsyncSession, *, batch: int = 20) -> tuple[int, int]:
+    """Reclaim jobs whose worker died mid-run (§E16 lease recovery).
+
+    A job left ``running`` with an expired ``lease_until`` means the worker
+    crashed or was killed (e.g. a deploy) before finishing. Requeue it until
+    ``max_attempts`` is reached, then dead-letter it and fail its scan so the
+    UI stops waiting. Uses SKIP LOCKED so it is safe to run concurrently on
+    every worker. Returns ``(requeued, dead)`` counts.
+    """
+    stmt = (
+        select(Job)
+        .where(Job.status == JobStatus.running, Job.lease_until < func.now())
+        .order_by(Job.lease_until)
+        .limit(batch)
+        .with_for_update(skip_locked=True)
+    )
+    jobs = (await session.execute(stmt)).scalars().all()
+    now = dt.datetime.now(dt.UTC)
+    requeued = dead = 0
+    for job in jobs:
+        if job.attempt >= job.max_attempts:
+            job.status = JobStatus.dead
+            job.error_code = "lease_expired"
+            job.completed_at = now
+            await _fail_scan(session, job, "lease_expired")
+            dead += 1
+        else:
+            # Return to the ready pool; attempt was already incremented at lease.
+            job.status = JobStatus.queued
+            job.worker_id = None
+            job.lease_until = None
+            job.started_at = None
+            job.available_at = now
+            requeued += 1
+    await session.flush()
+    return requeued, dead
+
+
+async def _fail_scan(session: AsyncSession, job: Job, error_code: str) -> None:
+    scan_id = (job.payload_json or {}).get("scan_id")
+    if scan_id is None:
+        return
+    scan = (
+        await session.execute(select(Scan).where(Scan.id == uuid.UUID(str(scan_id))))
+    ).scalar_one_or_none()
+    if scan is not None and scan.status not in (ScanStatus.completed, ScanStatus.failed):
+        scan.status = ScanStatus.failed
+        scan.error_code = error_code
 
 
 async def mark_succeeded(session: AsyncSession, job: Job) -> None:
