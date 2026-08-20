@@ -57,6 +57,11 @@ async def persist_scan_result(
             technical_access_score=r.technical_access_score,
             confidence_score=r.confidence_score,
             methodology_version=r.methodology_version,
+            retrieval_readiness_score=r.retrieval_readiness_score,
+            citation_readiness_score=r.citation_readiness_score,
+            answer_extractability_score=r.answer_extractability_score,
+            methodology_hash=scan.methodology_hash,
+            measurement_as_of=scan.as_of,
         )
     )
 

@@ -271,6 +271,12 @@ class ReadinessSnapshot(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     technical_access_score: Mapped[float | None] = mapped_column(Score)
     confidence_score: Mapped[float | None] = mapped_column(Score)
     methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    # V2 additive (§95). Nullable; historical V1 rows leave these NULL.
+    retrieval_readiness_score: Mapped[float | None] = mapped_column(Score)
+    citation_readiness_score: Mapped[float | None] = mapped_column(Score)
+    answer_extractability_score: Mapped[float | None] = mapped_column(Score)
+    methodology_hash: Mapped[str | None] = mapped_column(String(64))
+    measurement_as_of: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Action(UUIDPrimaryKeyMixin, TimestampMixin, Base):

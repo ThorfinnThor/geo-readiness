@@ -48,7 +48,11 @@ def _fetch(site):
     return fetch
 
 
-async def _seed_scan(session: AsyncSession, scan_type: ScanType = ScanType.quick) -> uuid.UUID:
+async def _seed_scan(
+    session: AsyncSession,
+    scan_type: ScanType = ScanType.quick,
+    methodology_version: str = "geo-readiness-v1",
+) -> uuid.UUID:
     user = User(email=f"{uuid.uuid4()}@example.com")
     session.add(user)
     await session.flush()
@@ -61,7 +65,7 @@ async def _seed_scan(session: AsyncSession, scan_type: ScanType = ScanType.quick
     scan = Scan(
         project_id=project.id,
         scan_type=scan_type,
-        methodology_version="geo-readiness-v1",
+        methodology_version=methodology_version,
         max_pages=12,
         max_browser_renders=2,
     )
@@ -108,6 +112,22 @@ async def test_process_one_runs_pipeline_and_persists(session: AsyncSession) -> 
     report = (await session.execute(select(Report).where(Report.scan_id == scan_id))).scalar_one()
     assert report.content_json["overall_score"] == float(snapshot.overall_score)
     assert report.content_json["meta"]["canonical_domain"] == "ex.example"
+
+
+async def test_v2_snapshot_fields_persisted(session: AsyncSession) -> None:
+    scan_id = await _seed_scan(session, ScanType.full, methodology_version="geo-readiness-v2")
+    await enqueue_job(session, JobType.crawl_project, {"scan_id": str(scan_id)}, str(scan_id))
+    await process_one(session, "w2", fetch_fn=_fetch(_site()), resolver=lambda _h: [PUBLIC])
+
+    snap = (
+        await session.execute(select(ReadinessSnapshot).where(ReadinessSnapshot.scan_id == scan_id))
+    ).scalar_one()
+    assert snap.methodology_version == "geo-readiness-v2"
+    assert snap.retrieval_readiness_score is not None
+    assert snap.citation_readiness_score is not None
+    assert snap.answer_extractability_score is not None
+    assert snap.methodology_hash is not None
+    assert snap.measurement_as_of is not None
 
 
 async def test_process_one_idle_returns_none(session: AsyncSession) -> None:
