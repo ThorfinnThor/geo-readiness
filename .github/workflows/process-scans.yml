@@ -1,14 +1,16 @@
 name: Process scans
 
-# Staging worker (ADR-0003 alternative): drain the Postgres scan queue on demand.
-# Triggered by the web app the moment a scan is enqueued (repository_dispatch),
-# manually, and on a safety-net schedule for stragglers + lease recovery.
+# Optional/backup worker (ADR-0003): drain the Postgres scan queue via Actions.
+# The primary worker is the always-on Railway container; this workflow stays as a
+# free fallback / manual drainer. It runs ONLY when explicitly triggered — the
+# web app's repository_dispatch (if GITHUB_DISPATCH_TOKEN is set) or a manual run
+# — so it never fails on a schedule when the DB secret isn't configured.
+# To use Actions as the *primary* worker instead, re-add a `schedule:` cron here
+# and set the DATABASE_URL_ASYNC repo secret (see docs/deploy.md).
 on:
   repository_dispatch:
     types: [scan-enqueued]
   workflow_dispatch: {}
-  schedule:
-    - cron: "*/15 * * * *" # backstop; per-scan latency comes from the dispatch
 
 # Single-flight: overlapping submissions coalesce into one draining run + one
 # queued run, so a burst never spawns a pile of runners. Never cancel a run
@@ -30,6 +32,8 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: apps/worker/uv.lock
       - name: Sync (no dev)
         run: uv sync --frozen --no-dev
       - name: Migrate to head

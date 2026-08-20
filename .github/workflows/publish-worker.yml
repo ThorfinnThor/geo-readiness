@@ -1,0 +1,46 @@
+name: Publish worker image
+
+# Build the worker container and push it to GitHub Container Registry (free for
+# public repos). A free always-on VM (Oracle Cloud / GCP e2-micro) then just runs
+# `docker run … ghcr.io/<owner>/geo-readiness-worker:latest` — no build on the VM.
+# Multi-arch so it runs on both ARM (Oracle Ampere) and x86 (GCP/Oracle AMD).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/worker/**"
+      - "configs/**"
+      - ".github/workflows/publish-worker.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-push:
+    name: Build + push (amd64, arm64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lowercase image name
+        id: img
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/geo-readiness-worker" >>"$GITHUB_OUTPUT"
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/worker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ steps.img.outputs.name }}:latest
+            ${{ steps.img.outputs.name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
