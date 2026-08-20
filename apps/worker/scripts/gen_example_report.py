@@ -10,6 +10,7 @@ issues. Re-run after report shape changes:
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 from pathlib import Path
 
@@ -17,6 +18,8 @@ from geo_worker.crawler.types import RawResponse
 from geo_worker.pipeline import build_report, run_pipeline
 
 PUBLIC = "93.184.216.34"
+# Pinned so the fixture is stable across regenerations (meta.as_of is not "now").
+AS_OF = dt.datetime(2026, 1, 1, tzinfo=dt.UTC)
 BASE = "https://brightsolar.example"
 LEAD = "BrightSolar installs rooftop solar panels and home battery storage for "
 BODY = "customers across Central Texas. Our team handles design, permitting and install. "
@@ -66,6 +69,7 @@ def main() -> None:
         scan_type="full",
         fetch_fn=fetch,
         resolver=lambda _h: [PUBLIC],
+        as_of=AS_OF,
     )
     report = build_report(scan)
 

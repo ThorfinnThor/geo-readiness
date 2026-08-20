@@ -6,7 +6,9 @@
     "pages_analyzed": 4,
     "clusters_evaluated": 8,
     "confidence_score": 60.65,
-    "confidence_band": "Low"
+    "confidence_band": "Low",
+    "methodology_hash": "d2e1a06a80cd74b9ea763c71b51a40b1f0f737af694e432e7d426ce1ebe0236b",
+    "as_of": "2026-01-01T00:00:00+00:00"
   },
   "overall_score": 41.87,
   "overall_level": "Weak",
@@ -376,5 +378,7 @@
       "missing_requirements": []
     }
   ],
-  "disclaimer": "Measures website readiness and sourceability. Does not measure actual rankings or visibility in ChatGPT or other AI platforms."
+  "disclaimer": "This audit measures deterministic website readiness for retrieval, citation and answer extraction using research-supported and heuristic proxies. It does not measure or guarantee rankings, citations, traffic or visibility in ChatGPT, Gemini, Perplexity or other AI platforms.",
+  "stages": [],
+  "diagnostics": []
 }

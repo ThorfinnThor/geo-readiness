@@ -10,7 +10,7 @@ describe("PreviewReport (E12)", () => {
     render(<PreviewReport report={exampleReport} reportId="demo" />);
     expect(screen.getByText(String(Math.round(exampleReport.overall_score)))).toBeDefined();
     expect(screen.getAllByText("Entity Clarity").length).toBeGreaterThan(0);
-    expect(screen.getByText(/does not measure actual/i)).toBeDefined();
+    expect(screen.getByText(/does not measure or guarantee/i)).toBeDefined();
   });
 
   it("locks the fixes and shows a CTA with the issue count", () => {

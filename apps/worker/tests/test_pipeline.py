@@ -80,8 +80,8 @@ def test_pipeline_produces_scored_report() -> None:
 
 
 def test_report_is_deterministic() -> None:
-    a = build_report(_run()).model_dump()
-    b = build_report(_run()).model_dump()
+    a = build_report(_run(FIXED_AS_OF)).model_dump()
+    b = build_report(_run(FIXED_AS_OF)).model_dump()
     assert a == b
 
 

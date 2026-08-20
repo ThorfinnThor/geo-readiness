@@ -57,6 +57,25 @@ export interface ReportMeta {
   clusters_evaluated: number;
   confidence_score: number;
   confidence_band: string;
+  // V2 additive; null/undefined for V1.
+  methodology_hash?: string | null;
+  as_of?: string | null;
+}
+
+// V2 additive (§90–92). Empty for V1 reports.
+export interface ReportStage {
+  key: string;
+  name: string;
+  score: number;
+  level: string;
+  explanation: string;
+}
+
+export interface ReportDiagnostic {
+  component: string;
+  strongest_signals: string[];
+  limiting_signals: string[];
+  explanation: string;
 }
 
 export interface ReportDocument {
@@ -70,4 +89,7 @@ export interface ReportDocument {
   actions: ReportAction[];
   clusters: ReportCluster[];
   disclaimer: string;
+  // V2 additive; default to [] when absent.
+  stages?: ReportStage[];
+  diagnostics?: ReportDiagnostic[];
 }

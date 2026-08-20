@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from geo_worker.methodology.v2.stages import STAGE_EXPLANATIONS
+
 from .runner import ScanResult
 
 _COMPONENT_NAMES: dict[str, str] = {
@@ -16,9 +18,30 @@ _COMPONENT_NAMES: dict[str, str] = {
     "technical_access": "Technical Accessibility",
 }
 
+_STAGE_NAMES: dict[str, str] = {
+    "retrieval_readiness": "Retrieval Readiness",
+    "citation_readiness": "Citation Readiness",
+    "answer_extractability": "Answer Extractability",
+}
+
+_SIGNAL_LABELS: dict[str, str] = {
+    "quantified_information": "specific quantified information",
+    "evidence_attribution": "source attribution",
+    "semantic_extractability": "extractable structure",
+    "direct_answerability": "direct answers",
+    "declared_freshness": "freshness signals",
+    "author_responsibility": "clear authorship",
+    "first_party_evidence_depth": "first-party evidence depth",
+    "definition_comparison_procedure": "definitions/comparisons/procedures",
+    "stable_topic_identity": "stable topic identity",
+}
+
+# §94 — the honest, provider-neutral disclaimer.
 DISCLAIMER = (
-    "Measures website readiness and sourceability. Does not measure actual "
-    "rankings or visibility in ChatGPT or other AI platforms."
+    "This audit measures deterministic website readiness for retrieval, citation "
+    "and answer extraction using research-supported and heuristic proxies. It does "
+    "not measure or guarantee rankings, citations, traffic or visibility in "
+    "ChatGPT, Gemini, Perplexity or other AI platforms."
 )
 
 
@@ -98,6 +121,24 @@ class ReportMeta(BaseModel):
     clusters_evaluated: int
     confidence_score: float
     confidence_band: str
+    # V2 additive (§89); V1 leaves these null.
+    methodology_hash: str | None = None
+    as_of: str | None = None
+
+
+class ReportStage(BaseModel):
+    key: str
+    name: str
+    score: float
+    level: str
+    explanation: str
+
+
+class ReportDiagnostic(BaseModel):
+    component: str
+    strongest_signals: list[str] = []
+    limiting_signals: list[str] = []
+    explanation: str = ""
 
 
 class ReportDocument(BaseModel):
@@ -111,6 +152,52 @@ class ReportDocument(BaseModel):
     actions: list[ReportAction]
     clusters: list[ReportCluster]
     disclaimer: str = DISCLAIMER
+    # V2 additive (§90–92); empty for V1.
+    stages: list[ReportStage] = []
+    diagnostics: list[ReportDiagnostic] = []
+
+
+def _build_stages(r) -> list[ReportStage]:
+    scores = {
+        "retrieval_readiness": r.retrieval_readiness_score,
+        "citation_readiness": r.citation_readiness_score,
+        "answer_extractability": r.answer_extractability_score,
+    }
+    stages: list[ReportStage] = []
+    for key, name in _STAGE_NAMES.items():
+        value = scores[key]
+        if value is None:
+            continue
+        stages.append(
+            ReportStage(
+                key=key,
+                name=name,
+                score=value,
+                level=score_level(value),
+                explanation=STAGE_EXPLANATIONS[key],
+            )
+        )
+    return stages
+
+
+def _build_diagnostics(r) -> list[ReportDiagnostic]:
+    out: list[ReportDiagnostic] = []
+    for d in r.component_diagnostics:
+        limiting = ", ".join(_SIGNAL_LABELS.get(s, s) for s in d.limiting_signals)
+        explanation = (
+            f"{d.component.replace('_', ' ').title()} is primarily limited by {limiting}."
+            if limiting
+            else ""
+        )
+        out.append(
+            ReportDiagnostic(
+                component=d.component,
+                strongest_signals=d.strongest_signals,
+                limiting_signals=d.limiting_signals,
+                explanation=explanation,
+            )
+        )
+    return out
 
 
 def build_report(scan: ScanResult) -> ReportDocument:
@@ -185,6 +272,8 @@ def build_report(scan: ScanResult) -> ReportDocument:
         clusters_evaluated=len(scan.clusters),
         confidence_score=r.confidence_score,
         confidence_band=confidence_band(r.confidence_score),
+        methodology_hash=scan.methodology_hash,
+        as_of=scan.as_of.isoformat() if scan.as_of else None,
     )
 
     return ReportDocument(
@@ -197,4 +286,6 @@ def build_report(scan: ScanResult) -> ReportDocument:
         business_profile=profile,
         actions=actions,
         clusters=clusters,
+        stages=_build_stages(r),
+        diagnostics=_build_diagnostics(r),
     )

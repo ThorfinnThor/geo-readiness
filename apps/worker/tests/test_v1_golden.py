@@ -6,6 +6,7 @@ behavior drifted — investigate before touching the golden file.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 from pathlib import Path
 
@@ -14,6 +15,8 @@ from geo_worker.pipeline import build_report, run_pipeline
 
 GOLDEN = Path(__file__).parent / "golden" / "v1_report.json"
 PUBLIC = "93.184.216.34"
+# Pinned so the report envelope (meta.as_of) is deterministic.
+FIXED_AS_OF = dt.datetime(2026, 1, 1, tzinfo=dt.UTC)
 LONG = "We install rooftop solar and home battery storage with clear specs. " * 10
 ORG = (
     '<script type="application/ld+json">'
@@ -60,6 +63,7 @@ def build_v1_report_dict() -> dict:
         methodology_version="geo-readiness-v1",
         fetch_fn=fetch,
         resolver=lambda _h: [PUBLIC],
+        as_of=FIXED_AS_OF,
     )
     return build_report(scan).model_dump()
 
