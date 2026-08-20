@@ -1,5 +1,5 @@
 // Presentational primitives for the report dashboard.
-import type { ReportComponent } from "@/lib/report/types";
+import type { ReportComponent, ReportStage } from "@/lib/report/types";
 
 /** Status color per level band (§23). Returned as a CSS var so `currentColor`
  *  can drive SVG strokes and bar fills. */
@@ -126,6 +126,29 @@ export function ComponentCard({ component }: { component: ReportComponent }) {
       </div>
       <ScoreBar score={component.score} />
       <LevelChip level={component.level} />
+    </div>
+  );
+}
+
+/** One stage of the retrieval → citation → answer pipeline (§90). Only rendered
+ *  for V2 reports; V1 emits no stages. */
+export function StageCard({ stage }: { stage: ReportStage }) {
+  return (
+    <div
+      className="flex flex-col gap-3 rounded-xl border border-border bg-surface/60 p-5"
+      style={{ color: levelColor(stage.level) }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="text-sm font-medium text-fg">{stage.name}</span>
+        <span className="font-mono text-2xl font-semibold tabular-nums text-fg">
+          {stage.score.toFixed(0)}
+        </span>
+      </div>
+      <ScoreBar score={stage.score} />
+      <div className="flex items-center gap-2">
+        <LevelChip level={stage.level} />
+      </div>
+      <p className="text-xs leading-relaxed text-fg-muted">{stage.explanation}</p>
     </div>
   );
 }

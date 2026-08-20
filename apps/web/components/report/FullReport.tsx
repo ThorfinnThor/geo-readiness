@@ -5,6 +5,7 @@ import {
   ComponentCard,
   LevelChip,
   OverallHeader,
+  StageCard,
   severityColor,
 } from "@/components/report/shared";
 import { TopBar } from "@/components/TopBar";
@@ -27,6 +28,8 @@ function coverageColor(score: number): string {
 
 export function FullReport({ report }: { report: ReportDocument; reportId?: string }) {
   const p = report.business_profile;
+  const stages = report.stages ?? [];
+  const limiting = (report.diagnostics ?? []).filter((d) => d.explanation);
   return (
     <>
       <TopBar />
@@ -47,6 +50,39 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
           ))}
         </div>
       </Section>
+
+      {stages.length > 0 && (
+        <Section title="Readiness stages">
+          <p className="-mt-1 text-sm text-fg-muted">
+            How ready the site is at each step machines take: finding a page,
+            trusting it enough to cite, and pulling a clean answer from it.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {stages.map((s) => (
+              <StageCard key={s.key} stage={s} />
+            ))}
+          </div>
+          <p className="text-xs text-fg-subtle">
+            Stage scores are diagnostic views of the components above — they do not
+            change the overall score.
+          </p>
+        </Section>
+      )}
+
+      {limiting.length > 0 && (
+        <Section title="What's limiting each area">
+          <ul className="flex flex-col gap-2">
+            {limiting.map((d) => (
+              <li
+                key={d.component}
+                className="rounded-xl border border-border bg-surface/50 px-5 py-3 text-sm text-fg-muted"
+              >
+                {d.explanation}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       <Section title="Business profile">
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl border border-border bg-surface/50 p-5 text-sm sm:grid-cols-3">
@@ -143,6 +179,16 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
               confidence {report.meta.confidence_score.toFixed(0)}/100 · {report.meta.confidence_band}
             </span>
           </div>
+          {(report.meta.methodology_hash || report.meta.as_of) && (
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[0.7rem] text-fg-subtle">
+              {report.meta.as_of && (
+                <span>measured {report.meta.as_of.slice(0, 10)}</span>
+              )}
+              {report.meta.methodology_hash && (
+                <span>hash {report.meta.methodology_hash.slice(0, 12)}</span>
+              )}
+            </div>
+          )}
           <p className="text-xs">{report.disclaimer}</p>
         </div>
       </Section>
