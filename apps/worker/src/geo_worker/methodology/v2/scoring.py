@@ -31,6 +31,7 @@ from geo_worker.scoring.types import (
 )
 
 from .sourceability import sourceability_component
+from .stages import compute_stage_scores
 
 
 def _trust_v2(idx: _ScoreIndex, pages: list[ExtractedPage]) -> list[tuple[str, int, float]]:
@@ -83,6 +84,7 @@ def compute_readiness(
     components = [entity, offer, coverage_component, source, structured, trust, technical]
     by_name = {c.name: c.score for c in components}
     overall = round(sum(COMPONENT_WEIGHTS[k] * by_name[k] for k in COMPONENT_WEIGHTS), 2)
+    stages = compute_stage_scores(by_name)
 
     confidence_score, confidence_components = compute_confidence(
         pages, profile, coverage, crawl_meta
@@ -101,6 +103,9 @@ def compute_readiness(
         confidence_score=confidence_score,
         components=components,
         confidence_components=confidence_components,
+        retrieval_readiness_score=stages["retrieval_readiness"],
+        citation_readiness_score=stages["citation_readiness"],
+        answer_extractability_score=stages["answer_extractability"],
         as_of=measurement_as_of,
         component_diagnostics=[source_diag],
     )
