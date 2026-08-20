@@ -42,3 +42,6 @@ tmp/
 
 # Machine-local Node CA workaround (this Node build ships an incomplete root set).
 .npmrc
+
+# Phase 14 benchmark output (regenerate with scripts/run_benchmark.py)
+apps/worker/benchmark_out/
