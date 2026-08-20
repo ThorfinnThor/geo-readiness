@@ -255,20 +255,36 @@ def _score_cluster(index: _SiteIndex, cluster: GeneratedCluster) -> ClusterCover
     )
 
 
+def score_requirements(
+    clusters: list[GeneratedCluster],
+    pages: list[ExtractedPage],
+    profile: BusinessProfile,
+) -> list[ClusterCoverageResult]:
+    """Per-cluster requirement scoring (coverage_score == requirements score).
+
+    Public so the V2 methodology can reuse it and blend in topical alignment.
+    """
+    index = _SiteIndex.build(pages, profile)
+    return [_score_cluster(index, c) for c in clusters]
+
+
+def aggregate_prompt_coverage(
+    results: list[ClusterCoverageResult], clusters: list[GeneratedCluster]
+) -> float:
+    weight_sum = sum(c.weight for c in clusters)
+    if weight_sum <= 0:
+        return 0.0
+    weighted = sum(r.coverage_score * c.weight for r, c in zip(results, clusters, strict=True))
+    return round(weighted / weight_sum, 2)
+
+
 def compute_coverage(
     clusters: list[GeneratedCluster],
     pages: list[ExtractedPage],
     profile: BusinessProfile,
 ) -> CoverageReport:
-    """Score each cluster's coverage and the weight-averaged aggregate (§15)."""
-    index = _SiteIndex.build(pages, profile)
-    results = [_score_cluster(index, c) for c in clusters]
-
-    weight_sum = sum(c.weight for c in clusters)
-    if weight_sum > 0:
-        weighted = sum(r.coverage_score * c.weight for r, c in zip(results, clusters, strict=True))
-        aggregate = weighted / weight_sum
-    else:
-        aggregate = 0.0
-
-    return CoverageReport(prompt_coverage_score=round(aggregate, 2), clusters=results)
+    """V1: coverage == requirements score, weight-averaged aggregate (§15)."""
+    results = score_requirements(clusters, pages, profile)
+    return CoverageReport(
+        prompt_coverage_score=aggregate_prompt_coverage(results, clusters), clusters=results
+    )
