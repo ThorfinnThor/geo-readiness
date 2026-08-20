@@ -17,14 +17,21 @@ a worker drains that queue, submitted scans never complete.
 
 ## Decision
 
-Run the worker as a **portable Docker container** (`apps/worker/Dockerfile`) and
-host it on **Railway** as an always-on service. The container runs
-`scripts/run_worker.py` — the resilient loop (E16) with lease recovery and
-graceful shutdown — after applying Alembic migrations on start.
+Two-tier, chosen by cost/latency:
 
-The image is deliberately host-agnostic (plain Dockerfile, no Railway-specific
-config), so Render (Background Worker) or Fly.io are drop-in alternatives if
-Railway is ever unsuitable.
+- **Staging — GitHub Actions** (`.github/workflows/process-scans.yml`). Free on
+  the public repo. The web app fires a `repository_dispatch` when a scan is
+  enqueued; the workflow runs `scripts/process_jobs.py` (recover stranded jobs →
+  drain → exit) after `alembic upgrade head`. A 15-min backstop cron covers any
+  missed dispatch. Accepts ~1–2 min per-scan latency (fresh runner each time) in
+  exchange for zero always-on cost.
+- **Production — always-on container** (`apps/worker/Dockerfile`), running the
+  resilient loop `scripts/run_worker.py` (E16: lease recovery + graceful
+  shutdown), hosted on **Railway** (Render/Fly are drop-in — the image is
+  host-agnostic). <1s pickup; the right tool once latency or reliability matters.
+
+Both entrypoints and the container already exist, so moving from Actions to an
+always-on host is a config change, not a rewrite.
 
 ## Consequences
 

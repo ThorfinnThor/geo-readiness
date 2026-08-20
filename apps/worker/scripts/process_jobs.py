@@ -1,7 +1,8 @@
-"""Process all queued scan jobs once, then exit.
+"""Reclaim stranded jobs, then process all queued scan jobs once, and exit.
 
-The runnable worker for local dev and the demo (a container/cron can invoke it
-on an interval). A resilient long-running loop with lease recovery is E16.
+The drain-once entrypoint: local dev, and the GitHub Actions worker (triggered
+per scan via repository_dispatch, plus a safety-net cron). For an always-on host
+use scripts/run_worker.py (the resilient loop) instead.
 
     uv run python scripts/process_jobs.py
 """
@@ -9,16 +10,26 @@ on an interval). A resilient long-running loop with lease recovery is E16.
 from __future__ import annotations
 
 import asyncio
+import os
+import socket
 
 from geo_worker.db.session import create_engine, create_session_factory
-from geo_worker.jobs import process_one
+from geo_worker.jobs import process_one, recover_stale_jobs
 
-WORKER_ID = "local-worker"
+WORKER_ID = os.environ.get("WORKER_ID") or f"drain-{socket.gethostname()}"
 
 
 async def main() -> None:
     engine = create_engine()
     session_factory = create_session_factory(engine)
+
+    # Reclaim jobs stranded by a killed worker/runner before draining (E16).
+    async with session_factory() as session:
+        requeued, dead = await recover_stale_jobs(session)
+        await session.commit()
+    if requeued or dead:
+        print(f"recovered stale jobs: requeued={requeued} dead={dead}")
+
     processed = 0
     while True:
         async with session_factory() as session:

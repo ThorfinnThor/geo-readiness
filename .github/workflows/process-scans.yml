@@ -1,0 +1,43 @@
+name: Process scans
+
+# Staging worker (ADR-0003 alternative): drain the Postgres scan queue on demand.
+# Triggered by the web app the moment a scan is enqueued (repository_dispatch),
+# manually, and on a safety-net schedule for stragglers + lease recovery.
+on:
+  repository_dispatch:
+    types: [scan-enqueued]
+  workflow_dispatch: {}
+  schedule:
+    - cron: "*/15 * * * *" # backstop; per-scan latency comes from the dispatch
+
+# Single-flight: overlapping submissions coalesce into one draining run + one
+# queued run, so a burst never spawns a pile of runners. Never cancel a run
+# mid-scan — let it finish draining.
+concurrency:
+  group: process-scans
+  cancel-in-progress: false
+
+jobs:
+  drain:
+    name: Drain scan queue
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/worker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Sync (no dev)
+        run: uv sync --frozen --no-dev
+      - name: Migrate to head
+        run: uv run alembic upgrade head
+      - name: Recover stranded jobs + drain the queue
+        run: uv run python scripts/process_jobs.py
+    env:
+      # Supabase session pooler (5432) — set in repo Settings → Secrets → Actions.
+      DATABASE_URL_ASYNC: ${{ secrets.DATABASE_URL_ASYNC }}
+      METHODOLOGY_VERSION: geo-readiness-v2
+      LOG_LEVEL: info

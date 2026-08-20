@@ -4,6 +4,7 @@ import { assertSameOrigin } from "@/lib/auth/http";
 import { AuthError } from "@/lib/auth/errors";
 import { InvalidDomainError, normalizeDomain } from "@/lib/scans/domain";
 import { createQuickScan } from "@/lib/scans/repository";
+import { triggerWorker } from "@/lib/scans/dispatch";
 
 export const runtime = "nodejs";
 
@@ -18,6 +19,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     }
     const domain = normalizeDomain(body.domain);
     const { scanId } = await createQuickScan(domain);
+    // Wake the worker now (best-effort; safety-net cron covers a miss).
+    await triggerWorker();
     return NextResponse.json({ scanId, domain }, { status: 201 });
   } catch (err) {
     if (err instanceof InvalidDomainError) {

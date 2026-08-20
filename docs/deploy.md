@@ -4,15 +4,17 @@ Target: a live end-to-end **free scan** (submit a domain → worker processes it
 report renders). No payments, email, or public abuse exposure yet — see
 [Not in staging](#not-in-staging).
 
-Topology (per [ADR-0001](adr/0001-deployment-architecture.md) +
-[ADR-0003](adr/0003-worker-hosting.md)):
+Staging runs the worker on **GitHub Actions** (free on the public repo): the web
+app fires a `repository_dispatch` the moment a scan is enqueued, and the workflow
+drains the queue. An always-on host (Railway) is the production alternative —
+[ADR-0003](adr/0003-worker-hosting.md), summarized under
+[Alternative worker](#alternative-worker-always-on-host).
 
 ```
- Browser ──> Vercel (Next.js web + API) ──enqueue job──> Supabase Postgres
-                                                              │  (jobs queue)
-                          Railway (Python worker loop) ◀──────┘  leases + drains
-                                        │
-                                        └─ writes snapshot/report back to Postgres
+ Browser ─> Vercel (Next.js web + API) ─enqueue job─> Supabase Postgres
+                     │                                     ▲  │ (jobs queue)
+                     └─ repository_dispatch ─> GitHub Actions │ drains + writes
+                                               (process-scans)┘  report back
 ```
 
 ## 1. Supabase (database)
@@ -24,40 +26,42 @@ Topology (per [ADR-0001](adr/0001-deployment-architecture.md) +
    host looks like `aws-0-<region>.pooler.supabase.com`, user `postgres.<ref>`):
    - **Transaction pooler**, port **6543** → for **Vercel** (serverless: many
      short connections).
-   - **Session pooler**, port **5432** → for the **Railway worker** (long-lived
-     and runs migrations; session mode supports the full DDL Alembic needs).
-   - *(Ignore "Direct connection" — it's IPv6-only and Railway can't reach it.)*
+   - **Session pooler**, port **5432** → for the **worker** (runs migrations;
+     session mode supports the full DDL Alembic needs).
+   - *(Ignore "Direct connection" — it's IPv6-only; the runners can't reach it.)*
 3. No manual SQL needed — the worker runs `alembic upgrade head` on start and
    owns the schema.
 
-## 2. Worker on Railway
+## 2. Worker on GitHub Actions
 
-First time with Railway — step by step:
+The workflow `.github/workflows/process-scans.yml` drains the queue. It fires
+when the web app enqueues a scan (`repository_dispatch`), manually, and every
+15 min as a backstop. Two things to set up:
 
-1. Sign up at **railway.com** with your GitHub account.
-2. **New Project → Deploy from GitHub repo** → authorize Railway → pick
-   `ThorfinnThor/geo-readiness`. (Skip adding a Railway database — we use Supabase.)
-3. Open the created service → **Settings → Build**:
-   - **Builder**: Dockerfile.
-   - **Dockerfile Path**: `apps/worker/Dockerfile`.
-   - Leave **Root Directory** empty — the build context must be the repo root
-     (the image copies both `apps/worker/` and the root `configs/`).
-4. **Settings → Networking**: do nothing. This is a background worker, not a web
-   service — it needs no public domain or port.
-5. **Variables** tab → add:
-   | Var | Value |
-   |---|---|
-   | `DATABASE_URL_ASYNC` | `postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres` (**session pooler**, 5432) |
-   | `METHODOLOGY_VERSION` | `geo-readiness-v2` |
-   | `LOG_LEVEL` | `info` |
-   | `WORKER_ID` | optional; defaults to the hostname |
+**a) Repo secret (so the workflow can reach the DB):**
+- GitHub repo → **Settings → Secrets and variables → Actions → New repository
+  secret**:
+  | Secret | Value |
+  |---|---|
+  | `DATABASE_URL_ASYNC` | `postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres` (**session pooler**, 5432) |
 
-   Note the `postgresql+asyncpg://` scheme (not `postgresql://`) and that the
-   username is `postgres.<ref>`, exactly as Supabase's session-pooler string shows.
-6. **Deploy**. Watch **Deploy Logs** for `alembic upgrade head` running, then
-   `worker loop starting`. That means it's live and draining the queue.
-7. One replica is enough for staging. Multiple are safe (leasing uses
-   `FOR UPDATE SKIP LOCKED`) but untested under real concurrency.
+  Note the `postgresql+asyncpg://` scheme (not `postgresql://`) and the username
+  `postgres.<ref>`, exactly as Supabase's session-pooler string shows.
+
+**b) A token so Vercel can trigger the workflow per scan:**
+- Create a **fine-grained Personal Access Token** (GitHub → Settings →
+  Developer settings → Fine-grained tokens): repository access =
+  `ThorfinnThor/geo-readiness`, permission **Contents: Read and write** (this is
+  what `repository_dispatch` needs). Copy it — you'll paste it into Vercel as
+  `GITHUB_DISPATCH_TOKEN` in step 3.
+
+That's it — no server to run. You can test it now: GitHub repo → **Actions →
+Process scans → Run workflow** should complete green (it will just report
+`done (0 job(s))` until a scan exists).
+
+> Latency: each run starts a fresh runner (checkout + install ≈ 1–2 min) before
+> it drains, so a scan completes a minute or two after submission. If that's too
+> slow, switch to the always-on worker below.
 
 ## 3. Web on Vercel
 
@@ -67,33 +71,50 @@ First time with Railway — step by step:
   | Var | Value |
   |---|---|
   | `DATABASE_URL` | `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres` (**transaction pooler**, 6543) |
+  | `GITHUB_DISPATCH_TOKEN` | the fine-grained PAT from step 2b (wakes the worker) |
+  | `GITHUB_REPO` | `ThorfinnThor/geo-readiness` |
   | `NEXT_PUBLIC_APP_URL` | the deployed URL (e.g. `https://geo.vercel.app`) |
   | `APP_ENV` | `staging` |
 - Deploy. Report/account routes are already `noindex` via `next.config.ts`.
 
-> The web and worker talk **only through the Postgres queue** — there is no
-> web→worker HTTP call in this design, so `WORKER_BASE_URL` / `WORKER_INTERNAL_TOKEN`
-> in `.env.example` are unused for now.
+> The web and worker talk **only through the Postgres queue**; the sole extra
+> signal is the `repository_dispatch` the web app sends to wake the workflow. If
+> `GITHUB_DISPATCH_TOKEN`/`GITHUB_REPO` are unset the app just skips the wake and
+> the 15-min backstop cron still drains the queue.
 
 ## 4. Smoke test
 
 1. Open the deployed site, submit a domain on the homepage.
-2. `POST /api/projects/quick-scan` returns `{ scanId }`; the scan page polls.
-3. Within a few seconds the Railway worker leases the job, runs the pipeline, and
-   writes the report; the page flips from pending to the rendered V2 report.
-4. If it stays pending: check Railway logs (worker leased the job?), confirm
-   `DATABASE_URL(_ASYNC)` point at the **same** Supabase project, and that
-   migrations ran (`alembic upgrade head` line in the worker boot log).
+2. `POST /api/projects/quick-scan` returns `{ scanId }` and fires the dispatch;
+   the scan page polls. In the GitHub repo **Actions** tab a "Process scans" run
+   appears.
+3. When that run finishes (~1–2 min) the report is written and the page flips
+   from pending to the rendered V2 report.
+4. If it stays pending: check the **Actions** run log (did it drain / any error?),
+   confirm the run's `DATABASE_URL_ASYNC` secret and Vercel's `DATABASE_URL`
+   point at the **same** Supabase project, and that `alembic upgrade head` ran in
+   the workflow. No Actions run at all → check `GITHUB_DISPATCH_TOKEN` scope
+   (Contents: write) in Vercel.
 
 ## Migrations
 
-The worker image runs `alembic upgrade head` on every start (idempotent). To run
-them manually against Supabase:
+The `process-scans` workflow runs `alembic upgrade head` before draining
+(idempotent), so the schema is created/updated on the first scan. To run them
+manually against Supabase:
 
 ```bash
 cd apps/worker
 DATABASE_URL_ASYNC='postgresql+asyncpg://…:5432/postgres' uv run alembic upgrade head
 ```
+
+## Alternative worker (always-on host)
+
+If the ~1–2 min per-scan latency is too slow (or for the paid launch), run the
+worker as an always-on container instead — [ADR-0003](adr/0003-worker-hosting.md).
+`apps/worker/Dockerfile` runs the resilient loop (`scripts/run_worker.py`, E16:
+lease recovery + graceful shutdown); host it on Railway/Render/Fly with the same
+`DATABASE_URL_ASYNC` session-pooler string. It picks scans up in <1s. Switching
+is a config change, not a code change — both entrypoints already exist.
 
 ## Not in staging
 
