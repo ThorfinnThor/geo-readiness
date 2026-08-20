@@ -21,6 +21,7 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
   const router = useRouter();
   const [current, setCurrent] = useState(status);
   const [step, setStep] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
 
   // Poll real status.
   useEffect(() => {
@@ -45,10 +46,19 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
     return () => clearInterval(timer);
   }, [scanId, current, router]);
 
-  // Advance the visual pipeline (stops one short until the scan actually completes).
+  // Advance the visual pipeline (stops one short until the scan actually
+  // completes). Paced to ~9s/step so it tracks the ~60s+ run instead of racing
+  // to the end and looking stuck.
   useEffect(() => {
     if (DONE.has(current)) return;
-    const t = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 2)), 1400);
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 2)), 9000);
+    return () => clearInterval(t);
+  }, [current]);
+
+  // Live elapsed counter so the wait never feels frozen.
+  useEffect(() => {
+    if (DONE.has(current)) return;
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, [current]);
 
@@ -110,9 +120,15 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
         )}
       </div>
       {!failed && (
-        <p className="text-center font-mono text-xs text-fg-subtle">
-          this usually takes under a minute
-        </p>
+        <div className="flex flex-col items-center gap-1 text-center">
+          <p className="font-mono text-xs text-fg-subtle">
+            Diagnosis takes at least 60 seconds — {elapsed}s elapsed
+          </p>
+          <p className="max-w-sm text-xs text-fg-subtle/70">
+            We spin up a fresh analysis run for each scan and crawl your pages
+            live, so this isn’t instant. You can safely keep this tab open.
+          </p>
+        </div>
       )}
       </main>
     </>

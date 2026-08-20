@@ -54,6 +54,9 @@ export function ScanForm() {
         </button>
       </div>
       {error && <p className="px-1 text-sm text-weak">{error}</p>}
+      <p className="px-1 text-xs text-fg-subtle">
+        Takes about 60 seconds — we crawl and analyze your pages live.
+      </p>
     </form>
   );
 }

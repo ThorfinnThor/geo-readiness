@@ -4,16 +4,17 @@ Target: a live end-to-end **free scan** (submit a domain → worker processes it
 report renders). No payments, email, or public abuse exposure yet — see
 [Not in staging](#not-in-staging).
 
-Recommended worker: a **free always-on VM** (Oracle Cloud / GCP e2-micro) running
-the prebuilt container — $0 and instant scan pickup. A GitHub Actions fallback
-(free, no VM, ~30–60s/scan) is documented under step 2. Production-grade managed
-hosts are [ADR-0003](adr/0003-worker-hosting.md).
+Worker: **GitHub Actions** — free, no server. The web app fires a
+`repository_dispatch` the moment a scan is enqueued; a workflow drains the queue.
+Each scan takes **~60 seconds** (a fresh runner spins up per scan) — the UI states
+this up front. A free always-on VM or managed host (instant pickup) is documented
+as a faster alternative under step 2 and [ADR-0003](adr/0003-worker-hosting.md).
 
 ```
  Browser ─> Vercel (Next.js web + API) ─enqueue job─> Supabase Postgres
-                                                          ▲   │ (jobs queue)
-                     free VM: docker run geo-worker ──────┘   │ drains + writes
-                     (always-on loop, <1s pickup)             ┘  report back
+                     │                                    ▲   │ (jobs queue)
+                     └ repository_dispatch ─> GitHub Actions   │ drains + writes
+                       (process-scans, ~60s)             ┘  report back
 ```
 
 ## 1. Supabase (database)
@@ -31,59 +32,41 @@ hosts are [ADR-0003](adr/0003-worker-hosting.md).
 3. No manual SQL needed — the worker runs `alembic upgrade head` on start and
    owns the schema.
 
-## 2. Worker on a free always-on VM (Oracle Cloud / GCP) — free **and** instant
+## 2. Worker on GitHub Actions
 
-The only way to get $0 **and** <1s scan pickup: a free always-on Linux VM running
-the prebuilt worker image. Recommended: **Oracle Cloud Always Free** (most
-generous) or **Google Cloud `e2-micro`** (always-free in `us-west1`/`us-central1`/
-`us-east1`). Both are free forever; both ask for a card to verify identity but
-won't charge on the free tier.
+The workflow `.github/workflows/process-scans.yml` drains the queue. It fires when
+the web app enqueues a scan (`repository_dispatch`), on a 10-min backstop schedule
+(catches misses + reclaims stranded jobs), and manually. Each scan takes ~60s (a
+fresh runner spins up, installs deps from cache, migrates, then drains). Two
+things to set up:
 
-The container image is published to GHCR by
-`.github/workflows/publish-worker.yml` (multi-arch: works on ARM *and* x86).
-**One-time:** make the package public so the VM can pull it without auth — GitHub
-→ your profile → **Packages → geo-readiness-worker → Package settings → Change
-visibility → Public**.
+**a) Repo secret (so the workflow can reach the DB):**
+- GitHub repo → **Settings → Secrets and variables → Actions → New repository
+  secret**:
+  | Secret | Value |
+  |---|---|
+  | `DATABASE_URL_ASYNC` | `postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres` (**session pooler**, 5432) |
 
-On the VM (Ubuntu; ~15 min one-time):
+  Note the `postgresql+asyncpg://` scheme (not `postgresql://`) and the username
+  `postgres.<ref>`, exactly as Supabase's session-pooler string shows.
 
-```bash
-# 1. Install Docker
-curl -fsSL https://get.docker.com | sudo sh
+**b) A token so Vercel can trigger the workflow per scan:**
+- Create a **fine-grained Personal Access Token** (GitHub → Settings → Developer
+  settings → Fine-grained tokens): repository access = `ThorfinnThor/geo-readiness`,
+  permission **Contents: Read and write** (what `repository_dispatch` needs). Copy
+  it — you'll paste it into Vercel as `GITHUB_DISPATCH_TOKEN` in step 3.
 
-# 2. DB connection (Supabase SESSION pooler, 5432; note the +asyncpg scheme)
-cat > worker.env <<'EOF'
-DATABASE_URL_ASYNC=postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
-METHODOLOGY_VERSION=geo-readiness-v2
-LOG_LEVEL=info
-EOF
+Test it now: GitHub repo → **Actions → Process scans → Run workflow** should go
+green (reporting `done (0 job(s))` until a scan exists).
 
-# 3. Run it — restarts on crash/reboot; migrates then drains the queue forever
-sudo docker run -d --name geo-worker --restart=always --env-file worker.env \
-  ghcr.io/<owner-lowercase>/geo-readiness-worker:latest
-
-# 4. Watch it come up (look for 'alembic upgrade head' then 'worker loop starting')
-sudo docker logs -f geo-worker
-```
-
-To update after new code lands on `main` (the image rebuilds automatically):
-
-```bash
-sudo docker pull ghcr.io/<owner-lowercase>/geo-readiness-worker:latest
-sudo docker rm -f geo-worker
-sudo docker run -d --name geo-worker --restart=always --env-file worker.env \
-  ghcr.io/<owner-lowercase>/geo-readiness-worker:latest
-```
-
-Because it's always awake, it picks up a scan the instant Vercel enqueues it — no
-dispatch token needed (skip `GITHUB_DISPATCH_TOKEN`/`GITHUB_REPO` in step 3).
-
-> **Zero-setup fallback (no VM, but slower):** GitHub Actions can drain the queue
-> instead — `.github/workflows/process-scans.yml`, triggered per scan by the web
-> app. Free, but ~30–60s cold-start per scan and less reliable. To use it, set the
-> repo secret `DATABASE_URL_ASYNC` (session pooler) + a fine-grained PAT
-> (Contents: write) as Vercel's `GITHUB_DISPATCH_TOKEN`, and re-add a `schedule:`
-> backstop in that workflow. See [ADR-0003](adr/0003-worker-hosting.md).
+> **Want instant scans instead of ~60s?** Run the same prebuilt container on a
+> free always-on VM (Oracle Cloud / GCP `e2-micro`) or a managed host. The image
+> is published multi-arch to GHCR by `.github/workflows/publish-worker.yml`; make
+> the package public, then on the VM:
+> `docker run -d --restart=always --env-file worker.env ghcr.io/<owner>/geo-readiness-worker:latest`
+> (`worker.env` holds the session-pooler `DATABASE_URL_ASYNC`). It polls the
+> queue itself, so you can skip the dispatch token. See
+> [ADR-0003](adr/0003-worker-hosting.md).
 
 ## 3. Web on Vercel
 
@@ -93,9 +76,10 @@ dispatch token needed (skip `GITHUB_DISPATCH_TOKEN`/`GITHUB_REPO` in step 3).
   | Var | Value |
   |---|---|
   | `DATABASE_URL` | `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres` (**transaction pooler**, 6543) |
+  | `GITHUB_DISPATCH_TOKEN` | the fine-grained PAT from step 2b (wakes the worker per scan) |
+  | `GITHUB_REPO` | `ThorfinnThor/geo-readiness` |
   | `NEXT_PUBLIC_APP_URL` | the deployed URL (e.g. `https://geo.vercel.app`) |
   | `APP_ENV` | `staging` |
-  | `GITHUB_DISPATCH_TOKEN`, `GITHUB_REPO` | *only for the Actions fallback* — omit when using the always-on VM |
 - Deploy. Report/account routes are already `noindex` via `next.config.ts`.
 
 > The web and worker talk **only through the Postgres queue**; the sole extra
@@ -105,15 +89,18 @@ dispatch token needed (skip `GITHUB_DISPATCH_TOKEN`/`GITHUB_REPO` in step 3).
 
 ## 4. Smoke test
 
-1. Open the deployed site, submit a domain on the homepage.
-2. `POST /api/projects/quick-scan` returns `{ scanId }`; the scan page polls.
-3. The always-on VM worker picks the job up within ~1s and runs it; the page
-   flips from pending to the rendered V2 report in a few seconds (crawl time).
-4. If it stays pending: `sudo docker logs geo-worker` on the VM (did it lease the
-   job? any error?), confirm the VM's `DATABASE_URL_ASYNC` and Vercel's
-   `DATABASE_URL` point at the **same** Supabase project, and that the container
-   logged `alembic upgrade head`. *(Actions fallback: check the "Process scans"
-   run log instead.)*
+1. Open the deployed site, submit a domain on the homepage. The UI states the
+   scan takes ~60 seconds and shows a live elapsed counter.
+2. `POST /api/projects/quick-scan` returns `{ scanId }` and fires the dispatch;
+   the scan page polls. In the GitHub repo **Actions** tab a "Process scans" run
+   appears.
+3. When that run finishes (~60s) the report is written and the page flips from
+   pending to the rendered V2 report.
+4. If it stays pending: check the **Actions** run log (did it drain / any error?),
+   confirm the run's `DATABASE_URL_ASYNC` secret and Vercel's `DATABASE_URL` point
+   at the **same** Supabase project, and that `alembic upgrade head` ran. No
+   Actions run at all → check `GITHUB_DISPATCH_TOKEN` scope (Contents: write) in
+   Vercel.
 
 ## Migrations
 

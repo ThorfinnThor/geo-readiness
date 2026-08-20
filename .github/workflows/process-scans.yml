@@ -1,16 +1,16 @@
 name: Process scans
 
-# Optional/backup worker (ADR-0003): drain the Postgres scan queue via Actions.
-# The primary worker is the always-on Railway container; this workflow stays as a
-# free fallback / manual drainer. It runs ONLY when explicitly triggered — the
-# web app's repository_dispatch (if GITHUB_DISPATCH_TOKEN is set) or a manual run
-# — so it never fails on a schedule when the DB secret isn't configured.
-# To use Actions as the *primary* worker instead, re-add a `schedule:` cron here
-# and set the DATABASE_URL_ASYNC repo secret (see docs/deploy.md).
+# The scan worker (ADR-0003): drain the Postgres scan queue on GitHub Actions.
+# Fast path: the web app fires a repository_dispatch the moment a scan is
+# enqueued. Backstop: a schedule catches any missed dispatch and reclaims jobs
+# stranded by a cancelled run (lease recovery). Also runnable manually.
+# Requires the DATABASE_URL_ASYNC repo secret (see docs/deploy.md).
 on:
   repository_dispatch:
     types: [scan-enqueued]
   workflow_dispatch: {}
+  schedule:
+    - cron: "*/10 * * * *"
 
 # Single-flight: overlapping submissions coalesce into one draining run + one
 # queued run, so a burst never spawns a pile of runners. Never cancel a run
