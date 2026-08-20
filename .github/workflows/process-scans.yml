@@ -27,13 +27,12 @@ jobs:
       run:
         working-directory: apps/worker
     steps:
+      - uses: actions/checkout@v4
       # Before the DB secret is configured (e.g. scheduled runs pre-deploy),
       # no-op cleanly instead of failing red.
-      - name: Skip if worker DB not configured
+      - name: Note if worker DB not configured
         if: ${{ env.DATABASE_URL_ASYNC == '' }}
-        run: echo "DATABASE_URL_ASYNC not set — worker not configured yet; skipping."
-      - uses: actions/checkout@v4
-        if: ${{ env.DATABASE_URL_ASYNC != '' }}
+        run: echo "DATABASE_URL_ASYNC not set — worker not configured yet; skipping drain."
       - name: Install uv
         if: ${{ env.DATABASE_URL_ASYNC != '' }}
         uses: astral-sh/setup-uv@v5
