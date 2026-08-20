@@ -7,10 +7,10 @@ scoring, and actions with V2 implementations without touching V1.
 
 from __future__ import annotations
 
-from geo_worker.actions import compute_actions
 from geo_worker.clusters import generate_clusters
 
 from ..types import Methodology
+from .actions import compute_actions as compute_actions_v2
 from .coverage import compute_coverage as compute_coverage_v2
 from .scoring import compute_readiness as compute_readiness_v2
 
@@ -20,5 +20,5 @@ V2_METHODOLOGY = Methodology(
     generate_clusters=generate_clusters,
     compute_coverage=compute_coverage_v2,
     compute_readiness=compute_readiness_v2,
-    compute_actions=compute_actions,
+    compute_actions=compute_actions_v2,
 )
