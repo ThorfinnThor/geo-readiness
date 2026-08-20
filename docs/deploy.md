@@ -17,30 +17,47 @@ Topology (per [ADR-0001](adr/0001-deployment-architecture.md) +
 
 ## 1. Supabase (database)
 
-1. Create a Supabase project. Note two connection strings from **Project
-   Settings → Database**:
-   - **Pooled** (PgBouncer, port `6543`) — for Vercel (serverless).
-   - **Direct** (port `5432`) — for the worker (long-lived + runs DDL/migrations;
-     PgBouncer transaction mode can't run all migrations).
-2. No manual SQL needed — the worker runs `alembic upgrade head` on start and
+1. Create a Supabase project (pick a region near your users; set a strong DB
+   password — you'll paste it into the connection strings).
+2. Click **Connect** (top bar) → **Connection string**. Supabase shows three
+   options; you need two of them (both go through the IPv4 "Supavisor" pooler —
+   host looks like `aws-0-<region>.pooler.supabase.com`, user `postgres.<ref>`):
+   - **Transaction pooler**, port **6543** → for **Vercel** (serverless: many
+     short connections).
+   - **Session pooler**, port **5432** → for the **Railway worker** (long-lived
+     and runs migrations; session mode supports the full DDL Alembic needs).
+   - *(Ignore "Direct connection" — it's IPv6-only and Railway can't reach it.)*
+3. No manual SQL needed — the worker runs `alembic upgrade head` on start and
    owns the schema.
 
 ## 2. Worker on Railway
 
-- New Railway service → **Deploy from repo**.
-- Build: **Dockerfile** at `apps/worker/Dockerfile`, **build root = repository
-  root** (the image copies both `apps/worker/` and the root `configs/`).
-- Variables:
-  | Var | Value |
-  |---|---|
-  | `DATABASE_URL_ASYNC` | `postgresql+asyncpg://…@…:5432/postgres` (**direct**, 5432) |
-  | `METHODOLOGY_VERSION` | `geo-readiness-v2` |
-  | `LOG_LEVEL` | `info` |
-  | `WORKER_ID` | optional; defaults to the hostname |
-- The container CMD applies migrations then runs the resilient loop
-  (`scripts/run_worker.py`, E16: lease recovery + graceful SIGTERM shutdown).
-- One replica is enough for staging. Multiple replicas are safe (leasing uses
-  `FOR UPDATE SKIP LOCKED`) but untested under real concurrency.
+First time with Railway — step by step:
+
+1. Sign up at **railway.com** with your GitHub account.
+2. **New Project → Deploy from GitHub repo** → authorize Railway → pick
+   `ThorfinnThor/geo-readiness`. (Skip adding a Railway database — we use Supabase.)
+3. Open the created service → **Settings → Build**:
+   - **Builder**: Dockerfile.
+   - **Dockerfile Path**: `apps/worker/Dockerfile`.
+   - Leave **Root Directory** empty — the build context must be the repo root
+     (the image copies both `apps/worker/` and the root `configs/`).
+4. **Settings → Networking**: do nothing. This is a background worker, not a web
+   service — it needs no public domain or port.
+5. **Variables** tab → add:
+   | Var | Value |
+   |---|---|
+   | `DATABASE_URL_ASYNC` | `postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres` (**session pooler**, 5432) |
+   | `METHODOLOGY_VERSION` | `geo-readiness-v2` |
+   | `LOG_LEVEL` | `info` |
+   | `WORKER_ID` | optional; defaults to the hostname |
+
+   Note the `postgresql+asyncpg://` scheme (not `postgresql://`) and that the
+   username is `postgres.<ref>`, exactly as Supabase's session-pooler string shows.
+6. **Deploy**. Watch **Deploy Logs** for `alembic upgrade head` running, then
+   `worker loop starting`. That means it's live and draining the queue.
+7. One replica is enough for staging. Multiple are safe (leasing uses
+   `FOR UPDATE SKIP LOCKED`) but untested under real concurrency.
 
 ## 3. Web on Vercel
 
@@ -49,7 +66,7 @@ Topology (per [ADR-0001](adr/0001-deployment-architecture.md) +
 - Environment variables:
   | Var | Value |
   |---|---|
-  | `DATABASE_URL` | `postgresql://…@…:6543/postgres?pgbouncer=true` (**pooled**, 6543) |
+  | `DATABASE_URL` | `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres` (**transaction pooler**, 6543) |
   | `NEXT_PUBLIC_APP_URL` | the deployed URL (e.g. `https://geo.vercel.app`) |
   | `APP_ENV` | `staging` |
 - Deploy. Report/account routes are already `noindex` via `next.config.ts`.
