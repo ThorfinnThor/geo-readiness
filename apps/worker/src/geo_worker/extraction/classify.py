@@ -42,3 +42,23 @@ def classify_page(final_url: str, title: str | None, headings: dict[str, list[st
             return page_type
 
     return "other"
+
+
+def classify_link(href: str, text: str) -> str | None:
+    """Best-effort page type for a link target, from its path then anchor text.
+
+    Lets identity/policy/contact/about pages count as present when the site
+    links to them (e.g. footer links) even if that page was not crawled — the
+    link itself is evidence the page exists and is reachable. Returns None when
+    nothing matches. Path is authoritative; anchor text is a fallback for footer
+    labels like "Impressum" / "Datenschutz" / "Privacy".
+    """
+    path = urlsplit(href).path.strip("/").lower()
+    for page_type, keywords in _PATH_RULES:
+        if any(kw in path for kw in keywords):
+            return page_type
+    label = (text or "").strip().lower()
+    for page_type, keywords in _PATH_RULES:
+        if any(kw in label for kw in keywords):
+            return page_type
+    return None

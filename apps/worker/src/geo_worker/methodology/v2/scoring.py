@@ -71,10 +71,22 @@ def _trust_v2(idx: _ScoreIndex, pages: list[ExtractedPage]) -> list[tuple[str, i
         1.0,
         (0.5 if total_quant else 0.0) + (0.3 if total_cit else 0.0) + (0.2 if has_case else 0.0),
     )
-    return [
-        (name, weight, supported if name == "claims_supported_specifics" else strength)
-        for name, weight, strength in _trust(idx)
-    ]
+    # De-proxy identity/policy signals: credit about/contact/legal(=imprint,
+    # privacy, terms) when the site LINKS to those pages (footer links), not only
+    # when they were among the crawled pages. Large/localized sites (e.g. Stripe:
+    # /de/legal/imprint, /de/privacy, /de/contact) otherwise score 0 despite
+    # clearly exposing them. V2-only — V1's _trust is unchanged.
+    overrides: dict[str, float] = {
+        "claims_supported_specifics": supported,
+        "about_transparency": 1.0 if idx.has_or_linked("about") else 0.0,
+        "contact_legal_identity": (0.5 if idx.has_or_linked("contact") else 0.0)
+        + (0.5 if idx.has_or_linked("legal") else 0.0),
+        "policies_terms_privacy": 1.0 if idx.has_or_linked("legal") else 0.0,
+        "authors_responsibility": 1.0
+        if idx.org_name_present
+        else (0.5 if idx.has_or_linked("legal") else 0.0),
+    }
+    return [(name, weight, overrides.get(name, strength)) for name, weight, strength in _trust(idx)]
 
 
 def compute_readiness(

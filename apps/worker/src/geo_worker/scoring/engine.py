@@ -13,6 +13,7 @@ import re
 from dataclasses import dataclass
 
 from geo_worker.coverage.types import CoverageReport
+from geo_worker.extraction.classify import classify_link
 from geo_worker.extraction.types import ExtractedPage
 from geo_worker.profile.types import BusinessProfile
 
@@ -73,9 +74,14 @@ class _ScoreIndex:
     headings_structure_ratio: float
     dedicated_longtext400: bool
     dedicated_longtext200: bool
+    linked_types: frozenset[str]
 
     def has(self, page_type: str) -> bool:
         return page_type in self.page_types
+
+    def has_or_linked(self, page_type: str) -> bool:
+        """True if a page of this type was crawled, or a crawled page links to one."""
+        return page_type in self.page_types or page_type in self.linked_types
 
     @property
     def has_case(self) -> bool:
@@ -162,6 +168,12 @@ class _ScoreIndex:
             ),
             dedicated_longtext200=any(
                 p.page_type in _DEDICATED and len(p.visible_text) >= 200 for p in pages
+            ),
+            linked_types=frozenset(
+                t
+                for p in pages
+                for lk in p.internal_links
+                if (t := classify_link(lk.href, lk.text)) is not None
             ),
         )
 
