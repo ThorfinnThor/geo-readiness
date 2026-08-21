@@ -8,6 +8,7 @@ import {
   StageCard,
   severityColor,
 } from "@/components/report/shared";
+import { ReportExport } from "@/components/report/ReportExport";
 import { TopBar } from "@/components/TopBar";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -32,8 +33,11 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
   const limiting = (report.diagnostics ?? []).filter((d) => d.explanation);
   return (
     <>
-      <TopBar />
+      <div className="print:hidden">
+        <TopBar />
+      </div>
       <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 print:py-4 sm:py-14">
+        <ReportExport report={report} />
         <OverallHeader
         domain={report.meta.canonical_domain}
         score={report.overall_score}

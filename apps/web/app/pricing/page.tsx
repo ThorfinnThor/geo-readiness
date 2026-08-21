@@ -55,7 +55,7 @@ export default function PricingPage() {
               <Feature>Overall readiness score (0–100)</Feature>
               <Feature>All seven component scores</Feature>
               <Feature>Which categories need improvement</Feature>
-              <Feature>Retrieval, citation &amp; answer readiness</Feature>
+              <Feature>Confidence rating &amp; pages analyzed</Feature>
             </ul>
             <Link
               href="/"
@@ -94,10 +94,11 @@ export default function PricingPage() {
             <ul className="flex flex-col gap-2.5">
               <Feature>Everything in the free preview</Feature>
               <Feature>Every prioritized fix, ranked by impact</Feature>
-              <Feature>The evidence behind each issue</Feature>
-              <Feature>How to verify each fix after you ship it</Feature>
-              <Feature>Full prompt-cluster coverage map</Feature>
-              <Feature>What’s limiting each component</Feature>
+              <Feature>The evidence behind each issue, and how to verify the fix</Feature>
+              <Feature>Retrieval, citation &amp; answer-extraction stage scores</Feature>
+              <Feature>Full prompt-cluster coverage map with missing requirements</Feature>
+              <Feature>What’s limiting your weakest areas</Feature>
+              <Feature>Download as PDF or Markdown</Feature>
             </ul>
             <div className="mt-auto flex flex-col gap-2">
               <span
