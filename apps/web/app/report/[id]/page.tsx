@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { FullReport } from "@/components/report/FullReport";
 import { ScanPending } from "@/components/scan/ScanPending";
 import { exampleReport } from "@/lib/report/example";
+import { hasEntitlement } from "@/lib/payments/entitlements";
 import { getReportByScan, getScanStatus, isUuid } from "@/lib/scans/repository";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,12 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
   if (!isUuid(id)) notFound();
 
   const report = await getReportByScan(id);
-  if (report) return <FullReport report={report} reportId={id} />;
+  if (report) {
+    // Gate: the full report requires an unlock (paid or promo). Otherwise send
+    // the visitor to the free preview / paywall.
+    if (!(await hasEntitlement(id))) redirect(`/scan/${id}`);
+    return <FullReport report={report} reportId={id} />;
+  }
 
   const status = await getScanStatus(id);
   if (!status) notFound();

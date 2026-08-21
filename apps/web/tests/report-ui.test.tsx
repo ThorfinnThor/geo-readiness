@@ -1,5 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// PaywallCTA (inside PreviewReport) uses the app-router hook.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 import { PreviewReport } from "@/components/report/PreviewReport";
 import { FullReport } from "@/components/report/FullReport";

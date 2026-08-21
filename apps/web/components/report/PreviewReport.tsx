@@ -1,10 +1,9 @@
 // E12 — Free Preview: the full report, but the prioritized fixes are blurred
 // behind a paywall. Visible: overall score, all component scores, and which
 // categories need improvement. Locked: the actual issues and how to fix them.
-import Link from "next/link";
-
 import type { ReportDocument } from "@/lib/report/types";
 import { ComponentCard, LevelChip, OverallHeader } from "@/components/report/shared";
+import { PaywallCTA } from "@/components/report/PaywallCTA";
 import { TopBar } from "@/components/TopBar";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -74,9 +73,12 @@ export function PreviewReport({
 
       <section className="flex flex-col gap-3" aria-label="Component scores">
         <SectionLabel>Component scores</SectionLabel>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
+        <div className="flex flex-wrap gap-3">
           {report.components.map((c) => (
-            <ComponentCard key={c.key} component={c} />
+            <div key={c.key} className="grow basis-[47%] lg:basis-[22%]">
+              <ComponentCard component={c} />
+            </div>
           ))}
         </div>
       </section>
@@ -129,30 +131,7 @@ export function PreviewReport({
                 "linear-gradient(to bottom, transparent 12%, color-mix(in srgb, var(--bg) 82%, transparent) 70%, var(--bg) 100%)",
             }}
           >
-            <div className="mb-4 w-full max-w-sm rounded-2xl border border-border-strong bg-surface/80 p-5 text-center shadow-2xl backdrop-blur">
-              <p className="font-mono text-xs" style={{ color: "var(--weak)" }}>
-                {issueCount} issues are limiting how AI search reads your site
-              </p>
-              <h2 className="mt-2 text-base font-semibold">Unlock the full audit</h2>
-              <p className="mt-1 text-sm text-fg-muted">
-                Every fix, with the evidence behind it and how to verify it.
-              </p>
-              <div className="mt-4 flex flex-col items-center gap-2">
-                <Link
-                  href="/pricing"
-                  className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
-                  style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
-                >
-                  Get the full audit
-                </Link>
-                <Link
-                  href={`/report/${reportId}`}
-                  className="font-mono text-xs text-fg-subtle underline underline-offset-4 hover:text-fg-muted"
-                >
-                  view full report (demo)
-                </Link>
-              </div>
-            </div>
+            <PaywallCTA reportId={reportId} issueCount={issueCount} />
           </div>
         </div>
       </section>

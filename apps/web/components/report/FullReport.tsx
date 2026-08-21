@@ -44,9 +44,12 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
       />
 
       <Section title="Component scores">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
+        <div className="flex flex-wrap gap-3">
           {report.components.map((c) => (
-            <ComponentCard key={c.key} component={c} />
+            <div key={c.key} className="grow basis-[47%] lg:basis-[22%]">
+              <ComponentCard component={c} />
+            </div>
           ))}
         </div>
       </Section>
