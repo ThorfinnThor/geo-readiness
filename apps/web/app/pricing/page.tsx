@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
 
 export const metadata: Metadata = { title: "Pricing" };
@@ -121,6 +122,7 @@ export default function PricingPage() {
           or visibility in ChatGPT, Gemini, Perplexity or other AI platforms.
         </p>
       </main>
+      <Footer />
     </>
   );
 }

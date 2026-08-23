@@ -24,7 +24,11 @@ export function ScanForm() {
         router.push(`/scan/${data.scanId}`);
         return;
       }
-      setError("Please enter a valid public domain (e.g. example.com).");
+      if (res.status === 429) {
+        setError("Too many scans just now. Please wait a few minutes and try again.");
+      } else {
+        setError("Please enter a valid public domain (e.g. example.com).");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     }

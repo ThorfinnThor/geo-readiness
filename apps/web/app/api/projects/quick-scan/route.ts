@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { assertSameOrigin } from "@/lib/auth/http";
+import { assertSameOrigin, clientIpHash } from "@/lib/auth/http";
 import { AuthError } from "@/lib/auth/errors";
+import { checkScanRateLimit } from "@/lib/scans/abuse";
 import { InvalidDomainError, normalizeDomain } from "@/lib/scans/domain";
 import { createQuickScan } from "@/lib/scans/repository";
 import { triggerWorker } from "@/lib/scans/dispatch";
@@ -9,10 +10,16 @@ import { triggerWorker } from "@/lib/scans/dispatch";
 export const runtime = "nodejs";
 
 // POST /api/projects/quick-scan — anonymous lead-magnet scan (§2.1).
-// Abuse controls (rate limit / domain cooldown) are hardened in E15.
+// Abuse controls: per-IP burst limit (best-effort) + per-domain cooldown/dedup
+// in createQuickScan (the primary cost control).
 export async function POST(req: Request): Promise<NextResponse> {
   try {
     assertSameOrigin(req);
+
+    if (!checkScanRateLimit(clientIpHash(req) ?? "unknown")) {
+      return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+    }
+
     const body = (await req.json()) as { domain?: unknown };
     if (typeof body.domain !== "string") {
       return NextResponse.json({ error: "invalid_request" }, { status: 400 });

@@ -4,6 +4,7 @@ import { query } from "@/lib/db";
 import type { ReportDocument } from "@/lib/report/types";
 
 const ANON_EMAIL = "anonymous@geo.internal";
+const DOMAIN_COOLDOWN_HOURS = Number(process.env.FREE_DOMAIN_COOLDOWN_HOURS ?? "24");
 // V2 is the default methodology as of the 2026-08-20 switch (calibrated against
 // the 35-site benchmark corpus). V1 stays reachable by explicit version + frozen
 // behind the worker's golden regression test.
@@ -47,6 +48,20 @@ export async function createQuickScan(domain: string): Promise<{ scanId: string 
     [orgId, domain],
   );
   const projectId = project[0]!.id;
+
+  // Domain cooldown / dedup: within the cooldown window, reuse the most recent
+  // non-failed scan for this domain instead of running the worker again. This is
+  // the primary abuse/cost control — one scan per domain per window.
+  const recent = await query<{ id: string }>(
+    `SELECT id FROM scans
+       WHERE project_id = $1
+         AND status <> 'failed'
+         AND requested_at > now() - ($2 || ' hours')::interval
+       ORDER BY requested_at DESC
+       LIMIT 1`,
+    [projectId, String(DOMAIN_COOLDOWN_HOURS)],
+  );
+  if (recent[0]) return { scanId: recent[0].id };
 
   const scan = await query<{ id: string }>(
     `INSERT INTO scans

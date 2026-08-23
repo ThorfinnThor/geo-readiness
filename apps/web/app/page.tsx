@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Footer } from "@/components/Footer";
 import { ScanForm } from "@/components/scan/ScanForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RadialScore } from "@/components/report/shared";
@@ -96,6 +97,7 @@ function Inspector() {
 
 export default function HomePage() {
   return (
+    <>
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6">
       <header className="flex items-center justify-between py-6">
         <Link href="/" className="flex items-center gap-2">
@@ -106,8 +108,8 @@ export default function HomePage() {
           <span className="font-mono text-sm font-medium tracking-tight">geo/readiness</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm text-fg-muted">
-          <Link href="/methodology" className="hover:text-fg">
-            Methodology
+          <Link href="/learn" className="hover:text-fg">
+            Learn
           </Link>
           <Link href="/pricing" className="hover:text-fg">
             Pricing
@@ -212,10 +214,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="flex items-center justify-between border-t border-border py-6 font-mono text-xs text-fg-subtle">
-        <span>geo/readiness</span>
-        <span>evidence-based · deterministic</span>
-      </footer>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

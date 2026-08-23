@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
 import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
 
@@ -62,6 +63,7 @@ export default function LearnPage() {
           </section>
         ))}
       </main>
+      <Footer />
     </>
   );
 }

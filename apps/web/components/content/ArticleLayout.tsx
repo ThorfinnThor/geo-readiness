@@ -4,6 +4,7 @@
 // doubles as clean, extractable Q&A for AI answer engines (GEO).
 import Link from "next/link";
 
+import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { SITE, absoluteUrl } from "@/lib/seo/site";
@@ -110,6 +111,7 @@ export function ArticleLayout({
           </Link>
         </aside>
       </main>
+      <Footer />
     </>
   );
 }
