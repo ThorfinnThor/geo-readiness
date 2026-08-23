@@ -1,0 +1,109 @@
+import type { Metadata } from "next";
+
+import { ArticleLayout } from "@/components/content/ArticleLayout";
+import { CONTENT } from "@/lib/content/registry";
+
+const meta = CONTENT.find((c) => c.slug === "/glossary")!;
+
+export const metadata: Metadata = {
+  title: meta.title,
+  description: meta.description,
+  alternates: { canonical: meta.slug },
+  openGraph: { title: meta.title, description: meta.description, url: meta.slug, type: "article" },
+};
+
+const TERMS: { term: string; id: string; def: string }[] = [
+  {
+    term: "AI answer engine",
+    id: "ai-answer-engine",
+    def: "A tool that answers a question with written text instead of a list of links — ChatGPT, Gemini, Perplexity, Google's AI overviews. It builds its answer partly from information it reads on websites.",
+  },
+  {
+    term: "GEO (Generative Engine Optimization)",
+    id: "geo",
+    def: "The work of making your website easy for AI answer engines to find, trust and quote. The goal is not to rank a link, but to have your facts used inside an AI-generated answer.",
+  },
+  {
+    term: "SEO (Search Engine Optimization)",
+    id: "seo",
+    def: "The work of getting your pages to rank well in traditional search results. GEO and SEO share many fundamentals but aim at different finish lines.",
+  },
+  {
+    term: "Retrieval",
+    id: "retrieval",
+    def: "The step where a system finds and fetches your page. If a page is blocked, unreachable, or clearly not about the topic asked, it is never retrieved — and nothing else matters.",
+  },
+  {
+    term: "Citation",
+    id: "citation",
+    def: "When an AI answer credits or quotes your page as a source. To be cited, your claims usually need to be specific and backed by identifiable evidence the system trusts.",
+  },
+  {
+    term: "Answer extraction",
+    id: "answer-extraction",
+    def: "The step where the system lifts a specific fact from your page into its answer — a price, a definition, a step, a yes/no. Content written as clear, self-contained statements extracts cleanly; vague copy does not.",
+  },
+  {
+    term: "Structured data (schema)",
+    id: "structured-data",
+    def: "Hidden labels in your page's code that state facts in a machine-readable format — for example that a block of text is your business's name, address and phone number. It removes guesswork for machines.",
+  },
+  {
+    term: "Entity clarity",
+    id: "entity-clarity",
+    def: "How obvious it is what your business is called, what it does and where it operates. Low entity clarity means AI systems leave you out of specific, local or branded answers.",
+  },
+  {
+    term: "Sourceability",
+    id: "sourceability",
+    def: "How usable your content is as a source: are there concrete facts and figures, attributed claims, and information laid out in extractable structures like tables and lists?",
+  },
+  {
+    term: "Crawler (bot)",
+    id: "crawler",
+    def: "An automated program that fetches web pages. Search engines and AI systems use crawlers to read the web. Crawlers read the raw page and often do not run all of a site's scripts.",
+  },
+  {
+    term: "Thin content / doorway pages",
+    id: "thin-content",
+    def: "Mass-produced pages with little unique value — for example the same page repeated with only a city name swapped. Search engines demote these, and AI systems ignore them. The fix is genuine, unique content per page, not cosmetic variation.",
+  },
+  {
+    term: "Hallucination",
+    id: "hallucination",
+    def: "When an AI system states something confidently that is wrong or made up. Clear, specific, well-sourced pages reduce the chance a system guesses wrongly about your business.",
+  },
+  {
+    term: "Trust signals",
+    id: "trust-signals",
+    def: "Checkable evidence that you are a real, accountable business: an about page, contact and legal details, references or case studies, and claims backed by sources. AI systems favor accountable pages over anonymous ones.",
+  },
+  {
+    term: "Readiness score",
+    id: "readiness-score",
+    def: "A measurement of how prepared your website is to be read, trusted and quoted by AI systems. It is a diagnostic of your site's readiness — not a promise of rankings, traffic or actual AI mentions.",
+  },
+];
+
+export default function Page() {
+  return (
+    <ArticleLayout
+      title="GEO & AI search glossary"
+      description="Clear, jargon-free definitions of the terms behind AI search readiness — from answer extraction to structured data — so the rest of it actually makes sense."
+      category="Reference"
+      updated={meta.updated}
+      path={meta.slug}
+    >
+      <p>
+        The world of AI search comes with its own vocabulary. Here are the terms that matter,
+        explained in plain language for business owners — no computer-science degree required.
+      </p>
+      {TERMS.map((t) => (
+        <div key={t.id}>
+          <h2 id={t.id}>{t.term}</h2>
+          <p>{t.def}</p>
+        </div>
+      ))}
+    </ArticleLayout>
+  );
+}

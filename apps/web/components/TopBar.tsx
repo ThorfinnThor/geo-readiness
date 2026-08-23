@@ -14,7 +14,15 @@ export function TopBar() {
           />
           <span className="font-mono text-sm font-medium tracking-tight">geo/readiness</span>
         </Link>
-        <ThemeToggle />
+        <nav className="flex items-center gap-5">
+          <Link href="/learn" className="text-sm text-fg-muted transition-colors hover:text-fg">
+            Learn
+          </Link>
+          <Link href="/pricing" className="text-sm text-fg-muted transition-colors hover:text-fg">
+            Pricing
+          </Link>
+          <ThemeToggle />
+        </nav>
       </div>
     </div>
   );
