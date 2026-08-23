@@ -32,6 +32,96 @@ _TITLE_SEPARATORS = re.compile(r"\s*[|–—:\-]\s*")
 _ORG_TYPE_MARKERS = ("organization", "localbusiness", "business", "corporation", "store")
 _IDENTITY_PAGE_TYPES = {"about", "legal", "contact"}
 
+# Generic/navigational words that are never a brand on their own. A candidate
+# whose tokens are ALL generic (e.g. a "Documentation" / "Dokumentation" title
+# suffix on docs.stripe.com) is dropped so it can't win the brand slot. DE + EN.
+_GENERIC_BRAND_TOKENS = {
+    "documentation",
+    "docs",
+    "doc",
+    "dokumentation",
+    "doku",
+    "blog",
+    "news",
+    "aktuelles",
+    "home",
+    "homepage",
+    "startseite",
+    "welcome",
+    "willkommen",
+    "support",
+    "help",
+    "hilfe",
+    "faq",
+    "wiki",
+    "login",
+    "signin",
+    "anmelden",
+    "account",
+    "konto",
+    "dashboard",
+    "api",
+    "reference",
+    "guide",
+    "guides",
+    "resources",
+    "developer",
+    "developers",
+    "shop",
+    "store",
+    "search",
+    "suche",
+    "menu",
+    "page",
+    "site",
+    "website",
+    "pricing",
+    "preise",
+    "contact",
+    "kontakt",
+    "about",
+    "impressum",
+    "overview",
+}
+
+# Common non-brand subdomain labels to strip when deriving the brand from the
+# domain, so docs.stripe.com resolves the brand from "stripe".
+_COMMON_SUBDOMAINS = {
+    "www",
+    "docs",
+    "doc",
+    "blog",
+    "help",
+    "support",
+    "app",
+    "apps",
+    "api",
+    "shop",
+    "store",
+    "dev",
+    "developer",
+    "developers",
+    "portal",
+    "account",
+    "login",
+    "my",
+    "go",
+    "get",
+    "cdn",
+    "static",
+    "assets",
+    "m",
+    "mobile",
+    "de",
+    "en",
+    "fr",
+    "es",
+    "it",
+    "us",
+    "uk",
+    "eu",
+}
+
 
 def _tokens(text: str) -> set[str]:
     return {t for t in re.split(r"[^a-z0-9]+", text.lower()) if t}
@@ -45,6 +135,9 @@ def _domain_tokens(canonical_domain: str) -> set[str]:
     labels = canonical_domain.lower().split(".")
     # Drop the public suffix label (rough: last label; refined by PSL later).
     core = labels[:-1] if len(labels) > 1 else labels
+    # Strip leading non-brand subdomains (docs/www/blog/…) so the brand label wins.
+    while len(core) > 1 and core[0] in _COMMON_SUBDOMAINS:
+        core = core[1:]
     return _tokens("-".join(core))
 
 
@@ -245,6 +338,9 @@ def _brand_candidates(
         cand_tokens = _tokens(display[key])
         if not cand_tokens:
             continue
+        # A purely generic/navigational name (e.g. "Documentation") is never a brand.
+        if cand_tokens <= _GENERIC_BRAND_TOKENS:
+            continue
         score = 0.0
         sources: list[str] = []
         if key in org_names:
@@ -293,25 +389,38 @@ def _resolve_brand(
         return
 
     candidates = _brand_candidates(pages, org_nodes, canonical_domain)
-    if not candidates:
-        profile.brand_name = None
-        profile.needs_confirmation = True
-        return
-
-    # Deterministic order: score desc, then name asc.
     ranked = sorted(candidates.values(), key=lambda c: (-c.score, c.name))
-    best = ranked[0]
+    best = ranked[0] if ranked else None
     second = ranked[1] if len(ranked) > 1 else None
 
     ambiguous = (
-        second is not None
+        best is not None
+        and second is not None
         and best.score - second.score < AMBIGUITY_MARGIN
         and second.score >= AMBIGUITY_RIVAL_MIN
     )
-    if best.score < MIN_BRAND_SCORE or ambiguous:
+    if best is None or best.score < MIN_BRAND_SCORE or ambiguous:
+        # Fallback: derive the brand from the registrable domain label when it is
+        # corroborated in the homepage title/h1/og:site_name (e.g. docs.stripe.com
+        # → "Stripe"). Only when the normal candidate model is not confident, so
+        # confident resolutions (and the V1 golden) are unaffected.
+        domain_brand = _domain_brand_fallback(pages, canonical_domain)
+        if domain_brand:
+            profile.brand_name = domain_brand
+            profile.brand_confidence = 0.55
+            profile.needs_confirmation = False
+            evidence.append(
+                EvidenceItem(
+                    field_name="brand_name",
+                    value=domain_brand,
+                    source_type="domain+title_h1",
+                    confidence=0.55,
+                )
+            )
+            return
         profile.brand_name = None
         profile.needs_confirmation = True
-        profile.brand_confidence = round(best.score, 4)
+        profile.brand_confidence = round(best.score, 4) if best else 0.0
         return
 
     profile.brand_name = best.name
@@ -326,6 +435,30 @@ def _resolve_brand(
             confidence=best.score,
         )
     )
+
+
+def _domain_brand_fallback(pages: list[ExtractedPage], canonical_domain: str) -> str | None:
+    """The cased registrable-domain label if it appears in the homepage identity.
+
+    Requires a single, non-generic domain label (≥3 chars) that occurs as a whole
+    word in a homepage og:site_name / title / h1, and returns that cased form.
+    """
+    dom = _domain_tokens(canonical_domain)
+    if len(dom) != 1:
+        return None
+    label = next(iter(dom))
+    if len(label) < 3 or label in _GENERIC_BRAND_TOKENS:
+        return None
+    for page in pages:
+        if page.page_type != "home":
+            continue
+        for text in (page.open_graph.get("og:site_name"), page.title, page.h1):
+            if not text:
+                continue
+            for word in re.findall(r"[A-Za-z0-9]+", text):
+                if word.lower() == label:
+                    return word
+    return None
 
 
 def _resolve_offerings(
