@@ -16,7 +16,7 @@ const TERMS: { term: string; id: string; def: string }[] = [
   {
     term: "AI answer engine",
     id: "ai-answer-engine",
-    def: "A tool that answers a question with written text instead of a list of links — ChatGPT, Gemini, Perplexity, Google's AI overviews. It builds its answer partly from information it reads on websites.",
+    def: "A tool that answers a question with written text instead of a list of links, such as ChatGPT, Gemini, Perplexity or Google's AI overviews. It builds its answer partly from information it reads on websites.",
   },
   {
     term: "GEO (Generative Engine Optimization)",
@@ -31,7 +31,7 @@ const TERMS: { term: string; id: string; def: string }[] = [
   {
     term: "Retrieval",
     id: "retrieval",
-    def: "The step where a system finds and fetches your page. If a page is blocked, unreachable, or clearly not about the topic asked, it is never retrieved — and nothing else matters.",
+    def: "The step where a system finds and fetches your page. If a page is blocked, unreachable, or clearly not about the topic asked, it is never retrieved, and nothing else matters.",
   },
   {
     term: "Citation",
@@ -41,12 +41,12 @@ const TERMS: { term: string; id: string; def: string }[] = [
   {
     term: "Answer extraction",
     id: "answer-extraction",
-    def: "The step where the system lifts a specific fact from your page into its answer — a price, a definition, a step, a yes/no. Content written as clear, self-contained statements extracts cleanly; vague copy does not.",
+    def: "The step where the system lifts a specific fact from your page into its answer, like a price, a definition, a step or a yes or no. Content written as clear, self-contained statements extracts cleanly. Vague copy does not.",
   },
   {
     term: "Structured data (schema)",
     id: "structured-data",
-    def: "Hidden labels in your page's code that state facts in a machine-readable format — for example that a block of text is your business's name, address and phone number. It removes guesswork for machines.",
+    def: "Hidden labels in your page's code that state facts in a machine-readable format, for example that a block of text is your business's name, address and phone number. It removes guesswork for machines.",
   },
   {
     term: "Entity clarity",
@@ -56,7 +56,7 @@ const TERMS: { term: string; id: string; def: string }[] = [
   {
     term: "Sourceability",
     id: "sourceability",
-    def: "How usable your content is as a source: are there concrete facts and figures, attributed claims, and information laid out in extractable structures like tables and lists?",
+    def: "How usable your content is as a source. It asks whether there are concrete facts and figures, attributed claims, and information laid out in extractable structures like tables and lists.",
   },
   {
     term: "Crawler (bot)",
@@ -64,9 +64,9 @@ const TERMS: { term: string; id: string; def: string }[] = [
     def: "An automated program that fetches web pages. Search engines and AI systems use crawlers to read the web. Crawlers read the raw page and often do not run all of a site's scripts.",
   },
   {
-    term: "Thin content / doorway pages",
+    term: "Thin content and doorway pages",
     id: "thin-content",
-    def: "Mass-produced pages with little unique value — for example the same page repeated with only a city name swapped. Search engines demote these, and AI systems ignore them. The fix is genuine, unique content per page, not cosmetic variation.",
+    def: "Mass-produced pages with little unique value, for example the same page repeated with only a city name swapped. Search engines demote these, and AI systems ignore them. The fix is genuine, unique content per page, not cosmetic variation.",
   },
   {
     term: "Hallucination",
@@ -76,27 +76,27 @@ const TERMS: { term: string; id: string; def: string }[] = [
   {
     term: "Trust signals",
     id: "trust-signals",
-    def: "Checkable evidence that you are a real, accountable business: an about page, contact and legal details, references or case studies, and claims backed by sources. AI systems favor accountable pages over anonymous ones.",
+    def: "Checkable evidence that you are a real, accountable business. This includes an about page, contact and legal details, references or case studies, and claims backed by sources. AI systems favor accountable pages over anonymous ones.",
   },
   {
     term: "Readiness score",
     id: "readiness-score",
-    def: "A measurement of how prepared your website is to be read, trusted and quoted by AI systems. It is a diagnostic of your site's readiness — not a promise of rankings, traffic or actual AI mentions.",
+    def: "A measurement of how prepared your website is to be read, trusted and quoted by AI systems. It is a diagnostic of your site's readiness. It is not a promise of rankings, traffic or actual AI mentions.",
   },
 ];
 
 export default function Page() {
   return (
     <ArticleLayout
-      title="GEO & AI search glossary"
-      description="Clear, jargon-free definitions of the terms behind AI search readiness — from answer extraction to structured data — so the rest of it actually makes sense."
+      title="GEO and AI search glossary"
+      description="Clear, jargon-free definitions of the terms behind AI search readiness, from answer extraction to structured data, so the rest of it actually makes sense."
       category="Reference"
       updated={meta.updated}
       path={meta.slug}
     >
       <p>
         The world of AI search comes with its own vocabulary. Here are the terms that matter,
-        explained in plain language for business owners — no computer-science degree required.
+        explained in plain language for business owners, with no computer-science degree required.
       </p>
       {TERMS.map((t) => (
         <div key={t.id}>

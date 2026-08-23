@@ -5,16 +5,16 @@ import { TopBar } from "@/components/TopBar";
 import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
 
 export const metadata: Metadata = {
-  title: "Learn — AI search readiness, in plain language",
+  title: "Learn AI search readiness, in plain language",
   description:
     "Guides and explainers on getting your website ready for AI answer engines like ChatGPT, " +
-    "Gemini and Perplexity — written for business owners, not engineers.",
+    "Gemini and Perplexity, written for business owners, not engineers.",
   alternates: { canonical: "/learn" },
 };
 
 const ORDER: ContentCategory[] = ["Explainer", "Comparison", "Guide", "Reference"];
 const BLURB: Record<ContentCategory, string> = {
-  Explainer: "Start here — what AI search is and why it matters for your business.",
+  Explainer: "Start here. What AI search is and why it matters for your business.",
   Comparison: "How AI search relates to the SEO you may already know.",
   Guide: "Practical, do-this-next guides to improve your readiness.",
   Reference: "Definitions and quick lookups.",
@@ -34,7 +34,7 @@ export default function LearnPage() {
             AI search readiness, in plain language
           </h1>
           <p className="max-w-2xl text-lg text-fg-muted">
-            Everything you need to understand how AI answer engines read your website — and how to
+            Everything you need to understand how AI answer engines read your website, and how to
             make yours one they find, trust and quote. Written for business owners.
           </p>
         </header>

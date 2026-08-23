@@ -11,7 +11,7 @@ export const SITE = {
   ),
   description:
     "A deterministic, evidence-based audit of how ready your website is for AI answer " +
-    "engines and search — retrieval, citation and answer extraction. No AI-provider calls.",
+    "engines and search across retrieval, citation and answer extraction. No AI-provider calls.",
   locale: "en_US",
 } as const;
 

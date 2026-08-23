@@ -9,7 +9,7 @@ import { SITE, siteJsonLd } from "@/lib/seo/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — is your site ready for AI search?`,
+    default: `${SITE.name}. Is your site ready for AI search?`,
     template: `%s · ${SITE.name}`,
   },
   description: SITE.description,
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE.name,
-    title: `${SITE.name} — is your site ready for AI search?`,
+    title: `${SITE.name}. Is your site ready for AI search?`,
     description: SITE.description,
     url: SITE.url,
     locale: SITE.locale,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.name} — is your site ready for AI search?`,
+    title: `${SITE.name}. Is your site ready for AI search?`,
     description: SITE.description,
   },
   robots: { index: true, follow: true },

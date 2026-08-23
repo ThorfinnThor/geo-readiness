@@ -39,7 +39,7 @@ function IssueCard({
       </div>
       <p className="mt-2 text-sm text-fg-muted">{problem}</p>
       <p className="mt-1 text-sm" style={{ color: "var(--weak)" }}>
-        → {recommendation}
+        <span className="font-mono">Fix</span> {recommendation}
       </p>
     </div>
   );

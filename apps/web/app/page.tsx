@@ -6,11 +6,11 @@ import { RadialScore } from "@/components/report/shared";
 import { READINESS_DISCLAIMER } from "@/lib/readiness";
 
 const SIGNALS: [string, string][] = [
-  ["Entity Clarity", "Can a machine identify who you are — unambiguously?"],
+  ["Entity Clarity", "Can a machine identify who you are, unambiguously?"],
   ["Offer Clarity", "Are your services and products explicit and structured?"],
   ["Prompt Coverage", "Do your pages answer the questions AI search asks?"],
   ["Sourceability", "Is your content specific, first-party and extractable?"],
-  ["Structured Data", "Do machines get clean schema — not guesses?"],
+  ["Structured Data", "Do machines get clean schema, not guesses?"],
   ["Evidence & Trust", "Is there real proof behind your claims?"],
   ["Technical Access", "Can crawlers actually read the page at all?"],
 ];
@@ -69,7 +69,7 @@ function Inspector() {
         <div className="my-4 border-t border-dashed border-border" />
 
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-fg-subtle">ai search asks →</span>
+          <span className="text-xs text-fg-subtle">ai search asks</span>
           <p className="text-sm text-fg">“Which solar installers serve Austin, TX?”</p>
           <div className="flex items-center gap-3">
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
@@ -113,7 +113,7 @@ export default function HomePage() {
             Pricing
           </Link>
           <Link href="/scan/demo" className="hidden font-mono text-xs text-fg-subtle hover:text-fg sm:block">
-            example →
+            example
           </Link>
           <ThemeToggle />
         </nav>
@@ -131,7 +131,7 @@ export default function HomePage() {
             read by machines.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
-            AI answer engines don’t rank pages — they extract facts. We read your site the way
+            AI answer engines don’t rank pages, they extract facts. We read your site the way
             they do, generate the questions they ask about your business, and score whether your
             pages actually answer them.
           </p>
@@ -157,7 +157,7 @@ export default function HomePage() {
             We generate the questions AI search asks.
           </h2>
           <p className="max-w-2xl text-fg-muted">
-            Deterministically, from your own business profile — no external AI. Then we check,
+            Deterministically, from your own business profile, with no external AI. Then we check,
             page by page, whether you answer them. Coverage gaps are exactly where AI search
             can’t use you as a source.
           </p>
@@ -203,7 +203,7 @@ export default function HomePage() {
       <section className="border-t border-border py-16">
         <div className="max-w-2xl">
           <h2 className="text-xl font-semibold tracking-tight text-fg-muted">
-            Readiness isn’t ranking — and we won’t pretend it is.
+            Readiness isn’t ranking, and we won’t pretend it is.
           </h2>
           <p className="mt-2 text-fg-subtle">
             We measure how usable your site is as a source, with evidence for every finding. We

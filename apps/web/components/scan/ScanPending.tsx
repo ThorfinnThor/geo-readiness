@@ -122,7 +122,7 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
       {!failed && (
         <div className="flex flex-col items-center gap-1 text-center">
           <p className="font-mono text-xs text-fg-subtle">
-            Diagnosis takes at least 60 seconds — {elapsed}s elapsed
+            Diagnosis takes at least 60 seconds. {elapsed}s elapsed
           </p>
           <p className="max-w-sm text-xs text-fg-subtle/70">
             We spin up a fresh analysis run for each scan and crawl your pages

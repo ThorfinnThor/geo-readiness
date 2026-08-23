@@ -98,8 +98,8 @@ export function ArticleLayout({
         <aside className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-surface/50 p-6">
           <h2 className="text-lg font-semibold">See how your site scores</h2>
           <p className="text-sm text-fg-muted">
-            Run a free readiness audit — score, component breakdown and what to fix, in about a
-            minute.
+            Run a free readiness audit and get your score, a component breakdown and what to fix, in
+            about a minute.
           </p>
           <Link
             href="/"

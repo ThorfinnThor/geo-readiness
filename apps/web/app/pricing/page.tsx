@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { TopBar } from "@/components/TopBar";
 
-export const metadata: Metadata = { title: "Pricing — GEO AI Search Readiness" };
+export const metadata: Metadata = { title: "Pricing" };
 
 const PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "249");
 
@@ -37,8 +37,8 @@ export default function PricingPage() {
             See the score free. Unlock the fixes when you’re ready.
           </h1>
           <p className="mx-auto max-w-xl text-sm text-fg-muted">
-            Every scan runs the full deterministic engine — no AI-provider calls, no
-            guesswork. The free preview shows your readiness; the full audit shows exactly
+            Every scan runs the full deterministic engine, with no AI-provider calls and no
+            guesswork. The free preview shows your readiness. The full audit shows exactly
             what to change.
           </p>
         </header>
@@ -52,7 +52,7 @@ export default function PricingPage() {
               <p className="text-sm text-fg-subtle">per scan · no account needed</p>
             </div>
             <ul className="flex flex-col gap-2.5">
-              <Feature>Overall readiness score (0–100)</Feature>
+              <Feature>Overall readiness score (0 to 100)</Feature>
               <Feature>All seven component scores</Feature>
               <Feature>Which categories need improvement</Feature>
               <Feature>Confidence rating &amp; pages analyzed</Feature>
@@ -108,8 +108,8 @@ export default function PricingPage() {
                 Card payment coming soon
               </span>
               <p className="text-center text-xs text-fg-subtle">
-                Run a scan, then unlock its full audit from the results page — with a
-                promo code today, or card payment shortly.
+                Run a scan, then unlock its full audit from the results page, with a
+                promo code today or card payment shortly.
               </p>
             </div>
           </section>

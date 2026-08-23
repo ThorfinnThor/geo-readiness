@@ -61,8 +61,8 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
       {stages.length > 0 && (
         <Section title="Readiness stages">
           <p className="-mt-1 text-sm text-fg-muted">
-            How ready the site is at each step machines take: finding a page,
-            trusting it enough to cite, and pulling a clean answer from it.
+            How ready the site is at each step machines take, from finding a page,
+            to trusting it enough to cite, to pulling a clean answer from it.
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
             {stages.map((s) => (
@@ -70,7 +70,7 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
             ))}
           </div>
           <p className="text-xs text-fg-subtle">
-            Stage scores are diagnostic views of the components above — they do not
+            Stage scores are diagnostic views of the components above. They do not
             change the overall score.
           </p>
         </Section>
@@ -93,12 +93,12 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
 
       <Section title="Business profile">
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl border border-border bg-surface/50 p-5 text-sm sm:grid-cols-3">
-          <Field label="Brand" value={p.brand_name ?? "Unknown — needs confirmation"} />
-          <Field label="Legal name" value={p.legal_name ?? "—"} />
-          <Field label="Locations" value={p.locations.join(", ") || "—"} />
-          <Field label="Services" value={p.services.join(", ") || "—"} />
-          <Field label="Products" value={p.products.join(", ") || "—"} />
-          <Field label="Languages" value={p.languages.join(", ") || "—"} />
+          <Field label="Brand" value={p.brand_name ?? "Unknown, needs confirmation"} />
+          <Field label="Legal name" value={p.legal_name ?? "None"} />
+          <Field label="Locations" value={p.locations.join(", ") || "None"} />
+          <Field label="Services" value={p.services.join(", ") || "None"} />
+          <Field label="Products" value={p.products.join(", ") || "None"} />
+          <Field label="Languages" value={p.languages.join(", ") || "None"} />
         </dl>
       </Section>
 
@@ -132,7 +132,7 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
                     </div>
                   </td>
                   <td className="px-4 py-2.5 text-fg-subtle">
-                    {c.missing_requirements.join(", ") || "—"}
+                    {c.missing_requirements.join(", ") || "None"}
                   </td>
                 </tr>
               ))}
@@ -160,15 +160,15 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
               </div>
               <p className="mt-3 text-sm text-fg-muted">{a.problem}</p>
               <p className="mt-2 text-sm">
-                <span className="text-accent">→</span> {a.recommendation}
+                <span className="font-mono text-accent">Fix</span> {a.recommendation}
               </p>
               <p className="mt-2 text-xs text-fg-subtle">
-                <span className="font-mono">verify:</span> {a.how_to_verify}
+                <span className="font-mono">Verify</span> {a.how_to_verify}
               </p>
               {a.evidence.length > 0 && (
                 <ul className="mt-3 flex flex-col gap-1 border-t border-border pt-3 font-mono text-xs text-fg-subtle">
                   {a.evidence.map((e, i) => (
-                    <li key={i}>— {e}</li>
+                    <li key={i}>{e}</li>
                   ))}
                 </ul>
               )}
