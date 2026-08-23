@@ -24,16 +24,26 @@ describe("quick scan submission", () => {
     expect(Number(jobs[0]!.n)).toBe(1);
   });
 
-  it("reuses the project for the same domain (new scan each time)", async () => {
+  it("dedupes a repeat scan of the same domain within the cooldown window", async () => {
+    // Domain cooldown/dedup (abuse/cost control): a second scan of the same
+    // domain within the window reuses the first scan instead of running again.
     const first = await createQuickScan("acme.example");
     const second = await createQuickScan("acme.example");
-    expect(first.scanId).not.toBe(second.scanId);
+    expect(second.scanId).toBe(first.scanId);
 
     const projects = await query<{ n: string }>(
       `SELECT count(*) AS n FROM projects WHERE canonical_domain = $1`,
       ["acme.example"],
     );
     expect(Number(projects[0]!.n)).toBe(1);
+
+    const scans = await query<{ n: string }>(
+      `SELECT count(*) AS n FROM scans s
+         JOIN projects p ON p.id = s.project_id
+        WHERE p.canonical_domain = $1`,
+      ["acme.example"],
+    );
+    expect(Number(scans[0]!.n)).toBe(1);
   });
 
   it("returns null report until one is stored, then returns it", async () => {
