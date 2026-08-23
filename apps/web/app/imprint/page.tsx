@@ -56,7 +56,7 @@ export default function ImprintPage() {
           <p>
             Telefon: [TELEFONNUMMER]
             <br />
-            E-Mail: [E-MAIL-ADRESSE]
+            E-Mail: info@findyouraiscore.com
           </p>
 
           <h2>Registereintrag</h2>

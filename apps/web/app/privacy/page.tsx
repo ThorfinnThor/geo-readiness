@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           <p>
             Verantwortlich für die Datenverarbeitung auf dieser Website ist:
             <br />
-            [FIRMENNAME / BETREIBER], [ANSCHRIFT], E-Mail: [E-MAIL-ADRESSE]. Weitere Angaben findest
+            [FIRMENNAME / BETREIBER], [ANSCHRIFT], E-Mail: info@findyouraiscore.com. Weitere Angaben findest
             du im <a href="/imprint">Impressum</a>.
           </p>
 
@@ -122,7 +122,7 @@ export default function PrivacyPage() {
           <p>
             Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung,
             Datenübertragbarkeit sowie Widerspruch. Außerdem kannst du dich bei einer
-            Aufsichtsbehörde beschweren. Wende dich dafür an [E-MAIL-ADRESSE].
+            Aufsichtsbehörde beschweren. Wende dich dafür an info@findyouraiscore.com.
           </p>
         </div>
       </main>

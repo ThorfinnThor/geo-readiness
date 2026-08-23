@@ -5,10 +5,9 @@ export const SITE = {
   name: "GEO AI Search Readiness",
   shortName: "geo/readiness",
   // Production URL. Override per environment via NEXT_PUBLIC_APP_URL.
-  url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://geo-readiness-web.vercel.app").replace(
-    /\/$/,
-    "",
-  ),
+  url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://findyouraiscore.com").replace(/\/$/, ""),
+  // Contact address used in the imprint / privacy pages.
+  email: "info@findyouraiscore.com",
   description:
     "A deterministic, evidence-based audit of how ready your website is for AI answer " +
     "engines and search across retrieval, citation and answer extraction. No AI-provider calls.",

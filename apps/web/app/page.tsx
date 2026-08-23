@@ -133,9 +133,9 @@ export default function HomePage() {
             read by machines.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
-            AI answer engines don’t rank pages, they extract facts. We read your site the way
-            they do, generate the questions they ask about your business, and score whether your
-            pages actually answer them.
+            AI answer engines pull facts out of pages instead of ranking them. We scan your site,
+            work out the questions people ask about your business, and score how well your pages
+            answer them.
           </p>
 
           <div className="flex flex-col gap-3">
@@ -159,9 +159,8 @@ export default function HomePage() {
             We generate the questions AI search asks.
           </h2>
           <p className="max-w-2xl text-fg-muted">
-            Deterministically, from your own business profile, with no external AI. Then we check,
-            page by page, whether you answer them. Coverage gaps are exactly where AI search
-            can’t use you as a source.
+            We build them from your own business profile, without any external AI, then check page
+            by page whether you answer them. Where you don’t, AI search has to rely on someone else.
           </p>
         </div>
         <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40">
@@ -201,15 +200,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Honest positioning — the disclaimer as a stance, not fine print. */}
       <section className="border-t border-border py-16">
         <div className="max-w-2xl">
           <h2 className="text-xl font-semibold tracking-tight text-fg-muted">
-            Readiness isn’t ranking, and we won’t pretend it is.
+            What the score measures
           </h2>
           <p className="mt-2 text-fg-subtle">
-            We measure how usable your site is as a source, with evidence for every finding. We
-            don’t fabricate visibility scores or claim a specific AI will cite you. {READINESS_DISCLAIMER}
+            It measures how usable your site is as a source, and every finding comes with the
+            evidence behind it. It does not predict rankings or traffic, and it cannot promise that a
+            specific AI will mention you. {READINESS_DISCLAIMER}
           </p>
         </div>
       </section>
