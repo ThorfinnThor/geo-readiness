@@ -7,7 +7,7 @@ describe("reportToMarkdown", () => {
   const md = reportToMarkdown(exampleReport);
 
   it("includes the header, score, and key sections", () => {
-    expect(md).toContain(`# GEO AI Search Readiness — ${exampleReport.meta.canonical_domain}`);
+    expect(md).toContain(`# Find Your AI Score report for ${exampleReport.meta.canonical_domain}`);
     expect(md).toContain(`${exampleReport.overall_score.toFixed(0)}/100`);
     expect(md).toContain("## Component scores");
     expect(md).toContain("## Prioritized fixes");

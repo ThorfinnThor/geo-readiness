@@ -34,7 +34,7 @@ export function GET(request: Request): ImageResponse {
               background: "linear-gradient(120deg, #6d4dff, #06b6d4)",
             }}
           />
-          <div style={{ color: "#9aa3b2", fontSize: 26, fontFamily: "monospace" }}>geo/readiness</div>
+          <div style={{ color: "#9aa3b2", fontSize: 26, fontFamily: "monospace" }}>findyouraiscore</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

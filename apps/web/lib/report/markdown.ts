@@ -13,7 +13,7 @@ export function reportToMarkdown(report: ReportDocument): string {
   const m = report.meta;
   const out: string[] = [];
 
-  out.push(`# GEO AI Search Readiness — ${m.canonical_domain}`);
+  out.push(`# Find Your AI Score report for ${m.canonical_domain}`);
   out.push("");
   out.push(`**Overall readiness: ${report.overall_score.toFixed(0)}/100 (${report.overall_level})**`);
   out.push("");

@@ -12,7 +12,7 @@ export function TopBar() {
             className="h-2.5 w-2.5 rounded-full"
             style={{ background: "linear-gradient(120deg, var(--accent), var(--accent-2))" }}
           />
-          <span className="font-mono text-sm font-medium tracking-tight">geo/readiness</span>
+          <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
         <nav className="flex items-center gap-5">
           <Link href="/learn" className="text-sm text-fg-muted transition-colors hover:text-fg">

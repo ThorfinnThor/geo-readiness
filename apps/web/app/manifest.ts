@@ -5,7 +5,7 @@ import { SITE } from "@/lib/seo/site";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE.name,
-    short_name: "geo/readiness",
+    short_name: "findyouraiscore",
     description: SITE.description,
     start_url: "/",
     display: "standalone",

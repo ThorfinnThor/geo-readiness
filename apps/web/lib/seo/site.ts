@@ -2,8 +2,8 @@
 // the structured-data identity used across pages.
 
 export const SITE = {
-  name: "GEO AI Search Readiness",
-  shortName: "geo/readiness",
+  name: "Find Your AI Score",
+  shortName: "findyouraiscore",
   // Production URL. Override per environment via NEXT_PUBLIC_APP_URL.
   url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://findyouraiscore.com").replace(/\/$/, ""),
   // Contact address used in the imprint / privacy pages.

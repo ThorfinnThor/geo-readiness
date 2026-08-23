@@ -42,7 +42,7 @@ export function Footer() {
               className="h-2.5 w-2.5 rounded-full"
               style={{ background: "linear-gradient(120deg, var(--accent), var(--accent-2))" }}
             />
-            <span className="font-mono text-sm font-medium tracking-tight">geo/readiness</span>
+            <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
           </Link>
           <p className="text-xs text-fg-subtle">Evidence-based, deterministic AI search readiness.</p>
         </div>
@@ -59,7 +59,7 @@ export function Footer() {
       </div>
       <div className="mx-auto max-w-4xl px-6 pb-8">
         <p className="font-mono text-xs text-fg-subtle">
-          geo/readiness · does not measure or guarantee rankings, citations or visibility in AI
+          findyouraiscore · does not measure or guarantee rankings, citations or visibility in AI
           platforms.
         </p>
       </div>
