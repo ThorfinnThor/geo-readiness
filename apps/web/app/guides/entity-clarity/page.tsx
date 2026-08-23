@@ -1,16 +1,10 @@
-import type { Metadata } from "next";
-
 import { ArticleLayout } from "@/components/content/ArticleLayout";
 import { CONTENT } from "@/lib/content/registry";
+import { contentMetadata } from "@/lib/seo/content-metadata";
 
 const meta = CONTENT.find((c) => c.slug === "/guides/entity-clarity")!;
 
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-  alternates: { canonical: meta.slug },
-  openGraph: { title: meta.title, description: meta.description, url: meta.slug, type: "article" },
-};
+export const metadata = contentMetadata(meta.slug);
 
 export default function Page() {
   return (

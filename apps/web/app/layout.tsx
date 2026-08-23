@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 
 import "./globals.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ogImageUrl } from "@/lib/seo/content-metadata";
 import { SITE, siteJsonLd } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
     description: SITE.description,
     url: SITE.url,
     locale: SITE.locale,
+    images: [ogImageUrl("Is your site ready for AI search?")],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE.name}. Is your site ready for AI search?`,
     description: SITE.description,
+    images: [ogImageUrl("Is your site ready for AI search?")],
   },
   robots: { index: true, follow: true },
 };

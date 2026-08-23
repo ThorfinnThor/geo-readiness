@@ -116,6 +116,18 @@ export const CONTENT: ContentEntry[] = [
   },
 ];
 
+// Maps a readiness component (by its key in the report) to the guide that
+// explains how to improve it. Used to link the report back into the content.
+export const COMPONENT_GUIDE: Record<string, string> = {
+  entity_clarity: "/guides/entity-clarity",
+  offer_clarity: "/guides/offer-clarity",
+  prompt_coverage: "/guides/prompt-coverage",
+  sourceability: "/guides/sourceability",
+  structured_data: "/guides/structured-data",
+  evidence_trust: "/guides/evidence-and-trust",
+  technical_access: "/guides/technical-accessibility",
+};
+
 export function contentByCategory(): Record<ContentCategory, ContentEntry[]> {
   const out = { Explainer: [], Comparison: [], Guide: [], Reference: [] } as Record<
     ContentCategory,

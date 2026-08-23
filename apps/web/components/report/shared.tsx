@@ -1,4 +1,7 @@
 // Presentational primitives for the report dashboard.
+import Link from "next/link";
+
+import { COMPONENT_GUIDE } from "@/lib/content/registry";
 import type { ReportComponent, ReportStage } from "@/lib/report/types";
 
 /** Status color per level band (§23). Returned as a CSS var so `currentColor`
@@ -111,6 +114,7 @@ export function LevelChip({ level }: { level: string }) {
 }
 
 export function ComponentCard({ component }: { component: ReportComponent }) {
+  const guide = COMPONENT_GUIDE[component.key];
   return (
     <div
       className="flex flex-col gap-3 rounded-xl border border-border bg-surface/60 p-4 transition-colors hover:border-border-strong"
@@ -126,6 +130,14 @@ export function ComponentCard({ component }: { component: ReportComponent }) {
       </div>
       <ScoreBar score={component.score} />
       <LevelChip level={component.level} />
+      {guide && (
+        <Link
+          href={guide}
+          className="mt-0.5 text-[0.7rem] text-fg-subtle underline underline-offset-2 hover:text-fg-muted"
+        >
+          How to improve this
+        </Link>
+      )}
     </div>
   );
 }
