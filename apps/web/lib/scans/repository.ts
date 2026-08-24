@@ -1,6 +1,6 @@
 // Scan submission + read access (Supabase Postgres). The Python worker owns the
 // schema (Alembic) and processes the enqueued job.
-import { query } from "@/lib/db";
+import { query, withTransaction } from "@/lib/db";
 import type { ReportDocument } from "@/lib/report/types";
 
 const ANON_EMAIL = "anonymous@geo.internal";
@@ -38,48 +38,57 @@ async function ensureAnonymousOrg(): Promise<string> {
   return org[0]!.id;
 }
 
-/** Create (or reuse) a project for the domain and enqueue a fresh quick scan. */
-export async function createQuickScan(domain: string): Promise<{ scanId: string }> {
+/** Create (or reuse) a project for the domain and enqueue a fresh quick scan.
+ * Returns `reused: true` when the domain cooldown returned an existing scan. */
+export async function createQuickScan(domain: string): Promise<{ scanId: string; reused: boolean }> {
   const orgId = await ensureAnonymousOrg();
-  const project = await query<{ id: string }>(
-    `INSERT INTO projects (organization_id, canonical_domain) VALUES ($1, $2)
-     ON CONFLICT (organization_id, canonical_domain) DO UPDATE SET updated_at = now()
-     RETURNING id`,
-    [orgId, domain],
-  );
-  const projectId = project[0]!.id;
 
-  // Domain cooldown / dedup: within the cooldown window, reuse the most recent
-  // non-failed scan for this domain instead of running the worker again. This is
-  // the primary abuse/cost control — one scan per domain per window.
-  const recent = await query<{ id: string }>(
-    `SELECT id FROM scans
-       WHERE project_id = $1
-         AND status <> 'failed'
-         AND requested_at > now() - ($2 || ' hours')::interval
-       ORDER BY requested_at DESC
-       LIMIT 1`,
-    [projectId, String(DOMAIN_COOLDOWN_HOURS)],
-  );
-  if (recent[0]) return { scanId: recent[0].id };
+  // Run the whole create in one transaction, guarded by a per-domain advisory
+  // lock, so two simultaneous submissions for the same domain cannot both pass
+  // the dedup check and each start a scan. The lock is released on commit.
+  return withTransaction(async (client) => {
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`${orgId}:${domain}`]);
 
-  const scan = await query<{ id: string }>(
-    `INSERT INTO scans
-       (project_id, scan_type, methodology_version, status, max_pages, max_browser_renders, requested_at)
-     VALUES ($1, 'quick', $2, 'queued', $3, $4, now())
-     RETURNING id`,
-    [projectId, METHODOLOGY_VERSION, QUICK_MAX_PAGES, QUICK_MAX_RENDERS],
-  );
-  const scanId = scan[0]!.id;
+    const project = await client.query<{ id: string }>(
+      `INSERT INTO projects (organization_id, canonical_domain) VALUES ($1, $2)
+       ON CONFLICT (organization_id, canonical_domain) DO UPDATE SET updated_at = now()
+       RETURNING id`,
+      [orgId, domain],
+    );
+    const projectId = project.rows[0]!.id;
 
-  await query(
-    `INSERT INTO jobs (job_type, payload_json, idempotency_key, status)
-     VALUES ('crawl_project', $1, $2, 'queued')
-     ON CONFLICT (idempotency_key) DO NOTHING`,
-    [{ scan_id: scanId }, scanId],
-  );
+    // Domain cooldown / dedup: within the cooldown window, reuse the most recent
+    // non-failed scan for this domain instead of running the worker again. This
+    // is the primary abuse/cost control — one scan per domain per window.
+    const recent = await client.query<{ id: string }>(
+      `SELECT id FROM scans
+         WHERE project_id = $1
+           AND status <> 'failed'
+           AND requested_at > now() - ($2 || ' hours')::interval
+         ORDER BY requested_at DESC
+         LIMIT 1`,
+      [projectId, String(DOMAIN_COOLDOWN_HOURS)],
+    );
+    if (recent.rows[0]) return { scanId: recent.rows[0].id, reused: true };
 
-  return { scanId };
+    const scan = await client.query<{ id: string }>(
+      `INSERT INTO scans
+         (project_id, scan_type, methodology_version, status, max_pages, max_browser_renders, requested_at)
+       VALUES ($1, 'quick', $2, 'queued', $3, $4, now())
+       RETURNING id`,
+      [projectId, METHODOLOGY_VERSION, QUICK_MAX_PAGES, QUICK_MAX_RENDERS],
+    );
+    const scanId = scan.rows[0]!.id;
+
+    await client.query(
+      `INSERT INTO jobs (job_type, payload_json, idempotency_key, status)
+       VALUES ('crawl_project', $1, $2, 'queued')
+       ON CONFLICT (idempotency_key) DO NOTHING`,
+      [{ scan_id: scanId }, scanId],
+    );
+
+    return { scanId, reused: false };
+  });
 }
 
 export interface ScanStatusRow {

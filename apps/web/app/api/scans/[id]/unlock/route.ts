@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { assertSameOrigin } from "@/lib/auth/http";
+import { assertSameOrigin, clientIpHash } from "@/lib/auth/http";
 import { AuthError } from "@/lib/auth/errors";
 import { grantPromoEntitlement, isValidPromoCode } from "@/lib/payments/entitlements";
+import { checkPromoRateLimit } from "@/lib/scans/abuse";
 import { isUuid } from "@/lib/scans/repository";
 
 export const runtime = "nodejs";
@@ -16,6 +17,12 @@ export async function POST(
 ): Promise<NextResponse> {
   try {
     assertSameOrigin(req);
+
+    // Throttle redemption attempts so the single promo code cannot be brute-forced.
+    if (!checkPromoRateLimit(clientIpHash(req) ?? "unknown")) {
+      return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+    }
+
     const { id } = await params;
     if (!isUuid(id)) return NextResponse.json({ error: "not_found" }, { status: 404 });
 

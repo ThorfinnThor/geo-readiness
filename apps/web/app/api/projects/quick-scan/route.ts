@@ -25,10 +25,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       return NextResponse.json({ error: "invalid_request" }, { status: 400 });
     }
     const domain = normalizeDomain(body.domain);
-    const { scanId } = await createQuickScan(domain);
-    // Wake the worker now (best-effort; safety-net cron covers a miss).
-    await triggerWorker();
-    return NextResponse.json({ scanId, domain }, { status: 201 });
+    const { scanId, reused } = await createQuickScan(domain);
+    // Only wake the worker for a genuinely new scan (a reused one is already done).
+    if (!reused) await triggerWorker();
+    return NextResponse.json({ scanId, domain, reused }, { status: 201 });
   } catch (err) {
     if (err instanceof InvalidDomainError) {
       return NextResponse.json({ error: "invalid_domain" }, { status: 400 });

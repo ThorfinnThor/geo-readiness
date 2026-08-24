@@ -1,10 +1,11 @@
-// E12 — Free Preview: the full report, but the prioritized fixes are blurred
-// behind a paywall. Visible: overall score, all component scores, and which
-// categories need improvement. Locked: the actual issues and how to fix them.
-import type { ReportDocument } from "@/lib/report/types";
-import { ComponentCard, LevelChip, OverallHeader } from "@/components/report/shared";
+// E12 — Free Preview. Shows the free-product data only: overall score, all
+// component scores, and which categories need improvement. The prioritized fixes
+// are represented by content-free locked placeholders — the real issue text is
+// never sent to an unpaid browser (see lib/report/preview.toPreviewDoc).
+import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
 import { TopBar } from "@/components/TopBar";
+import type { PreviewDoc } from "@/lib/report/preview";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -12,17 +13,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function IssueCard({
-  title,
-  problem,
-  recommendation,
-  severity,
-}: {
-  title: string;
-  problem: string;
-  recommendation: string;
-  severity: string;
-}) {
+// A locked placeholder for one fix: the severity chip is real (it is not
+// premium), the rest is a redacted skeleton — no title, problem or fix text.
+function LockedCard({ severity }: { severity: string }) {
   return (
     <div
       className="rounded-xl border p-4"
@@ -31,112 +24,104 @@ function IssueCard({
       <div className="flex items-center gap-2">
         <span
           className="rounded px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wide"
-          style={{ color: "var(--weak)", backgroundColor: "color-mix(in srgb, var(--weak) 14%, transparent)" }}
+          style={{ color: severityColor(severity), backgroundColor: "color-mix(in srgb, currentColor 14%, transparent)" }}
         >
           {severity}
         </span>
-        <span className="font-medium">{title}</span>
+        <span className="h-3 w-40 rounded bg-fg-subtle/25" />
       </div>
-      <p className="mt-2 text-sm text-fg-muted">{problem}</p>
-      <p className="mt-1 text-sm" style={{ color: "var(--weak)" }}>
-        <span className="font-mono">Fix</span> {recommendation}
-      </p>
+      <div className="mt-3 h-2.5 w-full rounded bg-fg-subtle/15" />
+      <div className="mt-2 h-2.5 w-3/4 rounded bg-fg-subtle/15" />
     </div>
   );
 }
 
-export function PreviewReport({
-  report,
-  reportId,
-}: {
-  report: ReportDocument;
-  reportId: string;
-}) {
-  const gaps = report.components
+export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; reportId: string }) {
+  const gaps = preview.components
     .filter((c) => c.level === "Weak" || c.level === "Needs improvement")
     .sort((a, b) => a.score - b.score);
-  const focus = gaps.length > 0 ? gaps : [...report.components].sort((a, b) => a.score - b.score).slice(0, 3);
-  const issueCount = report.actions.length;
+  const focus =
+    gaps.length > 0 ? gaps : [...preview.components].sort((a, b) => a.score - b.score).slice(0, 3);
+  const issueCount = preview.issueCount;
+  const measured = preview.meta.as_of ? preview.meta.as_of.slice(0, 10) : null;
 
   return (
     <>
       <TopBar />
       <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-10 sm:py-14">
         <OverallHeader
-        domain={report.meta.canonical_domain}
-        score={report.overall_score}
-        level={report.overall_level}
-        confidenceBand={report.meta.confidence_band}
-        pages={report.meta.pages_analyzed}
-        clusters={report.meta.clusters_evaluated}
-      />
+          domain={preview.meta.canonical_domain}
+          score={preview.overall_score}
+          level={preview.overall_level}
+          confidenceBand={preview.meta.confidence_band}
+          pages={preview.meta.pages_analyzed}
+          clusters={preview.meta.clusters_evaluated}
+        />
 
-      <section className="flex flex-col gap-3" aria-label="Component scores">
-        <SectionLabel>Component scores</SectionLabel>
-        {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
-        <div className="flex flex-wrap gap-3">
-          {report.components.map((c) => (
-            <div key={c.key} className="grow basis-[47%] lg:basis-[22%]">
-              <ComponentCard component={c} />
-            </div>
-          ))}
-        </div>
-      </section>
+        {measured && (
+          <p className="-mt-6 font-mono text-xs text-fg-subtle">
+            Measured {measured}. To limit crawl load, a repeat scan of the same domain may reuse this
+            result for up to 24 hours.
+          </p>
+        )}
 
-      {/* Visible: WHERE the problems are — the categories, not the fixes. */}
-      <section className="flex flex-col gap-3">
-        <SectionLabel>What needs improvement</SectionLabel>
-        <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40">
-          {focus.map((c) => (
-            <li key={c.key} className="flex items-center justify-between gap-4 px-4 py-3">
-              <span className="text-sm font-medium">{c.name}</span>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-sm tabular-nums text-fg-muted">
-                  {c.score.toFixed(0)}
-                </span>
-                <LevelChip level={c.level} />
+        <section className="flex flex-col gap-3" aria-label="Component scores">
+          <SectionLabel>Component scores</SectionLabel>
+          {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
+          <div className="flex flex-wrap gap-3">
+            {preview.components.map((c) => (
+              <div key={c.key} className="grow basis-[47%] lg:basis-[22%]">
+                <ComponentCard component={c} />
               </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Locked: the actual prioritized fixes, blurred behind the paywall. */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-baseline justify-between gap-4">
-          <SectionLabel>Prioritized fixes</SectionLabel>
-          <span className="font-mono text-xs" style={{ color: "var(--weak)" }}>
-            {issueCount} issues found
-          </span>
-        </div>
-        <div className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none max-h-[420px] select-none space-y-3 overflow-hidden blur-[6px]"
-          >
-            {report.actions.map((a) => (
-              <IssueCard
-                key={a.rule_id}
-                title={a.title}
-                problem={a.problem}
-                recommendation={a.recommendation}
-                severity={a.severity}
-              />
             ))}
           </div>
-          <div
-            className="absolute inset-0 flex items-end justify-center rounded-xl"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 12%, color-mix(in srgb, var(--bg) 82%, transparent) 70%, var(--bg) 100%)",
-            }}
-          >
-            <PaywallCTA reportId={reportId} issueCount={issueCount} />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <p className="border-t border-border pt-6 text-xs text-fg-subtle">{report.disclaimer}</p>
+        {/* Visible: WHERE the problems are — the categories, not the fixes. */}
+        <section className="flex flex-col gap-3">
+          <SectionLabel>What needs improvement</SectionLabel>
+          <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40">
+            {focus.map((c) => (
+              <li key={c.key} className="flex items-center justify-between gap-4 px-4 py-3">
+                <span className="text-sm font-medium">{c.name}</span>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-sm tabular-nums text-fg-muted">
+                    {c.score.toFixed(0)}
+                  </span>
+                  <LevelChip level={c.level} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Locked: how many fixes and how severe, but not what they are. */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-baseline justify-between gap-4">
+            <SectionLabel>Prioritized fixes</SectionLabel>
+            <span className="font-mono text-xs" style={{ color: "var(--weak)" }}>
+              {issueCount} issues found
+            </span>
+          </div>
+          <div className="relative">
+            <div className="pointer-events-none max-h-[420px] select-none space-y-3 overflow-hidden">
+              {preview.issueSeverities.map((severity, i) => (
+                <LockedCard key={i} severity={severity} />
+              ))}
+            </div>
+            <div
+              className="absolute inset-0 flex items-end justify-center rounded-xl"
+              style={{
+                background:
+                  "linear-gradient(to bottom, transparent 12%, color-mix(in srgb, var(--bg) 82%, transparent) 70%, var(--bg) 100%)",
+              }}
+            >
+              <PaywallCTA reportId={reportId} issueCount={issueCount} />
+            </div>
+          </div>
+        </section>
+
+        <p className="border-t border-border pt-6 text-xs text-fg-subtle">{preview.disclaimer}</p>
       </main>
     </>
   );

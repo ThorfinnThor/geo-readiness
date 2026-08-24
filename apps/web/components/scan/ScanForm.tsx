@@ -24,13 +24,19 @@ export function ScanForm() {
         router.push(`/scan/${data.scanId}`);
         return;
       }
-      if (res.status === 429) {
-        setError("Too many scans just now. Please wait a few minutes and try again.");
-      } else {
+      // Map the API's status/error codes to distinct, actionable messages
+      // instead of blaming the domain for every failure.
+      if (res.status === 400) {
         setError("Please enter a valid public domain (e.g. example.com).");
+      } else if (res.status === 429) {
+        setError("Too many scans just now. Please wait a few minutes and try again.");
+      } else if (res.status === 403) {
+        setError("That request was blocked. Please reload the page and try again.");
+      } else {
+        setError("The scan service is temporarily unavailable. Please try again shortly.");
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("Couldn’t reach the scan service. Check your connection and try again.");
     }
     setLoading(false);
   }
@@ -46,7 +52,9 @@ export function ScanForm() {
           onChange={(e) => setDomain(e.target.value)}
           placeholder="yourwebsite.com"
           aria-label="Website domain"
-          className="flex-1 bg-transparent font-mono text-base text-fg outline-none placeholder:text-fg-subtle"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "scan-error" : undefined}
+          className="min-w-0 flex-1 bg-transparent font-mono text-base text-fg outline-none placeholder:text-fg-subtle"
         />
         <button
           type="submit"
@@ -57,7 +65,11 @@ export function ScanForm() {
           {loading ? "Scanning…" : "Run scan"}
         </button>
       </div>
-      {error && <p className="px-1 text-sm text-weak">{error}</p>}
+      {error && (
+        <p id="scan-error" role="alert" className="px-1 text-sm text-weak">
+          {error}
+        </p>
+      )}
       <p className="px-1 text-xs text-fg-subtle">
         Takes about 60 seconds. We crawl and analyze your pages live.
       </p>

@@ -1,32 +1,31 @@
-// Best-effort per-IP burst limiter for the anonymous scan endpoint. In-memory
-// and per-instance — a fully robust cross-instance limit needs a shared store —
-// but it blunts rapid-fire abuse from a single client. The DB-side domain
-// cooldown in createQuickScan is the primary cost control (it prevents the
-// expensive worker run from repeating for the same domain).
+// Best-effort per-IP sliding-window limiters. In-memory and per-instance — a
+// fully robust cross-instance limit needs a shared store — but they blunt
+// rapid-fire abuse from a single client. For scans, the DB-side domain cooldown
+// in createQuickScan is the primary cost control; for promo redemption this is
+// the only brute-force protection, so it is intentionally strict.
 
-const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const MAX_PER_WINDOW = 8;
-
-const hits = new Map<string, number[]>();
-
-/** Returns true if the request is allowed, false if the key is rate-limited. */
-export function checkScanRateLimit(key: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-
-  if (recent.length >= MAX_PER_WINDOW) {
-    hits.set(key, recent);
-    return false;
-  }
-
-  recent.push(now);
-  hits.set(key, recent);
-
-  // Opportunistic cleanup so the map cannot grow unbounded.
-  if (hits.size > 5000) {
-    for (const [k, times] of hits) {
-      if (times.every((t) => now - t >= WINDOW_MS)) hits.delete(k);
+function slidingLimiter(maxPerWindow: number, windowMs: number) {
+  const hits = new Map<string, number[]>();
+  return function allow(key: string): boolean {
+    const now = Date.now();
+    const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
+    if (recent.length >= maxPerWindow) {
+      hits.set(key, recent);
+      return false;
     }
-  }
-  return true;
+    recent.push(now);
+    hits.set(key, recent);
+    if (hits.size > 5000) {
+      for (const [k, times] of hits) {
+        if (times.every((t) => now - t >= windowMs)) hits.delete(k);
+      }
+    }
+    return true;
+  };
 }
+
+/** Anonymous scan submissions: 8 per 10 minutes per IP. */
+export const checkScanRateLimit = slidingLimiter(8, 10 * 60 * 1000);
+
+/** Promo-code redemption attempts: 10 per 10 minutes per IP (brute-force guard). */
+export const checkPromoRateLimit = slidingLimiter(10, 10 * 60 * 1000);

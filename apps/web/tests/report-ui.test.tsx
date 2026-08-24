@@ -7,20 +7,36 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 import { PreviewReport } from "@/components/report/PreviewReport";
 import { FullReport } from "@/components/report/FullReport";
 import { exampleReport } from "@/lib/report/example";
+import { toPreviewDoc } from "@/lib/report/preview";
 
 describe("PreviewReport (E12)", () => {
   it("renders the overall score, components, and disclaimer", () => {
-    render(<PreviewReport report={exampleReport} reportId="demo" />);
+    render(<PreviewReport preview={toPreviewDoc(exampleReport)} reportId="demo" />);
     expect(screen.getByText(String(Math.round(exampleReport.overall_score)))).toBeDefined();
     expect(screen.getAllByText("Entity Clarity").length).toBeGreaterThan(0);
     expect(screen.getByText(/does not measure or guarantee/i)).toBeDefined();
   });
 
   it("locks the fixes and shows a CTA with the issue count", () => {
-    render(<PreviewReport report={exampleReport} reportId="demo" />);
+    render(<PreviewReport preview={toPreviewDoc(exampleReport)} reportId="demo" />);
     expect(screen.getByText("Unlock the full audit")).toBeDefined();
     expect(screen.getByText("Get the full audit")).toBeDefined();
     expect(screen.getByText(/issues found/i)).toBeDefined();
+  });
+
+  it("does not expose premium fix text in the preview DTO or DOM", () => {
+    const SENTINEL = "PREMIUM_SENTINEL_DO_NOT_EXPOSE";
+    const report = {
+      ...exampleReport,
+      actions: exampleReport.actions.map((a, i) =>
+        i === 0 ? { ...a, title: SENTINEL, problem: SENTINEL, recommendation: SENTINEL } : a,
+      ),
+    };
+    const preview = toPreviewDoc(report);
+    // The DTO carries only counts + severities, never the fix text.
+    expect(JSON.stringify(preview)).not.toContain(SENTINEL);
+    const { container } = render(<PreviewReport preview={preview} reportId="x" />);
+    expect(container.textContent).not.toContain(SENTINEL);
   });
 });
 

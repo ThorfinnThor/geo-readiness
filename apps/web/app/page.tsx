@@ -141,7 +141,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-3">
             <ScanForm />
             <p className="font-mono text-xs text-fg-subtle">
-              ≤ 50 pages &nbsp;·&nbsp; 7 signals &nbsp;·&nbsp; deterministic &nbsp;·&nbsp; 0
+              up to 12 pages &nbsp;·&nbsp; 7 signals &nbsp;·&nbsp; deterministic &nbsp;·&nbsp; 0
               AI-provider calls
             </p>
           </div>

@@ -16,7 +16,7 @@ export default function PrivacyPage() {
   return (
     <>
       <TopBar />
-      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
+      <main lang="de" className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
         <div
           className="rounded-xl border p-4 text-sm"
           style={{

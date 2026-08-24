@@ -29,6 +29,8 @@ describe("quick scan submission", () => {
     // domain within the window reuses the first scan instead of running again.
     const first = await createQuickScan("acme.example");
     const second = await createQuickScan("acme.example");
+    expect(first.reused).toBe(false);
+    expect(second.reused).toBe(true);
     expect(second.scanId).toBe(first.scanId);
 
     const projects = await query<{ n: string }>(
@@ -44,6 +46,33 @@ describe("quick scan submission", () => {
       ["acme.example"],
     );
     expect(Number(scans[0]!.n)).toBe(1);
+  });
+
+  it("dedupes concurrent scans of the same domain (advisory lock)", async () => {
+    // Warm up so the singleton anonymous org exists (its production steady
+    // state); this isolates the scan-creation race the advisory lock guards.
+    await createQuickScan("warmup.example");
+
+    // 12 simultaneous submissions must produce exactly one scan + one job.
+    const results = await Promise.all(
+      Array.from({ length: 12 }, () => createQuickScan("race.example")),
+    );
+    const uniqueIds = new Set(results.map((r) => r.scanId));
+    expect(uniqueIds.size).toBe(1);
+
+    const scans = await query<{ n: string }>(
+      `SELECT count(*) AS n FROM scans s
+         JOIN projects p ON p.id = s.project_id
+        WHERE p.canonical_domain = $1`,
+      ["race.example"],
+    );
+    expect(Number(scans[0]!.n)).toBe(1);
+
+    const jobs = await query<{ n: string }>(
+      `SELECT count(*) AS n FROM jobs WHERE idempotency_key = $1`,
+      [[...uniqueIds][0]!],
+    );
+    expect(Number(jobs[0]!.n)).toBe(1);
   });
 
   it("returns null report until one is stored, then returns it", async () => {

@@ -25,7 +25,13 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
         router.push(`/report/${reportId}`);
         return;
       }
-      setError(res.status === 403 ? "That code isn’t valid." : "Something went wrong.");
+      if (res.status === 429) {
+        setError("Too many attempts. Please wait a few minutes and try again.");
+      } else if (res.status === 403) {
+        setError("That code isn’t valid.");
+      } else {
+        setError("Something went wrong.");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     }
@@ -67,6 +73,8 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="promo code"
                 aria-label="Promo code"
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? "promo-error" : undefined}
                 className="min-w-0 flex-1 rounded-lg border border-border bg-surface/70 px-3 py-2 font-mono text-xs text-fg outline-none placeholder:text-fg-subtle focus:border-[color:var(--accent)]"
               />
               <button
@@ -77,7 +85,11 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
                 {busy ? "…" : "Redeem"}
               </button>
             </div>
-            {error && <p className="mt-1.5 text-left text-xs text-weak">{error}</p>}
+            {error && (
+              <p id="promo-error" role="alert" className="mt-1.5 text-left text-xs text-weak">
+                {error}
+              </p>
+            )}
           </form>
         )}
       </div>
