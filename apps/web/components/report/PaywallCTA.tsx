@@ -10,6 +10,36 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+
+  async function startCheckout() {
+    setCheckoutBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ scanId: reportId }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { url?: string; alreadyPaid?: boolean };
+        if (data.url) {
+          window.location.assign(data.url);
+          return;
+        }
+        if (data.alreadyPaid) {
+          router.push(`/report/${reportId}`);
+          return;
+        }
+      }
+      // Stripe not configured yet (503), or any other response: fall back to the
+      // pricing page, which explains the promo path.
+      router.push("/pricing");
+    } catch {
+      router.push("/pricing");
+    }
+    setCheckoutBusy(false);
+  }
 
   async function redeem(e: React.FormEvent) {
     e.preventDefault();
@@ -49,13 +79,25 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
       </p>
 
       <div className="mt-4 flex flex-col items-center gap-2">
-        <Link
-          href="/pricing"
-          className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
-          style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
-        >
-          Get the full audit
-        </Link>
+        {isDemo ? (
+          <Link
+            href="/pricing"
+            className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+            style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
+          >
+            Get the full audit
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={startCheckout}
+            disabled={checkoutBusy}
+            className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-60"
+            style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
+          >
+            {checkoutBusy ? "Starting checkout…" : "Get the full audit"}
+          </button>
+        )}
 
         {isDemo ? (
           <Link

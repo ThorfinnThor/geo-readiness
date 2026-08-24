@@ -28,6 +28,19 @@ export function isValidPromoCode(code: string): boolean {
   return timingSafeEqual(a, b);
 }
 
+/** Resolve the org/project that own a scan (both required on a payments row). */
+async function resolveScanOwner(
+  scanId: string,
+): Promise<{ organization_id: string; project_id: string } | null> {
+  const owner = await query<{ organization_id: string; project_id: string }>(
+    `SELECT pr.organization_id, pr.id AS project_id
+       FROM scans s JOIN projects pr ON pr.id = s.project_id
+      WHERE s.id = $1`,
+    [scanId],
+  );
+  return owner[0] ?? null;
+}
+
 /**
  * Grant the full-report entitlement for a scan via promo code. Idempotent:
  * a second call is a no-op. Resolves the scan's org/project (both required on
@@ -36,21 +49,60 @@ export function isValidPromoCode(code: string): boolean {
 export async function grantPromoEntitlement(scanId: string): Promise<boolean> {
   if (await hasEntitlement(scanId)) return true;
 
-  const owner = await query<{ organization_id: string; project_id: string }>(
-    `SELECT pr.organization_id, pr.id AS project_id
-       FROM scans s JOIN projects pr ON pr.id = s.project_id
-      WHERE s.id = $1`,
-    [scanId],
-  );
-  if (owner.length === 0) return false;
-  const { organization_id, project_id } = owner[0]!;
+  const owner = await resolveScanOwner(scanId);
+  if (owner === null) return false;
 
   await query(
     `INSERT INTO payments
        (organization_id, project_id, scan_id, provider, product_code,
         amount, currency, status, paid_at)
      VALUES ($1, $2, $3, 'promo', $4, 0, 'eur', 'paid', now())`,
-    [organization_id, project_id, scanId, FULL_AUDIT_PRODUCT],
+    [owner.organization_id, owner.project_id, scanId, FULL_AUDIT_PRODUCT],
+  );
+  return true;
+}
+
+export interface StripePaymentFacts {
+  scanId: string;
+  checkoutSessionId: string;
+  paymentIntentId?: string | null;
+  customerId?: string | null;
+  amount: number; // minor units (e.g. cents)
+  currency: string; // ISO 4217, lower-case
+}
+
+/**
+ * Grant the full-report entitlement from a completed Stripe checkout. Writes the
+ * same 'paid' payments row grantPromoEntitlement writes, but with provider
+ * 'stripe' and the Stripe references. Idempotent two ways: it no-ops if the scan
+ * is already entitled, and the INSERT is ON CONFLICT DO NOTHING against the unique
+ * stripe_checkout_session_id, so a redelivered webhook can never double-insert.
+ * Returns false only when the scan can't be resolved (bad/foreign scan id).
+ */
+export async function grantStripeEntitlement(facts: StripePaymentFacts): Promise<boolean> {
+  if (await hasEntitlement(facts.scanId)) return true;
+
+  const owner = await resolveScanOwner(facts.scanId);
+  if (owner === null) return false;
+
+  await query(
+    `INSERT INTO payments
+       (organization_id, project_id, scan_id, provider, product_code,
+        amount, currency, status, paid_at,
+        stripe_checkout_session_id, stripe_payment_intent_id, stripe_customer_id)
+     VALUES ($1, $2, $3, 'stripe', $4, $5, $6, 'paid', now(), $7, $8, $9)
+     ON CONFLICT (stripe_checkout_session_id) DO NOTHING`,
+    [
+      owner.organization_id,
+      owner.project_id,
+      facts.scanId,
+      FULL_AUDIT_PRODUCT,
+      facts.amount,
+      facts.currency.toLowerCase(),
+      facts.checkoutSessionId,
+      facts.paymentIntentId ?? null,
+      facts.customerId ?? null,
+    ],
   );
   return true;
 }
