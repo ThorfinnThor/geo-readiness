@@ -41,8 +41,9 @@ export default function PrivacyPage() {
           <p>
             Verantwortlich für die Datenverarbeitung auf dieser Website ist:
             <br />
-            [FIRMENNAME / BETREIBER], [ANSCHRIFT], E-Mail: info@findyouraiscore.com. Weitere Angaben findest
-            du im <a href="/imprint">Impressum</a>.
+            Schayan Yousefian, Freienwalder Str. 34, 13359 Berlin, E-Mail:
+            info@findyouraiscore.com. Weitere Angaben findest du im{" "}
+            <a href="/imprint">Impressum</a>.
           </p>
 
           <h2>2. Wenn du eine Website scannst</h2>

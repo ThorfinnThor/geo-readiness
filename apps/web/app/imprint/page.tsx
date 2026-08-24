@@ -9,25 +9,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/imprint" },
 };
 
-// SCAFFOLD. Replace every [PLATZHALTER] with your real details and have this
-// reviewed by a lawyer before launch. This is not legal advice.
 export default function ImprintPage() {
   return (
     <>
       <TopBar />
       <main lang="de" className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
-        <div
-          className="rounded-xl border p-4 text-sm"
-          style={{
-            borderColor: "color-mix(in srgb, var(--warn) 40%, var(--border))",
-            background: "color-mix(in srgb, var(--warn) 8%, transparent)",
-          }}
-        >
-          <strong>Entwurf / Platzhalter.</strong> Alle Angaben in eckigen Klammern müssen mit deinen
-          echten Daten ersetzt und vor dem Launch rechtlich geprüft werden. Dies ist keine
-          Rechtsberatung.
-        </div>
-
         <header className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
             Rechtliches
@@ -38,47 +24,25 @@ export default function ImprintPage() {
         <div className="content-prose">
           <h2>Angaben gemäß § 5 DDG</h2>
           <p>
-            [FIRMENNAME / BETREIBER]
+            Schayan Yousefian
             <br />
-            [RECHTSFORM, z. B. Einzelunternehmen / GmbH]
+            Freienwalder Str. 34
             <br />
-            [STRASSE UND HAUSNUMMER]
+            13359 Berlin
             <br />
-            [PLZ UND ORT]
-            <br />
-            [LAND]
+            Deutschland
           </p>
-
-          <h2>Vertreten durch</h2>
-          <p>[VERTRETUNGSBERECHTIGTE PERSON, z. B. Geschäftsführer:in]</p>
 
           <h2>Kontakt</h2>
-          <p>
-            Telefon: [TELEFONNUMMER]
-            <br />
-            E-Mail: info@findyouraiscore.com
-          </p>
-
-          <h2>Registereintrag</h2>
-          <p>
-            [Falls zutreffend:] Eintragung im Handelsregister.
-            <br />
-            Registergericht: [REGISTERGERICHT]
-            <br />
-            Registernummer: [REGISTERNUMMER]
-          </p>
-
-          <h2>Umsatzsteuer-ID</h2>
-          <p>
-            [Falls zutreffend:] Umsatzsteuer-Identifikationsnummer gemäß § 27 a
-            Umsatzsteuergesetz: [USt-IdNr.]
-          </p>
+          <p>E-Mail: info@findyouraiscore.com</p>
 
           <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
-            [NAME]
+            Schayan Yousefian
             <br />
-            [ANSCHRIFT]
+            Freienwalder Str. 34
+            <br />
+            13359 Berlin
           </p>
 
           <h2>EU-Streitschlichtung</h2>
