@@ -150,7 +150,7 @@ export function ScanPending({ scanId, status }: { scanId: string; status: string
         {!failed && !stalled && (
           <div className="flex flex-col items-center gap-1 text-center">
             <p className="font-mono text-xs text-fg-subtle">
-              Diagnosis takes at least 60 seconds. {elapsed}s elapsed
+              Diagnosis usually takes about a minute. {elapsed}s elapsed
             </p>
             <p className="max-w-sm text-xs text-fg-subtle/70">
               We crawl and analyze your pages live, so this isn’t instant. You can safely keep this

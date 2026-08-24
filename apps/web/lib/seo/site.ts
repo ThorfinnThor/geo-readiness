@@ -16,7 +16,7 @@ export const SITE = {
 
 // Single source of truth for the full-audit price, shared by the pricing page
 // and the Offer structured data so schema can never contradict visible content.
-export const FULL_AUDIT_PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "249");
+export const FULL_AUDIT_PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "4.99");
 
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = "/"): string {
