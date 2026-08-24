@@ -4,19 +4,19 @@ import { TopBar } from "@/components/TopBar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung",
-  description: "Wie wir personenbezogene Daten verarbeiten (DSGVO).",
+  title: "Privacy Policy",
+  description: "How we process personal data (GDPR).",
   alternates: { canonical: "/privacy" },
 };
 
 // SCAFFOLD. Reflects the app's actual data flows (Vercel, Supabase, GitHub
-// Actions, scan storage) but every [PLATZHALTER] and processor detail must be
+// Actions, scan storage) but every [PLACEHOLDER] and processor detail must be
 // completed and legally reviewed. This is not legal advice.
 export default function PrivacyPage() {
   return (
     <>
       <TopBar />
-      <main lang="de" className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
+      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
         <div
           className="rounded-xl border p-4 text-sm"
           style={{
@@ -24,106 +24,101 @@ export default function PrivacyPage() {
             background: "color-mix(in srgb, var(--warn) 8%, transparent)",
           }}
         >
-          <strong>Entwurf / Platzhalter.</strong> Diese Erklärung bildet die tatsächlichen
-          Datenflüsse der App ab, muss aber mit deinen Firmendaten und geprüften Auftragsverarbeiter-
-          Angaben ergänzt und vor dem Launch rechtlich geprüft werden. Dies ist keine Rechtsberatung.
+          <strong>Draft / placeholder.</strong> This notice reflects the app&apos;s actual data
+          flows, but the processor details still need to be completed with verified information and
+          legally reviewed before launch. This is not legal advice.
         </div>
 
         <header className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
-            Rechtliches
+            Legal
           </span>
-          <h1 className="text-3xl font-semibold tracking-tight">Datenschutzerklärung</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
         </header>
 
         <div className="content-prose">
-          <h2>1. Verantwortlicher</h2>
+          <h2>1. Controller</h2>
           <p>
-            Verantwortlich für die Datenverarbeitung auf dieser Website ist:
+            The controller responsible for data processing on this website is:
             <br />
-            Schayan Yousefian, Freienwalder Str. 34, 13359 Berlin, E-Mail:
-            info@findyouraiscore.com. Weitere Angaben findest du im{" "}
-            <a href="/imprint">Impressum</a>.
+            Schayan Yousefian, Freienwalder Str. 34, 13359 Berlin, Germany. Email:
+            info@findyouraiscore.com. Further details are in the{" "}
+            <a href="/imprint">legal notice</a>.
           </p>
 
-          <h2>2. Wenn du eine Website scannst</h2>
+          <h2>2. When you scan a website</h2>
           <p>
-            Kernfunktion des Dienstes ist die Analyse einer von dir eingegebenen Website. Dabei
-            verarbeiten wir:
+            The core function of the service is to analyze a website you enter. In doing so we
+            process:
           </p>
           <ul>
-            <li>die von dir eingegebene Domain,</li>
-            <li>
-              öffentlich abrufbare Inhalte dieser Website, die wir automatisiert abrufen und
-              analysieren,
-            </li>
-            <li>das daraus erzeugte Auswertungsergebnis (Score, Komponenten, Empfehlungen).</li>
+            <li>the domain you enter,</li>
+            <li>publicly accessible content of that website, which we fetch and analyze automatically,</li>
+            <li>the resulting assessment (score, components, recommendations).</li>
           </ul>
           <p>
-            Diese Daten werden in unserer Datenbank gespeichert, um dir das Ergebnis anzuzeigen und
-            es erneut aufrufbar zu machen. Wenn du eine fremde Website scannst, prüfe bitte, dass du
-            dazu berechtigt bist. Rechtsgrundlage ist die Durchführung des von dir angeforderten
-            Dienstes (Art. 6 Abs. 1 lit. b bzw. f DSGVO).
+            This data is stored in our database so we can show you the result and make it available
+            again later. If you scan a website that is not your own, please make sure you are
+            entitled to do so. The legal basis is the performance of the service you requested
+            (Art. 6(1)(b) and (f) GDPR).
           </p>
 
-          <h2>3. Server-Logfiles und Hosting</h2>
+          <h2>3. Server log files and hosting</h2>
           <p>
-            Die Website wird bei [HOSTING-ANBIETER, z. B. Vercel Inc., USA] gehostet. Beim Aufruf
-            werden automatisch Zugriffsdaten (u. a. IP-Adresse, Zeitpunkt, aufgerufene Seite,
-            Browsertyp) verarbeitet, wie es beim Betrieb einer Website technisch erforderlich ist.
-            Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren, stabilen Betrieb
-            (Art. 6 Abs. 1 lit. f DSGVO).
+            The website is hosted by [HOSTING PROVIDER, e.g. Vercel Inc., USA]. When the site is
+            accessed, access data (including IP address, time, page requested, browser type) is
+            processed automatically, as is technically necessary to operate a website. The legal
+            basis is our legitimate interest in secure, stable operation (Art. 6(1)(f) GDPR).
           </p>
 
-          <h2>4. Eingesetzte Dienste (Auftragsverarbeiter)</h2>
+          <h2>4. Services used (processors)</h2>
           <ul>
             <li>
-              <strong>[Hosting, z. B. Vercel Inc., USA]</strong> — Auslieferung der Website.
+              <strong>[Hosting, e.g. Vercel Inc., USA]</strong> — serving the website.
             </li>
             <li>
-              <strong>[Datenbank, z. B. Supabase, Region ausfüllen]</strong> — Speicherung der
-              Scans und Ergebnisse.
+              <strong>[Database, e.g. Supabase, region to be specified]</strong> — storing scans
+              and results.
             </li>
             <li>
-              <strong>[Scan-Verarbeitung, z. B. GitHub Actions, GitHub Inc., USA]</strong> —
-              Ausführung der Analyse.
+              <strong>[Scan processing, e.g. GitHub Actions, GitHub Inc., USA]</strong> — running
+              the analysis.
             </li>
             <li>
-              [Falls Zahlungen aktiv:] <strong>[Zahlungsdienstleister, z. B. Stripe]</strong> —
-              Abwicklung von Zahlungen.
+              [If payments are active:] <strong>[Payment provider, e.g. Stripe]</strong> —
+              processing payments.
             </li>
           </ul>
           <p>
-            Mit diesen Anbietern ist jeweils ein Auftragsverarbeitungsvertrag zu schließen. Soweit
-            Anbieter außerhalb der EU/des EWR sitzen, erfolgt die Übermittlung auf Grundlage
-            geeigneter Garantien (z. B. EU-Standardvertragsklauseln). [ANGABEN PRÜFEN UND ERGÄNZEN.]
+            A data processing agreement must be concluded with each of these providers. Where a
+            provider is located outside the EU/EEA, transfers are made on the basis of appropriate
+            safeguards (e.g. EU standard contractual clauses). [TO BE VERIFIED AND COMPLETED.]
           </p>
 
-          <h2>5. Cookies und lokale Speicherung</h2>
+          <h2>5. Cookies and local storage</h2>
           <p>
-            Wir setzen keine Tracking-Cookies ein. Für die Anzeige (hell/dunkel) wird ausschließlich
-            ein technischer Wert lokal in deinem Browser (localStorage) gespeichert; dieser Wert
-            wird nicht an uns übertragen.
+            We do not use tracking cookies. For the display (light/dark) only a technical value is
+            stored locally in your browser (localStorage); this value is not transmitted to us.
           </p>
 
-          <h2>6. Konten (falls genutzt)</h2>
+          <h2>6. Accounts (if used)</h2>
           <p>
-            [Falls du Konten anbietest:] Bei einer Registrierung verarbeiten wir E-Mail-Adresse und
-            ein gesichertes (gehashtes) Passwort, um dir Zugang zu deinen Auswertungen zu geben.
-            Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).
+            [If you offer accounts:] When you register, we process your email address and a secured
+            (hashed) password in order to give you access to your assessments. The legal basis is
+            the performance of a contract (Art. 6(1)(b) GDPR).
           </p>
 
-          <h2>7. Speicherdauer</h2>
+          <h2>7. Retention period</h2>
           <p>
-            Wir speichern Scan-Daten [ZEITRAUM FESTLEGEN, z. B. bis zu 90 Tage] und löschen sie
-            anschließend, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+            We store scan data [DEFINE PERIOD, e.g. up to 90 days] and delete it afterwards, unless
+            statutory retention obligations require otherwise.
           </p>
 
-          <h2>8. Deine Rechte</h2>
+          <h2>8. Your rights</h2>
           <p>
-            Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung,
-            Datenübertragbarkeit sowie Widerspruch. Außerdem kannst du dich bei einer
-            Aufsichtsbehörde beschweren. Wende dich dafür an info@findyouraiscore.com.
+            You have the right to access, rectification, erasure, restriction of processing, data
+            portability and objection. You may also lodge a complaint with a supervisory authority.
+            To exercise these rights, contact info@findyouraiscore.com.
           </p>
         </div>
       </main>
