@@ -4,13 +4,30 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
 import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
+import { ogImageUrl } from "@/lib/seo/content-metadata";
+
+const LEARN_TITLE = "Learn AI search readiness, in plain language";
+const LEARN_DESC =
+  "Guides and explainers on getting your website ready for AI answer engines like ChatGPT, " +
+  "Gemini and Perplexity, written for business owners, not engineers.";
 
 export const metadata: Metadata = {
-  title: "Learn AI search readiness, in plain language",
-  description:
-    "Guides and explainers on getting your website ready for AI answer engines like ChatGPT, " +
-    "Gemini and Perplexity, written for business owners, not engineers.",
+  title: LEARN_TITLE,
+  description: LEARN_DESC,
   alternates: { canonical: "/learn" },
+  openGraph: {
+    title: LEARN_TITLE,
+    description: LEARN_DESC,
+    url: "/learn",
+    type: "website",
+    images: [ogImageUrl(LEARN_TITLE)],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: LEARN_TITLE,
+    description: LEARN_DESC,
+    images: [ogImageUrl(LEARN_TITLE)],
+  },
 };
 
 const ORDER: ContentCategory[] = ["Explainer", "Comparison", "Guide", "Reference"];

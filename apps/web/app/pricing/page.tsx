@@ -3,9 +3,31 @@ import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
+import { ogImageUrl } from "@/lib/seo/content-metadata";
 import { FULL_AUDIT_PRICE_EUR as PRICE_EUR } from "@/lib/seo/site";
 
-export const metadata: Metadata = { title: "Pricing" };
+const PRICING_DESC =
+  "See your AI search readiness score for free. The full audit unlocks every fix, the " +
+  "evidence behind it and how to verify it, for a one-time price.";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description: PRICING_DESC,
+  alternates: { canonical: "/pricing" },
+  openGraph: {
+    title: "Pricing",
+    description: PRICING_DESC,
+    url: "/pricing",
+    type: "website",
+    images: [ogImageUrl("Pricing")],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing",
+    description: PRICING_DESC,
+    images: [ogImageUrl("Pricing")],
+  },
+};
 
 function Check() {
   return (

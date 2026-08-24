@@ -4,13 +4,30 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
+import { ogImageUrl } from "@/lib/seo/content-metadata";
 import { SITE, absoluteUrl } from "@/lib/seo/site";
+
+const ABOUT_DESC =
+  "Find Your AI Score is a deterministic, evidence-based audit of how ready a website is to be " +
+  "found, trusted and quoted by AI answer engines. Here is who we are and how the method works.";
 
 export const metadata: Metadata = {
   title: "About",
-  description:
-    "Find Your AI Score is a deterministic, evidence-based audit of how ready a website is to be found, trusted and quoted by AI answer engines. Here is who we are and how the method works.",
+  description: ABOUT_DESC,
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About",
+    description: ABOUT_DESC,
+    url: "/about",
+    type: "website",
+    images: [ogImageUrl("About")],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About",
+    description: ABOUT_DESC,
+    images: [ogImageUrl("About")],
+  },
 };
 
 const aboutJsonLd = {
