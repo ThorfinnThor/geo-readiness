@@ -1,6 +1,8 @@
 import { ArticleLayout } from "@/components/content/ArticleLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { CONTENT } from "@/lib/content/registry";
 import { contentMetadata } from "@/lib/seo/content-metadata";
+import { absoluteUrl } from "@/lib/seo/site";
 
 const meta = CONTENT.find((c) => c.slug === "/glossary")!;
 
@@ -79,6 +81,24 @@ const TERMS: { term: string; id: string; def: string }[] = [
   },
 ];
 
+// DefinedTermSet is the schema built for a glossary: each term becomes an
+// addressable, extractable definition an AI engine can lift — the sourceability
+// signal the audit itself scores.
+const glossaryJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  name: "GEO and AI search glossary",
+  url: absoluteUrl("/glossary"),
+  hasDefinedTerm: TERMS.map((t) => ({
+    "@type": "DefinedTerm",
+    "@id": absoluteUrl(`/glossary#${t.id}`),
+    name: t.term,
+    description: t.def,
+    url: absoluteUrl(`/glossary#${t.id}`),
+    inDefinedTermSet: absoluteUrl("/glossary"),
+  })),
+};
+
 export default function Page() {
   return (
     <ArticleLayout
@@ -88,6 +108,7 @@ export default function Page() {
       updated={meta.updated}
       path={meta.slug}
     >
+      <JsonLd data={glossaryJsonLd} />
       <p>
         The world of AI search comes with its own vocabulary. Here are the terms that matter,
         explained in plain language for business owners, with no computer-science degree required.

@@ -18,6 +18,7 @@ export function ArticleLayout({
   title,
   description,
   category,
+  published,
   updated,
   path,
   faqs = [],
@@ -26,19 +27,37 @@ export function ArticleLayout({
   title: string;
   description: string;
   category?: string;
+  published?: string; // ISO date; falls back to `updated`
   updated?: string; // ISO date
   path: string; // site-relative, for canonical + Article url
   faqs?: Faq[];
   children: React.ReactNode;
 }) {
+  const url = absoluteUrl(path);
+  // author + publisher are the Organization itself: honest E-E-A-T without
+  // inventing a person, and it's the trust signal the audit scores.
+  const org = { "@type": "Organization", name: SITE.name, url: SITE.url };
+  const datePublished = published ?? updated;
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: title,
     description,
-    url: absoluteUrl(path),
+    url,
+    ...(datePublished ? { datePublished } : {}),
     ...(updated ? { dateModified: updated } : {}),
-    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    author: org,
+    publisher: org,
+  };
+  // Home → Learn → this page, so AI engines and SERPs get the site hierarchy.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
+      { "@type": "ListItem", position: 2, name: "Learn", item: absoluteUrl("/learn") },
+      { "@type": "ListItem", position: 3, name: title, item: url },
+    ],
   };
   const faqJsonLd =
     faqs.length > 0
@@ -52,11 +71,12 @@ export function ArticleLayout({
           })),
         }
       : null;
+  const jsonLd = [articleJsonLd, breadcrumbJsonLd, ...(faqJsonLd ? [faqJsonLd] : [])];
 
   return (
     <>
       <TopBar />
-      <JsonLd data={faqJsonLd ? [articleJsonLd, faqJsonLd] : articleJsonLd} />
+      <JsonLd data={jsonLd} />
       <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-12 sm:py-16">
         <article className="flex flex-col gap-8">
           <header className="flex flex-col gap-4">
