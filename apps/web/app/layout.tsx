@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -46,6 +47,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <JsonLd data={siteJsonLd()} />
         {children}
+        <Analytics />
       </body>
     </html>
   );
