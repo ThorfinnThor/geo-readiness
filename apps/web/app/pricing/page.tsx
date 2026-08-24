@@ -3,10 +3,9 @@ import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
+import { FULL_AUDIT_PRICE_EUR as PRICE_EUR } from "@/lib/seo/site";
 
 export const metadata: Metadata = { title: "Pricing" };
-
-const PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "249");
 
 function Check() {
   return (

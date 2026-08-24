@@ -51,6 +51,7 @@ export function Footer() {
         <Col
           title="More"
           links={[
+            { href: "/about", label: "About" },
             { href: "/pricing", label: "Pricing" },
             { href: "/imprint", label: "Imprint" },
             { href: "/privacy", label: "Privacy" },
