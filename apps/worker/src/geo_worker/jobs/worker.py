@@ -18,7 +18,8 @@ from geo_worker.db.models import Scan
 from geo_worker.security.resolver import Resolver
 
 from .processor import run_scan_job
-from .queue import lease_next_job, mark_dead, mark_succeeded
+from .queue import lease_next_job, mark_dead, mark_for_retry, mark_succeeded
+from .retry import is_retryable_error, retry_delay_seconds
 
 
 async def process_one(
@@ -41,11 +42,18 @@ async def process_one(
         )
         await mark_succeeded(session, job)
     except Exception as exc:  # noqa: BLE001 — job must not crash the worker loop
+        error_code = type(exc).__name__
+        # Transient failures (network/timeout) get a backed-off retry until
+        # max_attempts; deterministic failures dead-letter immediately.
+        retry = is_retryable_error(exc) and job.attempt < job.max_attempts
         scan_row = (
             await session.execute(select(Scan).where(Scan.id == scan_id))
         ).scalar_one_or_none()
         if scan_row is not None:
-            scan_row.status = ScanStatus.failed
-            scan_row.error_code = type(exc).__name__
-        await mark_dead(session, job, type(exc).__name__)
+            scan_row.status = ScanStatus.queued if retry else ScanStatus.failed
+            scan_row.error_code = error_code
+        if retry:
+            await mark_for_retry(session, job, error_code, retry_delay_seconds(job.attempt))
+        else:
+            await mark_dead(session, job, error_code)
     return job.id

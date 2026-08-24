@@ -11,18 +11,23 @@ from .queue import (
     enqueue_job,
     lease_next_job,
     mark_dead,
+    mark_for_retry,
     mark_succeeded,
     recover_stale_jobs,
 )
+from .retry import is_retryable_error, retry_delay_seconds
 from .worker import process_one
 
 __all__ = [
     "enqueue_job",
+    "is_retryable_error",
     "lease_next_job",
     "mark_dead",
+    "mark_for_retry",
     "mark_succeeded",
     "process_one",
     "recover_stale_jobs",
+    "retry_delay_seconds",
     "run_scan_job",
     "run_worker_loop",
 ]

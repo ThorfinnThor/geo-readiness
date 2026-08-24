@@ -117,6 +117,25 @@ async def _fail_scan(session: AsyncSession, job: Job, error_code: str) -> None:
         scan.error_code = error_code
 
 
+async def mark_for_retry(
+    session: AsyncSession, job: Job, error_code: str, delay_seconds: int
+) -> None:
+    """Requeue a job for a later attempt (transient failure, §E16 retry policy).
+
+    The attempt counter was already incremented at lease time; here we return the
+    job to the ready pool but hold it back with ``available_at`` so lease_next_job
+    (which requires ``available_at <= now()``) only picks it up after the backoff.
+    """
+    now = dt.datetime.now(dt.UTC)
+    job.status = JobStatus.queued
+    job.error_code = error_code
+    job.worker_id = None
+    job.lease_until = None
+    job.started_at = None
+    job.available_at = now + dt.timedelta(seconds=delay_seconds)
+    await session.flush()
+
+
 async def mark_succeeded(session: AsyncSession, job: Job) -> None:
     job.status = JobStatus.succeeded
     job.completed_at = dt.datetime.now(dt.UTC)
