@@ -9,9 +9,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-// SCAFFOLD. Reflects the app's actual data flows (Vercel, Supabase, GitHub
-// Actions, scan storage) but every [PLACEHOLDER] and processor detail must be
-// completed and legally reviewed. This is not legal advice.
+// Reflects the app's actual data flows. Vercel (hosting + analytics), GitHub
+// Actions (scan processing) and Stripe (payments) are filled; the database
+// vendor/region and the retention period still need confirming, and the notice
+// should be legally reviewed before launch. This is not legal advice.
 export default function PrivacyPage() {
   return (
     <>
@@ -24,9 +25,9 @@ export default function PrivacyPage() {
             background: "color-mix(in srgb, var(--warn) 8%, transparent)",
           }}
         >
-          <strong>Draft / placeholder.</strong> This notice reflects the app&apos;s actual data
-          flows, but the processor details still need to be completed with verified information and
-          legally reviewed before launch. This is not legal advice.
+          <strong>Draft.</strong> The database vendor/region and the retention period still need to
+          be confirmed, and this notice should be legally reviewed before launch. This is not legal
+          advice.
         </div>
 
         <header className="flex flex-col gap-2">
@@ -65,28 +66,28 @@ export default function PrivacyPage() {
 
           <h2>3. Server log files and hosting</h2>
           <p>
-            The website is hosted by [HOSTING PROVIDER, e.g. Vercel Inc., USA]. When the site is
-            accessed, access data (including IP address, time, page requested, browser type) is
-            processed automatically, as is technically necessary to operate a website. The legal
-            basis is our legitimate interest in secure, stable operation (Art. 6(1)(f) GDPR).
+            The website is hosted by Vercel Inc. (USA). When the site is accessed, access data
+            (including IP address, time, page requested, browser type) is processed automatically,
+            as is technically necessary to operate a website. The legal basis is our legitimate
+            interest in secure, stable operation (Art. 6(1)(f) GDPR).
           </p>
 
           <h2>4. Services used (processors)</h2>
           <ul>
             <li>
-              <strong>[Hosting, e.g. Vercel Inc., USA]</strong> — serving the website.
+              <strong>Vercel Inc. (USA)</strong> — hosting and serving the website, including
+              aggregate, cookieless usage analytics (see section 5).
             </li>
             <li>
-              <strong>[Database, e.g. Supabase, region to be specified]</strong> — storing scans
-              and results.
+              <strong>GitHub, Inc. (USA)</strong> — running the scan analysis via GitHub Actions.
             </li>
             <li>
-              <strong>[Scan processing, e.g. GitHub Actions, GitHub Inc., USA]</strong> — running
-              the analysis.
+              <strong>Stripe (Stripe Payments Europe, Ltd.)</strong> — processing payments when you
+              purchase the full audit. We never receive or store your full card details.
             </li>
             <li>
-              [If payments are active:] <strong>[Payment provider, e.g. Stripe]</strong> —
-              processing payments.
+              <strong>[Database host — to confirm, e.g. Supabase]</strong> — storing scans and
+              results.
             </li>
           </ul>
           <p>
@@ -98,7 +99,10 @@ export default function PrivacyPage() {
           <h2>5. Cookies and local storage</h2>
           <p>
             We do not use tracking cookies. For the display (light/dark) only a technical value is
-            stored locally in your browser (localStorage); this value is not transmitted to us.
+            stored locally in your browser (localStorage); this value is not transmitted to us. We
+            use Vercel Web Analytics, which collects aggregate, cookieless usage statistics such as
+            page views and referrers; it does not set cookies, does not track you across websites,
+            and does not build personal profiles.
           </p>
 
           <h2>6. Accounts (if used)</h2>
