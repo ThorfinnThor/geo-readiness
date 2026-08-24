@@ -10,7 +10,7 @@
     "methodology_hash": "847c007e91d755059dd8352302ddd847442e7b2555b7b23549493cee4b4b3b4a",
     "as_of": "2026-01-01T00:00:00+00:00"
   },
-  "overall_score": 44.94,
+  "overall_score": 47.97,
   "overall_level": "Weak",
   "components": [
     {
@@ -22,8 +22,8 @@
     {
       "key": "offer_clarity",
       "name": "Offer Clarity",
-      "score": 57.0,
-      "level": "Needs improvement"
+      "score": 72.18,
+      "level": "Good"
     },
     {
       "key": "prompt_coverage",
@@ -57,7 +57,8 @@
     }
   ],
   "strengths": [
-    "Prompt Coverage is strong (85.87/100)"
+    "Prompt Coverage is strong (85.87/100)",
+    "Offer Clarity is strong (72.18/100)"
   ],
   "gaps": [
     "Sourceability needs work (1.55/100)",
@@ -202,21 +203,6 @@
       ]
     },
     {
-      "rule_id": "RDY-002",
-      "title": "Add dedicated service/product pages",
-      "category": "offer",
-      "severity": "medium",
-      "priority_score": 0.0695,
-      "problem": "Services are named but lack dedicated, detailed landing pages.",
-      "recommendation": "Give each primary service its own page with specific, factual detail.",
-      "expected_signal": "Higher Offer Clarity and stronger per-service evidence depth.",
-      "how_to_verify": "Re-scan: dedicated service/product pages are detected for each service.",
-      "evidence": [
-        "services=['battery storage', 'solar panels']",
-        "dedicated_pages_strength=0.6667"
-      ]
-    },
-    {
       "rule_id": "RDY-010",
       "title": "Serve meaningful content without JS",
       "category": "technical",
@@ -228,6 +214,21 @@
       "how_to_verify": "Re-scan: server-rendered pages expose meaningful text.",
       "evidence": [
         "server_visible_content_strength=0.25"
+      ]
+    },
+    {
+      "rule_id": "RDY-002",
+      "title": "Add dedicated service/product pages",
+      "category": "offer",
+      "severity": "low",
+      "priority_score": 0.045,
+      "problem": "Services are named but lack dedicated, detailed landing pages.",
+      "recommendation": "Give each primary service its own page with specific, factual detail.",
+      "expected_signal": "Higher Offer Clarity and stronger per-service evidence depth.",
+      "how_to_verify": "Re-scan: dedicated service/product pages are detected for each service.",
+      "evidence": [
+        "services=['battery storage', 'solar panels']",
+        "dedicated_pages_strength=0.6667"
       ]
     }
   ],
@@ -443,7 +444,7 @@
     {
       "key": "retrieval_readiness",
       "name": "Retrieval Readiness",
-      "score": 61.07,
+      "score": 63.34,
       "level": "Needs improvement",
       "explanation": "Measures whether important pages are technically accessible, clearly associated with the business and aligned with likely information needs."
     },
@@ -457,12 +458,23 @@
     {
       "key": "answer_extractability",
       "name": "Answer Extractability",
-      "score": 32.57,
+      "score": 34.85,
       "level": "Weak",
       "explanation": "Measures whether important information is presented in forms that can be cleanly extracted into answers, such as concise explanations, specifications, comparisons and procedures."
     }
   ],
   "diagnostics": [
+    {
+      "component": "offer_clarity",
+      "strongest_signals": [
+        "business_offering_relation",
+        "dedicated_service_product_pages"
+      ],
+      "limiting_signals": [
+        "differentiating_factual_detail"
+      ],
+      "explanation": "Offer Clarity is primarily limited by differentiating_factual_detail."
+    },
     {
       "component": "sourceability",
       "strongest_signals": [],

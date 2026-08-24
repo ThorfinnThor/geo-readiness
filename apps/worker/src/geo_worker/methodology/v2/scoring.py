@@ -16,7 +16,6 @@ from geo_worker.scoring.confidence import compute_confidence
 from geo_worker.scoring.engine import (
     _component,
     _entity,
-    _offer,
     _ScoreIndex,
     _structured,
     _technical,
@@ -30,6 +29,7 @@ from geo_worker.scoring.types import (
     SubScore,
 )
 
+from .offer import offer_component
 from .sourceability import sourceability_component
 from .stages import compute_stage_scores
 
@@ -101,7 +101,7 @@ def compute_readiness(
     idx = _ScoreIndex.build(pages, profile)
 
     entity = _component("entity_clarity", _entity(idx))
-    offer = _component("offer_clarity", _offer(idx))
+    offer, offer_diag = offer_component(idx)
     cov = round(coverage.prompt_coverage_score, 2)
     coverage_component = ComponentScore(
         name="prompt_coverage",
@@ -150,5 +150,5 @@ def compute_readiness(
         citation_readiness_score=stages["citation_readiness"],
         answer_extractability_score=stages["answer_extractability"],
         as_of=measurement_as_of,
-        component_diagnostics=[source_diag],
+        component_diagnostics=[offer_diag, source_diag],
     )
