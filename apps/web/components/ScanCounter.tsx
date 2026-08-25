@@ -5,6 +5,10 @@ import { query } from "@/lib/db";
 // Total scans ever run (all scans, paid or not — every scan writes a row). Cached
 // for 60s, so it's at most one DB query per minute regardless of traffic: no
 // rebuilds, negligible cost. Grows into a trust signal over time.
+// Only surface the counter once it reads as a real trust signal, not an awkward
+// early number.
+const MIN_VISIBLE = 114;
+
 const getScanCount = unstable_cache(
   async (): Promise<number> => {
     const rows = await query<{ n: number }>("SELECT count(*)::int AS n FROM scans");
@@ -21,7 +25,7 @@ export async function ScanCounter() {
   } catch {
     return null; // DB unavailable (e.g. building without a database) — hide gracefully.
   }
-  if (count <= 0) return null;
+  if (count <= MIN_VISIBLE) return null; // shows only above 114
 
   return (
     <div className="flex items-center gap-2.5" aria-label={`${count} websites analyzed`}>
