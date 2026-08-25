@@ -61,6 +61,27 @@ export function siteJsonLd(): Record<string, unknown>[] {
     url: SITE.url,
     publisher: { "@id": ORG_ID },
   };
+  const offers = [
+    {
+      "@type": "Offer",
+      name: "Free preview",
+      price: "0",
+      priceCurrency: "EUR",
+      url: absoluteUrl("/pricing"),
+      description:
+        "Overall readiness score, all seven component scores and a confidence rating. No account needed.",
+    },
+    {
+      "@type": "Offer",
+      name: FULL_AUDIT_PRODUCT_NAME,
+      price: String(FULL_AUDIT_PRICE_EUR),
+      priceCurrency: "EUR",
+      url: absoluteUrl("/pricing"),
+      description:
+        "The full AI readiness score across all seven dimensions, concrete findings with " +
+        "evidence, prioritized fixes, and a downloadable report.",
+    },
+  ];
   const service = {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -78,27 +99,24 @@ export function siteJsonLd(): Record<string, unknown>[] {
       "A deterministic audit that reads a website the way an AI answer engine does and scores " +
       "seven readiness signals, with a prioritized list of fixes. It does not call any AI " +
       "provider and does not guarantee AI mentions.",
-    offers: [
-      {
-        "@type": "Offer",
-        name: "Free preview",
-        price: "0",
-        priceCurrency: "EUR",
-        url: absoluteUrl("/pricing"),
-        description:
-          "Overall readiness score, all seven component scores and a confidence rating. No account needed.",
-      },
-      {
-        "@type": "Offer",
-        name: FULL_AUDIT_PRODUCT_NAME,
-        price: String(FULL_AUDIT_PRICE_EUR),
-        priceCurrency: "EUR",
-        url: absoluteUrl("/pricing"),
-        description:
-          "The full AI readiness score across all seven dimensions, concrete findings with " +
-          "evidence, prioritized fixes, and a downloadable report.",
-      },
-    ],
+    offers,
   };
-  return [organization, website, service];
+  // The product is a web-delivered software tool (a SaaS audit app). Accurate
+  // SoftwareApplication schema — improves structured data and lets a reader
+  // identify the archetype rather than mistaking the content library for a blog.
+  const webApplication = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": `${SITE.url}/#app`,
+    name: SITE.name,
+    url: SITE.url,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    provider: { "@id": ORG_ID },
+    description:
+      "A web-based tool that audits how ready a website is for AI answer engines and returns a " +
+      "readiness score with prioritized fixes.",
+    offers,
+  };
+  return [organization, website, service, webApplication];
 }
