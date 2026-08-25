@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { ScanCounter } from "@/components/ScanCounter";
 import { ScanForm } from "@/components/scan/ScanForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RadialScore } from "@/components/report/shared";
@@ -95,7 +96,7 @@ function Inspector() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <>
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6">
@@ -145,6 +146,8 @@ export default function HomePage() {
               AI-provider calls
             </p>
           </div>
+
+          <ScanCounter />
         </section>
 
         <section className="lg:pl-4">
