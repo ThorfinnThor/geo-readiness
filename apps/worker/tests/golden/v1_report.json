@@ -98,7 +98,8 @@
       "evidence": [
         "structured_data_score=51.75",
         "valid_org_identity_strength=1.0"
-      ]
+      ],
+      "fix_prompt": ""
     },
     {
       "rule_id": "RDY-008",
@@ -113,7 +114,8 @@
       "evidence": [
         "evidence_trust_score=43.5",
         "missing_page_types=['legal', 'case_study']"
-      ]
+      ],
+      "fix_prompt": ""
     },
     {
       "rule_id": "RDY-004",
@@ -128,7 +130,8 @@
       "evidence": [
         "sourceability_score=46.0",
         "weak_areas=['case_studies_examples', 'clear_answers_faq', 'dates_freshness', 'named_methodology_source', 'specific_factual_statements', 'tables_lists_spec_structure']"
-      ]
+      ],
+      "fix_prompt": ""
     },
     {
       "rule_id": "RDY-002",
@@ -143,7 +146,8 @@
       "evidence": [
         "services=['solar', 'solar installation']",
         "dedicated_pages_strength=0.3333"
-      ]
+      ],
+      "fix_prompt": ""
     }
   ],
   "clusters": [
@@ -427,5 +431,6 @@
   ],
   "disclaimer": "This audit measures deterministic website readiness for retrieval, citation and answer extraction using research-supported and heuristic proxies. It does not measure or guarantee rankings, citations, traffic or visibility in ChatGPT, Gemini, Perplexity or other AI platforms.",
   "stages": [],
-  "diagnostics": []
+  "diagnostics": [],
+  "fix_prompt_master": ""
 }

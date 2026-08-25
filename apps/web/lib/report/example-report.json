@@ -94,7 +94,8 @@
       "evidence": [
         "structured_data_score=14.29",
         "valid_org_identity_strength=0.0"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add or complete structured data\nProblem: Organization/offer structured data is missing or incomplete.\nChange to make: Add valid Organization + Service/Product JSON-LD with core fields.\nHow the audit re-checks it: Re-scan: Organization and Service/Product markup are detected.\n\nWhat the audit observed:\n- structured_data_score=14.29\n- valid_org_identity_strength=0.0\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-004A",
@@ -109,7 +110,8 @@
       "evidence": [
         "quantified_information_strength=0.0",
         "sourceability=1.55"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add concrete quantified information\nProblem: Pages lack specific figures where they would support the topic.\nChange to make: Add concrete prices, percentages, specifications, measurements, counts or outcome figures where they genuinely support the page.\nHow the audit re-checks it: Re-scan: quantified_information improves.\n\nWhat the audit observed:\n- quantified_information_strength=0.0\n- sourceability=1.55\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-004B",
@@ -124,7 +126,8 @@
       "evidence": [
         "evidence_attribution_strength=0.0",
         "sourceability=1.55"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Attribute claims to identifiable sources\nProblem: Externally verifiable claims are not attributed to sources.\nChange to make: Attribute important externally verifiable claims to identifiable sources and link the supporting material where appropriate.\nHow the audit re-checks it: Re-scan: evidence_attribution improves.\n\nWhat the audit observed:\n- evidence_attribution_strength=0.0\n- sourceability=1.55\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-004C",
@@ -139,7 +142,8 @@
       "evidence": [
         "semantic_extractability_strength=0.0",
         "sourceability=1.55"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Present content in extractable structures\nProblem: Specifications, comparisons and processes are not in extractable structures.\nChange to make: Present genuine specifications, comparisons and processes using semantic tables, lists or definition structures where they fit.\nHow the audit re-checks it: Re-scan: semantic_extractability improves.\n\nWhat the audit observed:\n- semantic_extractability_strength=0.0\n- sourceability=1.55\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-004D",
@@ -154,7 +158,8 @@
       "evidence": [
         "direct_answerability_strength=0.0",
         "sourceability=1.55"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add concise direct answers\nProblem: High-priority questions lack concise, extractable answers.\nChange to make: Add concise answer passages for high-priority customer questions. A dedicated FAQ page is not required.\nHow the audit re-checks it: Re-scan: direct_answerability improves.\n\nWhat the audit observed:\n- direct_answerability_strength=0.0\n- sourceability=1.55\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-008",
@@ -169,7 +174,8 @@
       "evidence": [
         "evidence_trust_score=8.57",
         "missing_page_types=['about', 'contact', 'legal', 'case_study']"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add trust and transparency evidence\nProblem: Trust signals (identity, references, policies) are thin.\nChange to make: Add about, contact/imprint, references/case studies, and policy pages.\nHow the audit re-checks it: Re-scan: transparency and reference signals are detected.\n\nWhat the audit observed:\n- evidence_trust_score=8.57\n- missing_page_types=['about', 'contact', 'legal', 'case_study']\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-001",
@@ -185,7 +191,8 @@
         "brand_name=BrightSolar",
         "entity_clarity_score=55.0",
         "legal_name=missing"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Clarify business identity\nProblem: The site's business identity is ambiguous or under-specified.\nChange to make: State a single, consistent organization identity (brand name, legal name, imprint/contact) and add Organization structured data.\nHow the audit re-checks it: Re-scan: Entity Clarity rises and the brand no longer needs confirmation.\n\nWhat the audit observed:\n- brand_name=BrightSolar\n- entity_clarity_score=55.0\n- legal_name=missing\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-012",
@@ -200,7 +207,8 @@
       "evidence": [
         "declared_freshness_strength=0.0",
         "sourceability=1.55"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add accurate freshness metadata\nProblem: Time-sensitive content lacks accurate publication/update metadata.\nChange to make: Add accurate publication/update metadata and visibly maintain time-sensitive content. Never change timestamps merely to look fresh.\nHow the audit re-checks it: Re-scan: declared_freshness improves.\n\nWhat the audit observed:\n- declared_freshness_strength=0.0\n- sourceability=1.55\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-010",
@@ -214,7 +222,8 @@
       "how_to_verify": "Re-scan: server-rendered pages expose meaningful text.",
       "evidence": [
         "server_visible_content_strength=0.25"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Serve meaningful content without JS\nProblem: Little meaningful content is present in server-rendered HTML.\nChange to make: Ensure core content is in the server-rendered HTML, not JS-only.\nHow the audit re-checks it: Re-scan: server-rendered pages expose meaningful text.\n\nWhat the audit observed:\n- server_visible_content_strength=0.25\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     },
     {
       "rule_id": "RDY-002",
@@ -229,7 +238,8 @@
       "evidence": [
         "services=['battery storage', 'solar panels']",
         "dedicated_pages_strength=0.6667"
-      ]
+      ],
+      "fix_prompt": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\n\nFix: Add dedicated service/product pages\nProblem: Services are named but lack dedicated, detailed landing pages.\nChange to make: Give each primary service its own page with specific, factual detail.\nHow the audit re-checks it: Re-scan: dedicated service/product pages are detected for each service.\n\nWhat the audit observed:\n- services=['battery storage', 'solar panels']\n- dedicated_pages_strength=0.6667\n\nTell me exactly which pages or files to edit and give the concrete markup or copy. Only use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue."
     }
   ],
   "clusters": [
@@ -484,5 +494,6 @@
       ],
       "explanation": "Sourceability is primarily limited by specific quantified information, source attribution."
     }
-  ]
+  ],
+  "fix_prompt_master": "You are improving brightsolar.example so AI answer engines can find, trust and quote it.\nWork through the prioritized fixes below. For each, tell me exactly which pages or files to edit and give the concrete markup or copy.\nOnly use facts that are genuinely true of this business. Never invent claims, numbers, reviews, prices or credentials. Prefer the smallest change that resolves the issue.\n\nFixes, most important first:\n\n1. [high] Add or complete structured data\n   Problem: Organization/offer structured data is missing or incomplete.\n   Change: Add valid Organization + Service/Product JSON-LD with core fields.\n   Verify: Re-scan: Organization and Service/Product markup are detected.\n\n2. [high] Add concrete quantified information\n   Problem: Pages lack specific figures where they would support the topic.\n   Change: Add concrete prices, percentages, specifications, measurements, counts or outcome figures where they genuinely support the page.\n   Verify: Re-scan: quantified_information improves.\n\n3. [high] Attribute claims to identifiable sources\n   Problem: Externally verifiable claims are not attributed to sources.\n   Change: Attribute important externally verifiable claims to identifiable sources and link the supporting material where appropriate.\n   Verify: Re-scan: evidence_attribution improves.\n\n4. [high] Present content in extractable structures\n   Problem: Specifications, comparisons and processes are not in extractable structures.\n   Change: Present genuine specifications, comparisons and processes using semantic tables, lists or definition structures where they fit.\n   Verify: Re-scan: semantic_extractability improves.\n\n5. [high] Add concise direct answers\n   Problem: High-priority questions lack concise, extractable answers.\n   Change: Add concise answer passages for high-priority customer questions. A dedicated FAQ page is not required.\n   Verify: Re-scan: direct_answerability improves.\n\n6. [high] Add trust and transparency evidence\n   Problem: Trust signals (identity, references, policies) are thin.\n   Change: Add about, contact/imprint, references/case studies, and policy pages.\n   Verify: Re-scan: transparency and reference signals are detected.\n\n7. [high] Clarify business identity\n   Problem: The site's business identity is ambiguous or under-specified.\n   Change: State a single, consistent organization identity (brand name, legal name, imprint/contact) and add Organization structured data.\n   Verify: Re-scan: Entity Clarity rises and the brand no longer needs confirmation.\n\n8. [medium] Add accurate freshness metadata\n   Problem: Time-sensitive content lacks accurate publication/update metadata.\n   Change: Add accurate publication/update metadata and visibly maintain time-sensitive content. Never change timestamps merely to look fresh.\n   Verify: Re-scan: declared_freshness improves.\n\n9. [medium] Serve meaningful content without JS\n   Problem: Little meaningful content is present in server-rendered HTML.\n   Change: Ensure core content is in the server-rendered HTML, not JS-only.\n   Verify: Re-scan: server-rendered pages expose meaningful text.\n\n10. [low] Add dedicated service/product pages\n   Problem: Services are named but lack dedicated, detailed landing pages.\n   Change: Give each primary service its own page with specific, factual detail.\n   Verify: Re-scan: dedicated service/product pages are detected for each service.\n"
 }

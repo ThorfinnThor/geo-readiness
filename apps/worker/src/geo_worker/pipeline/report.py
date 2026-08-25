@@ -100,6 +100,9 @@ class ReportAction(BaseModel):
     expected_signal: str
     how_to_verify: str
     evidence: list[str]
+    # V2 additive: a paste-ready prompt the user can hand to an AI/developer to
+    # implement this one fix. Empty for V1.
+    fix_prompt: str = ""
 
 
 class ReportProfile(BaseModel):
@@ -155,6 +158,8 @@ class ReportDocument(BaseModel):
     # V2 additive (§90–92); empty for V1.
     stages: list[ReportStage] = []
     diagnostics: list[ReportDiagnostic] = []
+    # V2 additive: one prompt that bundles every fix, paste-ready. Empty for V1.
+    fix_prompt_master: str = ""
 
 
 def _build_stages(r) -> list[ReportStage]:
@@ -200,8 +205,61 @@ def _build_diagnostics(r) -> list[ReportDiagnostic]:
     return out
 
 
+_FIX_GUARDRAIL = (
+    "Only use facts that are genuinely true of this business. Never invent claims, numbers, "
+    "reviews, prices or credentials. Prefer the smallest change that resolves the issue."
+)
+
+
+def _action_fix_prompt(action, domain: str) -> str:
+    """A paste-ready prompt for a single fix (V2)."""
+    lines = [
+        f"You are improving {domain} so AI answer engines can find, trust and quote it.",
+        "",
+        f"Fix: {action.title}",
+        f"Problem: {action.problem}",
+        f"Change to make: {action.recommendation}",
+        f"How the audit re-checks it: {action.how_to_verify}",
+    ]
+    if action.evidence:
+        lines.append("")
+        lines.append("What the audit observed:")
+        lines.extend(f"- {e}" for e in action.evidence)
+    lines.append("")
+    lines.append(
+        "Tell me exactly which pages or files to edit and give the concrete markup or copy. "
+        + _FIX_GUARDRAIL
+    )
+    return "\n".join(lines)
+
+
+def _master_fix_prompt(actions, domain: str) -> str:
+    """One prompt bundling every fix, in priority order (V2)."""
+    if not actions:
+        return ""
+    out = [
+        f"You are improving {domain} so AI answer engines can find, trust and quote it.",
+        "Work through the prioritized fixes below. For each, tell me exactly which pages or files "
+        "to edit and give the concrete markup or copy.",
+        _FIX_GUARDRAIL,
+        "",
+        "Fixes, most important first:",
+        "",
+    ]
+    for i, a in enumerate(actions, 1):
+        out.append(f"{i}. [{a.severity}] {a.title}")
+        out.append(f"   Problem: {a.problem}")
+        out.append(f"   Change: {a.recommendation}")
+        out.append(f"   Verify: {a.how_to_verify}")
+        out.append("")
+    return "\n".join(out).rstrip() + "\n"
+
+
 def build_report(scan: ScanResult) -> ReportDocument:
     r = scan.readiness
+    # Fix prompts are a V2 feature; V1 reports leave them empty (frozen output).
+    is_v2 = scan.methodology_version != "geo-readiness-v1"
+    domain = scan.canonical_domain
     components = [
         ReportComponent(
             key=key,
@@ -249,6 +307,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
             expected_signal=a.expected_signal,
             how_to_verify=a.how_to_verify,
             evidence=a.evidence,
+            fix_prompt=_action_fix_prompt(a, domain) if is_v2 else "",
         )
         for a in scan.actions
     ]
@@ -288,4 +347,5 @@ def build_report(scan: ScanResult) -> ReportDocument:
         clusters=clusters,
         stages=_build_stages(r),
         diagnostics=_build_diagnostics(r),
+        fix_prompt_master=_master_fix_prompt(scan.actions, domain) if is_v2 else "",
     )
