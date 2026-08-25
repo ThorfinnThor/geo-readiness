@@ -86,7 +86,7 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
       <p className="mt-2 text-sm">
         <span className="font-semibold">€{PRICE_EUR.toLocaleString("en-US")}</span>{" "}
         <span className="text-fg-subtle">
-          launch price · <span className="line-through">€{REGULAR_EUR.toLocaleString("en-US")}</span>
+          launch price · €{REGULAR_EUR.toLocaleString("en-US")} after launch
         </span>
       </p>
 

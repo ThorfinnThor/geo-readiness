@@ -131,8 +131,7 @@ export default function PricingPage() {
                 </span>
               </div>
               <p className="text-sm text-fg-subtle">
-                <span className="line-through">€{REGULAR_EUR.toLocaleString("en-US")}</span> regular
-                price · one-time payment
+                Regular price €{REGULAR_EUR.toLocaleString("en-US")} after launch · one-time payment
               </p>
             </div>
             <ul className="flex flex-col gap-2.5">
