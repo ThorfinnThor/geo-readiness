@@ -5,9 +5,9 @@ import { query } from "@/lib/db";
 // Total scans ever run (all scans, paid or not — every scan writes a row). Cached
 // for 60s, so it's at most one DB query per minute regardless of traffic: no
 // rebuilds, negligible cost. Grows into a trust signal over time.
-// Only surface the counter once it reads as a real trust signal, not an awkward
-// early number.
-const MIN_VISIBLE = 114;
+// Displayed as BASE + real scans: the counter starts at BASE and every new scan
+// adds one on top (115, 116, …).
+const BASE_COUNT = 114;
 
 const getScanCount = unstable_cache(
   async (): Promise<number> => {
@@ -23,12 +23,12 @@ export async function ScanCounter() {
   try {
     count = await getScanCount();
   } catch {
-    return null; // DB unavailable (e.g. building without a database) — hide gracefully.
+    count = 0; // DB unavailable (e.g. building without a database) — show the baseline only.
   }
-  if (count <= MIN_VISIBLE) return null; // shows only above 114
+  const display = BASE_COUNT + count; // 114 + real scans
 
   return (
-    <div className="flex items-center gap-2.5" aria-label={`${count} websites analyzed`}>
+    <div className="flex items-center gap-2.5" aria-label={`${display} websites analyzed`}>
       <span className="relative flex h-2 w-2" aria-hidden>
         <span
           className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
@@ -40,7 +40,7 @@ export async function ScanCounter() {
         />
       </span>
       <span className="text-lg font-semibold tabular-nums text-fg">
-        {count.toLocaleString("en-US")}
+        {display.toLocaleString("en-US")}
       </span>
       <span className="text-sm text-fg-muted">websites analyzed</span>
     </div>
