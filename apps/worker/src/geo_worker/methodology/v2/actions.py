@@ -266,6 +266,37 @@ def compute_actions(
             )
         )
 
+    # Offer clarity can score 0 because NO offering was detected — a case RDY-002
+    # (which only suggests dedicated pages for existing services) never covers,
+    # leaving a weak component with no finding. Fill that gap so a low, shown
+    # component always has an action.
+    offer_score = next((c.score for c in readiness.components if c.name == "offer_clarity"), 0.0)
+    if offer_score < 50 and not profile.services and not profile.products:
+        families.append(
+            _make(
+                rule_id="RDY-002B",
+                family="RDY-002",  # one offer action at most; mutually exclusive with RDY-002
+                category="offer",
+                component_score=offer_score,
+                confidence=confidence,
+                impact=0.85,
+                effort=3,
+                title="State what you offer",
+                problem=(
+                    "No products or services could be identified on the site, so AI answer "
+                    "engines cannot tell what you offer."
+                ),
+                evidence=[f"offer_clarity={offer_score}", "services=[]", "products=[]"],
+                recommendation=(
+                    "State your main products or services in visible page text and headings, "
+                    "ideally on a dedicated page, and add matching Service or Product structured "
+                    "data."
+                ),
+                expected_signal="Offer Clarity rises once a clear offering is detected.",
+                how_to_verify="Re-scan: services or products are detected.",
+            )
+        )
+
     # Dedup by family, keep highest priority; then sort.
     best: dict[str, Action] = {}
     for family, action in families:
