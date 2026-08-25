@@ -14,9 +14,14 @@ export const SITE = {
   locale: "en_US",
 } as const;
 
-// Single source of truth for the full-audit price, shared by the pricing page
-// and the Offer structured data so schema can never contradict visible content.
-export const FULL_AUDIT_PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "4.99");
+// Single source of truth for the paid product, shared by the pricing page, the
+// paywall and the Offer structured data so nothing can drift.
+export const FULL_AUDIT_PRODUCT_NAME = "Premium AI Readiness Audit";
+export const FULL_AUDIT_PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "9.99");
+// Regular (post-launch) price, shown as the anchor next to the launch price.
+export const FULL_AUDIT_REGULAR_PRICE_EUR = Number(
+  process.env.GEO_FULL_AUDIT_REGULAR_PRICE_EUR ?? "49",
+);
 
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = "/"): string {
@@ -60,7 +65,7 @@ export function siteJsonLd(): Record<string, unknown>[] {
     "@context": "https://schema.org",
     "@type": "Service",
     "@id": `${SITE.url}/#service`,
-    name: "AI Search Readiness Audit",
+    name: FULL_AUDIT_PRODUCT_NAME,
     serviceType: "Generative Engine Optimization (GEO) audit",
     provider: { "@id": ORG_ID },
     url: SITE.url,
@@ -85,11 +90,13 @@ export function siteJsonLd(): Record<string, unknown>[] {
       },
       {
         "@type": "Offer",
-        name: "Full audit",
+        name: FULL_AUDIT_PRODUCT_NAME,
         price: String(FULL_AUDIT_PRICE_EUR),
         priceCurrency: "EUR",
         url: absoluteUrl("/pricing"),
-        description: "Every fix with the evidence behind it and how to verify it.",
+        description:
+          "The full AI readiness score across all seven dimensions, concrete findings with " +
+          "evidence, prioritized fixes, and a downloadable report.",
       },
     ],
   };

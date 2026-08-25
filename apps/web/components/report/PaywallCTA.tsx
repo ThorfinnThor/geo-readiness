@@ -4,6 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import {
+  FULL_AUDIT_PRICE_EUR as PRICE_EUR,
+  FULL_AUDIT_PRODUCT_NAME as PRODUCT,
+  FULL_AUDIT_REGULAR_PRICE_EUR as REGULAR_EUR,
+} from "@/lib/seo/site";
+
 export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCount: number }) {
   const router = useRouter();
   const isDemo = reportId === "demo";
@@ -73,9 +79,15 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
       <p className="font-mono text-xs" style={{ color: "var(--weak)" }}>
         {issueCount} issues are limiting how AI search reads your site
       </p>
-      <h2 className="mt-2 text-base font-semibold">Unlock the full audit</h2>
+      <h2 className="mt-2 text-base font-semibold">Unlock the {PRODUCT}</h2>
       <p className="mt-1 text-sm text-fg-muted">
         Every fix, with the evidence behind it and how to verify it.
+      </p>
+      <p className="mt-2 text-sm">
+        <span className="font-semibold">€{PRICE_EUR.toLocaleString("en-US")}</span>{" "}
+        <span className="text-fg-subtle">
+          launch price · <span className="line-through">€{REGULAR_EUR.toLocaleString("en-US")}</span>
+        </span>
       </p>
 
       <div className="mt-4 flex flex-col items-center gap-2">
@@ -85,7 +97,7 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
             className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
-            Get the full audit
+            Get the Premium Audit
           </Link>
         ) : (
           <button
@@ -95,7 +107,7 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
             className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-60"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
-            {checkoutBusy ? "Starting checkout…" : "Get the full audit"}
+            {checkoutBusy ? "Starting checkout…" : "Get the Premium Audit"}
           </button>
         )}
 

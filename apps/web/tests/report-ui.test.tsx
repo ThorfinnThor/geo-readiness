@@ -19,8 +19,8 @@ describe("PreviewReport (E12)", () => {
 
   it("locks the fixes and shows a CTA with the issue count", () => {
     render(<PreviewReport preview={toPreviewDoc(exampleReport)} reportId="demo" />);
-    expect(screen.getByText("Unlock the full audit")).toBeDefined();
-    expect(screen.getByText("Get the full audit")).toBeDefined();
+    expect(screen.getByText("Unlock the Premium AI Readiness Audit")).toBeDefined();
+    expect(screen.getByText("Get the Premium Audit")).toBeDefined();
     expect(screen.getByText(/issues found/i)).toBeDefined();
   });
 

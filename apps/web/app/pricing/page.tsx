@@ -4,11 +4,16 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
-import { FULL_AUDIT_PRICE_EUR as PRICE_EUR } from "@/lib/seo/site";
+import {
+  FULL_AUDIT_PRICE_EUR as PRICE_EUR,
+  FULL_AUDIT_PRODUCT_NAME as PRODUCT,
+  FULL_AUDIT_REGULAR_PRICE_EUR as REGULAR_EUR,
+} from "@/lib/seo/site";
 
 const PRICING_DESC =
-  "See your AI search readiness score for free. The full audit unlocks every fix, the " +
-  "evidence behind it and how to verify it, for a one-time price.";
+  "See your AI search readiness score for free, then unlock the Premium AI Readiness Audit: the " +
+  "full score across seven dimensions, findings with evidence, prioritized fixes and a " +
+  "downloadable report.";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -60,7 +65,7 @@ export default function PricingPage() {
           </h1>
           <p className="mx-auto max-w-xl text-sm text-fg-muted">
             Every scan runs the full deterministic engine, with no AI-provider calls and no
-            guesswork. The free preview shows your readiness. The full audit shows exactly
+            guesswork. The free preview shows your readiness. The Premium audit shows exactly
             what to change.
           </p>
         </header>
@@ -95,9 +100,9 @@ export default function PricingPage() {
               background: "color-mix(in srgb, var(--accent) 6%, var(--surface))",
             }}
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold">Full audit</h2>
+                <h2 className="text-lg font-semibold">{PRODUCT}</h2>
                 <span
                   className="rounded-full px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wide"
                   style={{
@@ -105,33 +110,51 @@ export default function PricingPage() {
                     backgroundColor: "color-mix(in srgb, var(--accent) 14%, transparent)",
                   }}
                 >
-                  complete
+                  premium
                 </span>
               </div>
-              <p className="font-mono text-3xl font-semibold tabular-nums">
-                €{PRICE_EUR.toLocaleString("en-US")}
+              <p className="text-sm text-fg-muted">
+                See how ready your website is for AI search, and exactly what to fix.
               </p>
-              <p className="text-sm text-fg-subtle">one-time · per scan</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <p className="font-mono text-3xl font-semibold tabular-nums">
+                  €{PRICE_EUR.toLocaleString("en-US")}
+                </p>
+                <span
+                  className="rounded-full px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wide"
+                  style={{
+                    color: "var(--accent)",
+                    backgroundColor: "color-mix(in srgb, var(--accent) 14%, transparent)",
+                  }}
+                >
+                  Launch price
+                </span>
+              </div>
+              <p className="text-sm text-fg-subtle">
+                <span className="line-through">€{REGULAR_EUR.toLocaleString("en-US")}</span> regular
+                price · one-time payment
+              </p>
             </div>
             <ul className="flex flex-col gap-2.5">
-              <Feature>Everything in the free preview</Feature>
-              <Feature>Every prioritized fix, ranked by impact</Feature>
-              <Feature>The evidence behind each issue, and how to verify the fix</Feature>
-              <Feature>Retrieval, citation &amp; answer-extraction stage scores</Feature>
-              <Feature>Full prompt-cluster coverage map with missing requirements</Feature>
-              <Feature>What’s limiting your weakest areas</Feature>
-              <Feature>Download as PDF or Markdown</Feature>
+              <Feature>Full AI Readiness Score across all seven dimensions</Feature>
+              <Feature>Concrete findings, each with the evidence behind it</Feature>
+              <Feature>Prioritized fixes, ranked by impact</Feature>
+              <Feature>Prompt &amp; topic coverage map with missing requirements</Feature>
+              <Feature>Retrieval, citation &amp; answer readiness</Feature>
+              <Feature>Structured data &amp; technical AI accessibility</Feature>
+              <Feature>Downloadable report (PDF or Markdown)</Feature>
             </ul>
             <div className="mt-auto flex flex-col gap-2">
-              <span
-                className="rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-[color:var(--accent-fg)] opacity-70"
+              <Link
+                href="/"
+                className="rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
                 style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
               >
-                Card payment coming soon
-              </span>
+                Run a free scan
+              </Link>
               <p className="text-center text-xs text-fg-subtle">
-                Run a scan, then unlock its full audit from the results page, with a
-                promo code today or card payment shortly.
+                Run a scan, then unlock the Premium audit from your results page by card or promo
+                code.
               </p>
             </div>
           </section>
