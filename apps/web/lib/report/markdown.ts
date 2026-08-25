@@ -88,8 +88,24 @@ export function reportToMarkdown(report: ReportDocument): string {
       out.push("**Evidence:**");
       for (const e of a.evidence) out.push(`- ${e}`);
     }
+    if (a.fix_prompt) {
+      out.push("", "**Fix prompt (copy-paste):**", "", "```text", a.fix_prompt, "```");
+    }
     out.push("");
   });
+
+  if (report.fix_prompt_master) {
+    out.push(
+      "## Master fix prompt",
+      "",
+      "Paste this into ChatGPT, Claude or hand it to your developer.",
+      "",
+      "```text",
+      report.fix_prompt_master,
+      "```",
+      "",
+    );
+  }
 
   out.push("---", "", `_${report.disclaimer}_`, "");
   return out.join("\n");

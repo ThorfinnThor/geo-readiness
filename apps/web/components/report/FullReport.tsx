@@ -8,6 +8,7 @@ import {
   StageCard,
   severityColor,
 } from "@/components/report/shared";
+import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
 import { TopBar } from "@/components/TopBar";
 
@@ -142,6 +143,24 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
       </Section>
 
       <Section title="Full action backlog">
+        {report.fix_prompt_master && (
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
+            style={{
+              borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))",
+              background: "color-mix(in srgb, var(--accent) 6%, var(--surface))",
+            }}
+          >
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold">Fix everything with one prompt</h3>
+              <p className="mt-0.5 text-xs text-fg-muted">
+                Paste this into ChatGPT, Claude or hand it to your developer. It only uses facts
+                that are true of your site and never invents any.
+              </p>
+            </div>
+            <CopyPromptButton text={report.fix_prompt_master} label="Copy master prompt" />
+          </div>
+        )}
         <ol className="flex flex-col gap-3">
           {report.actions.map((a) => (
             <li key={a.rule_id} className="rounded-xl border border-border bg-surface/50 p-5">
@@ -171,6 +190,11 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
                     <li key={i}>{e}</li>
                   ))}
                 </ul>
+              )}
+              {a.fix_prompt && (
+                <div className="mt-3 flex justify-end border-t border-border pt-3">
+                  <CopyPromptButton text={a.fix_prompt} />
+                </div>
               )}
             </li>
           ))}

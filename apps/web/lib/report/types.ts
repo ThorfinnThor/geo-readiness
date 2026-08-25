@@ -36,6 +36,7 @@ export interface ReportAction {
   expected_signal: string;
   how_to_verify: string;
   evidence: string[];
+  fix_prompt?: string;
 }
 
 export interface ReportProfile {
@@ -92,4 +93,5 @@ export interface ReportDocument {
   // V2 additive; default to [] when absent.
   stages?: ReportStage[];
   diagnostics?: ReportDiagnostic[];
+  fix_prompt_master?: string;
 }
