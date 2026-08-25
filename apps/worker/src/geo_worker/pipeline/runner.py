@@ -35,6 +35,12 @@ class ScanResult:
     crawl_status: str
     as_of: dt.datetime
     methodology_hash: str
+    # Crawl transparency (§v2-plan 5.1). Defaults are neutral for legacy callers.
+    pages_fetched: int = 0
+    crawl_errors: int = 0
+    robots_skipped: int = 0
+    homepage_reachable: bool = True
+    robots_blocked_core: bool = False
 
 
 def _limits_for(scan_type: str) -> CrawlLimits:
@@ -117,4 +123,9 @@ def run_pipeline(
         crawl_status=str(crawl_result.status),
         as_of=measurement_as_of,
         methodology_hash=methodology_hash,
+        pages_fetched=fetched,
+        crawl_errors=errors,
+        robots_skipped=crawl_result.metrics.robots_skipped,
+        homepage_reachable=crawl_result.homepage_reachable,
+        robots_blocked_core=crawl_result.robots_blocked_core,
     )

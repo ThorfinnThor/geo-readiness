@@ -144,6 +144,19 @@ class ReportDiagnostic(BaseModel):
     explanation: str = ""
 
 
+class ReportCrawl(BaseModel):
+    """Crawl transparency (§v2-plan 5.1): what was actually fetched."""
+
+    status: str
+    pages_analyzed: int
+    pages_fetched: int
+    errors: int
+    robots_skipped: int
+    homepage_reachable: bool
+    robots_blocked_core: bool
+    valid_response_ratio: float
+
+
 class ReportDocument(BaseModel):
     meta: ReportMeta
     overall_score: float
@@ -160,6 +173,12 @@ class ReportDocument(BaseModel):
     diagnostics: list[ReportDiagnostic] = []
     # V2 additive: one prompt that bundles every fix, paste-ready. Empty for V1.
     fix_prompt_master: str = ""
+    # V2 additive transparency: crawl summary, a provisional flag when crawl
+    # coverage is too thin to fully trust the score, and an explained empty-cluster
+    # state. All null/empty for V1.
+    crawl: ReportCrawl | None = None
+    provisional: bool = False
+    cluster_note: str = ""
 
 
 def _build_stages(r) -> list[ReportStage]:
@@ -255,11 +274,59 @@ def _master_fix_prompt(actions, domain: str) -> str:
     return "\n".join(out).rstrip() + "\n"
 
 
+def _cluster_note(scan: ScanResult) -> str:
+    """Explain an empty prompt-cluster set (§v2-plan 7.3) instead of showing 0."""
+    if scan.clusters:
+        return ""
+    p = scan.profile
+    missing = []
+    if not p.brand_name:
+        missing.append("a clear organization identity")
+    if not p.services and not p.products:
+        missing.append("an identifiable offering (services or products)")
+    if not (p.industries or p.services or p.products):
+        missing.append("a stable topic")
+    reason = ", ".join(missing) if missing else "signals of sufficient confidence"
+    return (
+        "Prompt modeling could not be completed because the crawl did not yield "
+        f"{reason}. Clarify these on the site and re-scan."
+    )
+
+
 def build_report(scan: ScanResult) -> ReportDocument:
     r = scan.readiness
-    # Fix prompts are a V2 feature; V1 reports leave them empty (frozen output).
+    # These are V2 features; V1 reports leave them empty (frozen output).
     is_v2 = scan.methodology_version != "geo-readiness-v1"
     domain = scan.canonical_domain
+    valid_ratio = (
+        scan.pages_fetched / (scan.pages_fetched + scan.crawl_errors)
+        if (scan.pages_fetched + scan.crawl_errors)
+        else 1.0
+    )
+    crawl = (
+        ReportCrawl(
+            status=scan.crawl_status,
+            pages_analyzed=scan.pages_analyzed,
+            pages_fetched=scan.pages_fetched,
+            errors=scan.crawl_errors,
+            robots_skipped=scan.robots_skipped,
+            homepage_reachable=scan.homepage_reachable,
+            robots_blocked_core=scan.robots_blocked_core,
+            valid_response_ratio=round(valid_ratio, 4),
+        )
+        if is_v2
+        else None
+    )
+    # Provisional when crawl coverage is too thin to fully trust the score.
+    provisional = bool(
+        is_v2
+        and (
+            not scan.homepage_reachable
+            or scan.robots_blocked_core
+            or valid_ratio < 0.8
+            or scan.pages_analyzed == 0
+        )
+    )
     components = [
         ReportComponent(
             key=key,
@@ -348,4 +415,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
         stages=_build_stages(r),
         diagnostics=_build_diagnostics(r),
         fix_prompt_master=_master_fix_prompt(scan.actions, domain) if is_v2 else "",
+        crawl=crawl,
+        provisional=provisional,
+        cluster_note=_cluster_note(scan) if is_v2 else "",
     )

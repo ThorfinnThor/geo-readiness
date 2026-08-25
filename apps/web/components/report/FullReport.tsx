@@ -48,6 +48,22 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
         clusters={report.meta.clusters_evaluated}
       />
 
+      {report.provisional && (
+        <div
+          className="rounded-xl border p-4 text-sm"
+          style={{
+            borderColor: "color-mix(in srgb, var(--warn) 40%, var(--border))",
+            background: "color-mix(in srgb, var(--warn) 8%, transparent)",
+          }}
+        >
+          <strong>Provisional score.</strong> The crawl could not fully read this site
+          {report.crawl && !report.crawl.homepage_reachable ? " (the homepage was unreachable)" : ""}
+          {report.crawl && report.crawl.robots_blocked_core ? " (robots.txt blocked core pages)" : ""}
+          , so the score is based on limited coverage. Treat it as an early indication and re-scan
+          once the pages are reachable.
+        </div>
+      )}
+
       <Section title="Component scores">
         {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
         <div className="flex flex-wrap gap-3">
@@ -104,6 +120,12 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
       </Section>
 
       <Section title="Prompt cluster map & coverage">
+        {report.clusters.length === 0 ? (
+          <p className="rounded-xl border border-border bg-surface/50 p-5 text-sm text-fg-muted">
+            {report.cluster_note ||
+              "No prompt clusters could be generated from the crawled content."}
+          </p>
+        ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-surface/50">
           <table className="w-full min-w-[36rem] border-collapse text-sm">
             <thead>
@@ -140,6 +162,7 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
             </tbody>
           </table>
         </div>
+        )}
       </Section>
 
       <Section title="Full action backlog">
@@ -210,6 +233,15 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
               confidence {report.meta.confidence_score.toFixed(0)}/100 · {report.meta.confidence_band}
             </span>
           </div>
+          {report.crawl && (
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[0.7rem] text-fg-subtle">
+              <span>crawl {report.crawl.status}</span>
+              <span>analyzed {report.crawl.pages_analyzed}</span>
+              <span>fetched {report.crawl.pages_fetched}</span>
+              {report.crawl.errors > 0 && <span>errors {report.crawl.errors}</span>}
+              {report.crawl.robots_skipped > 0 && <span>robots-skipped {report.crawl.robots_skipped}</span>}
+            </div>
+          )}
           {(report.meta.methodology_hash || report.meta.as_of) && (
             <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[0.7rem] text-fg-subtle">
               {report.meta.as_of && (

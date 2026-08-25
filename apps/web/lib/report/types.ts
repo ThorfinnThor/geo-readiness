@@ -94,4 +94,18 @@ export interface ReportDocument {
   stages?: ReportStage[];
   diagnostics?: ReportDiagnostic[];
   fix_prompt_master?: string;
+  crawl?: ReportCrawl | null;
+  provisional?: boolean;
+  cluster_note?: string;
+}
+
+export interface ReportCrawl {
+  status: string;
+  pages_analyzed: number;
+  pages_fetched: number;
+  errors: number;
+  robots_skipped: number;
+  homepage_reachable: boolean;
+  robots_blocked_core: boolean;
+  valid_response_ratio: number;
 }
