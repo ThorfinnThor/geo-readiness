@@ -98,6 +98,13 @@ export interface ReportDocument {
   crawl?: ReportCrawl | null;
   provisional?: boolean;
   cluster_note?: string;
+  language_coverage?: ReportLanguageCoverage[];
+}
+
+export interface ReportLanguageCoverage {
+  language: string;
+  pages: number;
+  prompt_coverage_score: number;
 }
 
 export interface ReportCrawl {

@@ -166,6 +166,36 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
         )}
       </Section>
 
+      {report.language_coverage && report.language_coverage.length > 0 && (
+        <Section title="Coverage by language">
+          <p className="text-sm text-fg-muted">
+            Each language is scored only from its own pages, so content in one language never counts
+            as coverage for another.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {report.language_coverage.map((lc) => (
+              <div
+                key={lc.language}
+                className="min-w-[7rem] grow basis-[30%] rounded-xl border border-border bg-surface/50 p-4"
+              >
+                <div className="font-mono text-xs uppercase tracking-wide text-fg-subtle">
+                  {lc.language}
+                </div>
+                <div
+                  className="mt-1 font-mono text-2xl font-semibold tabular-nums"
+                  style={{ color: coverageColor(lc.prompt_coverage_score) }}
+                >
+                  {lc.prompt_coverage_score.toFixed(0)}
+                </div>
+                <div className="text-xs text-fg-subtle">
+                  {lc.pages} page{lc.pages === 1 ? "" : "s"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
       <Section title="Full action backlog">
         {report.fix_prompt_master && (
           <div

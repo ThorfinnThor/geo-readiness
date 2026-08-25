@@ -146,6 +146,14 @@ class ReportDiagnostic(BaseModel):
     explanation: str = ""
 
 
+class ReportLanguageCoverage(BaseModel):
+    """Per-language prompt coverage on multilingual sites (§v2-plan 7.4)."""
+
+    language: str
+    pages: int
+    prompt_coverage_score: float
+
+
 class ReportCrawl(BaseModel):
     """Crawl transparency (§v2-plan 5.1): what was actually fetched."""
 
@@ -181,6 +189,7 @@ class ReportDocument(BaseModel):
     crawl: ReportCrawl | None = None
     provisional: bool = False
     cluster_note: str = ""
+    language_coverage: list[ReportLanguageCoverage] = []
 
 
 def _build_stages(r) -> list[ReportStage]:
@@ -421,4 +430,10 @@ def build_report(scan: ScanResult) -> ReportDocument:
         crawl=crawl,
         provisional=provisional,
         cluster_note=_cluster_note(scan) if is_v2 else "",
+        language_coverage=[
+            ReportLanguageCoverage(
+                language=lc.language, pages=lc.pages, prompt_coverage_score=lc.prompt_coverage_score
+            )
+            for lc in scan.coverage.language_coverage
+        ],
     )

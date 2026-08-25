@@ -508,5 +508,6 @@
     "valid_response_ratio": 1.0
   },
   "provisional": false,
-  "cluster_note": ""
+  "cluster_note": "",
+  "language_coverage": []
 }

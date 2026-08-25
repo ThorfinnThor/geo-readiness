@@ -25,6 +25,16 @@ class ClusterCoverageResult(BaseModel):
     best_supporting_url: str | None = None
 
 
+class LanguageCoverage(BaseModel):
+    """Coverage computed from a single language's pages (§v2-plan 7.4)."""
+
+    language: str
+    pages: int
+    prompt_coverage_score: float
+
+
 class CoverageReport(BaseModel):
     prompt_coverage_score: float  # 0..100, weight-averaged across clusters
     clusters: list[ClusterCoverageResult] = []
+    # V2 additive: per-language coverage on multilingual sites; empty otherwise.
+    language_coverage: list[LanguageCoverage] = []

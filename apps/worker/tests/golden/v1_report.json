@@ -436,5 +436,6 @@
   "fix_prompt_master": "",
   "crawl": null,
   "provisional": false,
-  "cluster_note": ""
+  "cluster_note": "",
+  "language_coverage": []
 }
