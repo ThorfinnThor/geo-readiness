@@ -81,9 +81,10 @@ def compute_actions(
 
     families: list[tuple[str, Action]] = []
 
-    # Base V1 actions, minus the generic RDY-004 (superseded by RDY-004A–D).
+    # Base V1 actions, minus the generic RDY-004 (superseded by RDY-004A–D) and the
+    # combined RDY-009 (split below into two independent findings).
     for action in compute_actions_v1(readiness, profile, coverage, clusters, pages):
-        if action.rule_id == "RDY-004":
+        if action.rule_id in ("RDY-004", "RDY-009"):
             continue
         families.append((_BASE_FAMILY.get(action.rule_id, action.rule_id), action))
 
@@ -212,6 +213,56 @@ def compute_actions(
                 ),
                 expected_signal="Higher topical alignment on the candidate page.",
                 how_to_verify="Re-scan: topical alignment for these clusters increases.",
+            )
+        )
+
+    # RDY-009 split (§v2-plan 4.3): duplicate content and low page-type classification
+    # are independent problems. A site with fully unique content but many unclassified
+    # pages must NOT be told it has duplicate content.
+    n = len(pages)
+    unique_hash_ratio = (len({p.content_hash for p in pages}) / n) if n else 1.0
+    other_ratio = (sum(1 for p in pages if p.page_type == "other") / n) if n else 0.0
+    tech_score = next((c.score for c in readiness.components if c.name == "technical_access"), 0.0)
+    if unique_hash_ratio < 0.9:
+        families.append(
+            _make(
+                rule_id="RDY-009A",
+                family="duplicate_content",
+                category="technical",
+                component_score=tech_score,
+                confidence=confidence,
+                impact=0.5,
+                effort=2,
+                title="Consolidate duplicate content",
+                problem="Several pages share near-identical content, which blurs topic identity.",
+                evidence=[f"unique_content_ratio={round(unique_hash_ratio, 2)}"],
+                recommendation=(
+                    "Consolidate or genuinely differentiate the duplicate pages and set a "
+                    "clear canonical URL for each."
+                ),
+                expected_signal="A higher ratio of unique pages.",
+                how_to_verify="Re-scan: the unique-content ratio rises.",
+            )
+        )
+    if other_ratio > 0.5:
+        families.append(
+            _make(
+                rule_id="RDY-014",
+                family="page_classification",
+                category="technical",
+                component_score=tech_score,
+                confidence=confidence,
+                impact=0.5,
+                effort=2,
+                title="Clarify each page's topic and type",
+                problem="Many pages could not be classified into a clear type or topic.",
+                evidence=[f"unclassified_page_ratio={round(other_ratio, 2)}"],
+                recommendation=(
+                    "Give each page one clear topic, a descriptive title and H1, and "
+                    "matching structured data so its type is unambiguous."
+                ),
+                expected_signal="Fewer unclassified pages.",
+                how_to_verify="Re-scan: the unclassified-page ratio drops.",
             )
         )
 
