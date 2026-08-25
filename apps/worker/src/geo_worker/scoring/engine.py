@@ -75,6 +75,7 @@ class _ScoreIndex:
     dedicated_longtext400: bool
     dedicated_longtext200: bool
     linked_types: frozenset[str]
+    site_type: str = "unknown"
 
     def has(self, page_type: str) -> bool:
         return page_type in self.page_types
@@ -149,6 +150,7 @@ class _ScoreIndex:
             countries=len(profile.countries),
             locations=len(profile.locations),
             audiences=len(profile.target_audiences),
+            site_type=profile.site_type,
             dedicated_pages=sum(1 for t in types if t in _DEDICATED),
             org_name_present=bool(org_names),
             org_core_fields=org_core,

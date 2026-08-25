@@ -110,6 +110,7 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
 
       <Section title="Business profile">
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl border border-border bg-surface/50 p-5 text-sm sm:grid-cols-3">
+          {p.site_type && <Field label="Site type" value={p.site_type.replace(/_/g, " ")} />}
           <Field label="Brand" value={p.brand_name ?? "Unknown, needs confirmation"} />
           <Field label="Legal name" value={p.legal_name ?? "None"} />
           <Field label="Locations" value={p.locations.join(", ") || "None"} />

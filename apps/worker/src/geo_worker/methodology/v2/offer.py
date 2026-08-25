@@ -57,18 +57,20 @@ def _assess(idx: _ScoreIndex) -> list[SignalAssessment]:
     # would penalize every site. Observe it only when actually present; else N/A.
     audience: tuple[SignalStatus, float | None] = (_OBS, 1.0) if idx.audiences else (_NA, None)
 
-    # location_service_relation applies only to location-based businesses. With no
-    # location AND no country signal at all, the business is not location-based
-    # (global/online) → N/A. Otherwise score the service↔location relation.
+    # location_service_relation applies only to location-based businesses (§v2-plan 6):
+    # a local business, or any site with a resolved location. A SaaS, e-commerce,
+    # publisher or documentation site is not location-based, so the signal is N/A
+    # rather than a penalty.
+    location_based = idx.site_type == "local_business" or idx.locations > 0
     location: tuple[SignalStatus, float | None]
-    if not idx.locations and not idx.countries:
+    if not location_based:
         location = (_NA, None)
     elif idx.locations and services:
         location = (_OBS, 1.0)
     elif idx.locations:
         location = (_MISS, 0.5)
     else:
-        location = (_MISS, 0.0)
+        location = (_MISS, 0.0)  # local business that never states its location
 
     values: dict[str, tuple[SignalStatus, float | None]] = {
         "primary_services_explicit": (_status(primary), primary),

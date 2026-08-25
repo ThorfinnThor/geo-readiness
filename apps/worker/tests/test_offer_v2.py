@@ -72,18 +72,30 @@ def test_na_renormalization_beats_scoring_the_gap_as_zero() -> None:
     assert v2_score > v1_score  # excluding N/A raises the (correct) score
 
 
-def test_location_is_scored_when_the_business_is_location_based() -> None:
-    # Counterfactual: add a country signal → location becomes applicable.
+def test_location_is_scored_when_a_location_is_resolved() -> None:
+    # Counterfactual: a resolved location makes the signal applicable.
     without = offer_component(_idx(services_count=1))[0]
-    with_geo = offer_component(_idx(services_count=1, countries=1))[0]
+    with_loc = offer_component(_idx(services_count=1, locations=1))[0]
     assert "location_service_relation" not in _names(without)
-    assert "location_service_relation" in _names(with_geo)
+    assert "location_service_relation" in _names(with_loc)
+
+
+def test_local_site_type_makes_location_applicable() -> None:
+    # A local_business is location-based even before a location string resolves.
+    comp = offer_component(_idx(services_count=1, site_type="local_business"))[0]
+    assert "location_service_relation" in _names(comp)
+
+
+def test_saas_site_type_keeps_location_not_applicable() -> None:
+    # A SaaS is not location-based → the signal must be N/A, never a penalty.
+    comp = offer_component(_idx(services_count=1, site_type="saas", countries=1))[0]
+    assert "location_service_relation" not in _names(comp)
 
 
 def test_location_strength_rises_with_an_actual_service_location() -> None:
-    # Counterfactual: same site, vary locations 0 → 1 (country present throughout).
-    weak = offer_component(_idx(services_count=1, countries=1, locations=0))[0]
-    strong = offer_component(_idx(services_count=1, countries=1, locations=1))[0]
+    # Counterfactual: same local site, vary locations 0 → 1.
+    weak = offer_component(_idx(services_count=1, site_type="local_business", locations=0))[0]
+    strong = offer_component(_idx(services_count=1, site_type="local_business", locations=1))[0]
     assert strong.score > weak.score
 
 

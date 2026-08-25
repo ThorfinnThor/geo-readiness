@@ -114,6 +114,8 @@ class ReportProfile(BaseModel):
     locations: list[str]
     countries: list[str]
     languages: list[str]
+    # V2 additive: detected site archetype (§v2-plan 6). Empty for V1.
+    site_type: str = ""
 
 
 class ReportMeta(BaseModel):
@@ -388,6 +390,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
         locations=scan.profile.locations,
         countries=scan.profile.countries,
         languages=scan.profile.languages,
+        site_type=scan.profile.site_type if is_v2 else "",
     )
 
     meta = ReportMeta(

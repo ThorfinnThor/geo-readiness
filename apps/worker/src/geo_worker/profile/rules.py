@@ -21,6 +21,7 @@ from collections import Counter
 from geo_worker.extraction.classify import classify_page
 from geo_worker.extraction.types import ExtractedPage
 
+from .site_type import classify_site_type
 from .types import BrandCandidate, BusinessProfile, EvidenceItem
 
 # Brand selection thresholds.
@@ -188,6 +189,8 @@ def build_profile(
 
     profile.evidence = evidence
     profile.profile_hash = _profile_hash(profile)
+    # Derived after the hash so it never affects reproducibility (§v2-plan 6).
+    profile.site_type, profile.site_type_confidence = classify_site_type(pages, profile)
     return profile
 
 

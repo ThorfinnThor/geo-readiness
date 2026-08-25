@@ -35,5 +35,8 @@ class BusinessProfile(BaseModel):
     languages: list[str] = []
     industries: list[str] = []
     target_audiences: list[str] = []
+    # Primary site archetype (§v2-plan 6); drives per-profile rule applicability.
+    site_type: str = "unknown"
+    site_type_confidence: float = 0.0
     evidence: list[EvidenceItem] = []
     profile_hash: str = ""

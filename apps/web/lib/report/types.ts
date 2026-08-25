@@ -48,6 +48,7 @@ export interface ReportProfile {
   locations: string[];
   countries: string[];
   languages: string[];
+  site_type?: string;
 }
 
 export interface ReportMeta {
