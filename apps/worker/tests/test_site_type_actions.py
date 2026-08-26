@@ -66,7 +66,7 @@ def test_commercial_site_keeps_service_product_advice() -> None:
     prof = BusinessProfile(canonical_domain="shop.example", site_type="service_business")
     acts = _actions(prof, _readiness(structured_data=40.0, offer_clarity=35.0))
     rdy005 = next(a for a in acts if a.rule_id == "RDY-005")
-    assert "Service/Product" in rdy005.recommendation
+    assert "Service or Product" in rdy005.recommendation
     ids = {a.rule_id for a in acts}
     assert "RDY-002B" in ids  # commercial site with no offering is still told to state it
 

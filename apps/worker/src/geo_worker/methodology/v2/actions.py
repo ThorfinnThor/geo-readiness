@@ -24,6 +24,32 @@ _BASE_FAMILY = {"RDY-004": "sourceability"}
 # get Dataset/Article advice, not Service/Product, and no commercial offer action.
 _NON_COMMERCIAL = NON_COMMERCIAL_SITE_TYPES
 
+# Clearer, more concrete wording for the base V1 actions (V2 only; V1 stays frozen).
+# The report is only as clear as these strings — and the fix prompts are built from
+# them — so they name the exact pages, fields and schema to add.
+_V2_TEXT_OVERRIDES: dict[str, dict[str, str]] = {
+    "RDY-001": {
+        "recommendation": (
+            "State one consistent business name in the page title and an <h1>, add an About page "
+            "and a Contact or imprint page, and confirm the identity with Organization structured "
+            "data (name, url, logo, sameAs)."
+        ),
+    },
+    "RDY-005": {  # commercial sites; the non-commercial rewrite below wins for data sites
+        "recommendation": (
+            "Add valid Organization JSON-LD (name, url, logo, contactPoint), and add Service or "
+            "Product schema for what you offer, or SoftwareApplication for an online tool. Put "
+            "the schema on the relevant pages, not only the homepage."
+        ),
+    },
+    "RDY-008": {
+        "recommendation": (
+            "Add the trust pages you probably already have content for: About, Contact or imprint, "
+            "a privacy or policy page, and references or case studies where they genuinely apply."
+        ),
+    },
+}
+
 # Site-type-aware rewrite of the structured-data action (RDY-005): a data/content
 # site should be told to add Dataset/Article schema, not Service/Product.
 _RDY005_NON_COMMERCIAL = {
@@ -109,6 +135,8 @@ def compute_actions(
             continue
         if action.rule_id == "RDY-005" and non_commercial:
             action = action.model_copy(update=_RDY005_NON_COMMERCIAL)
+        elif action.rule_id in _V2_TEXT_OVERRIDES:
+            action = action.model_copy(update=_V2_TEXT_OVERRIDES[action.rule_id])
         families.append((_BASE_FAMILY.get(action.rule_id, action.rule_id), action))
 
     def sourceability_action(rule_id, family, signal, impact, title, problem, rec, expected):
@@ -308,19 +336,20 @@ def compute_actions(
                 confidence=confidence,
                 impact=0.85,
                 effort=3,
-                title="State what you offer",
+                title="State what you offer clearly",
                 problem=(
-                    "No products or services could be identified on the site, so AI answer "
-                    "engines cannot tell what you offer."
+                    "AI answer engines could not identify what you offer. If your products, "
+                    "services or tools are only described in prose, they are not clearly "
+                    "machine-readable."
                 ),
                 evidence=[f"offer_clarity={offer_score}", "services=[]", "products=[]"],
                 recommendation=(
-                    "State your main products or services in visible page text and headings, "
-                    "ideally on a dedicated page, and add matching Service or Product structured "
-                    "data."
+                    "State your main products, services or tools plainly on a dedicated page or "
+                    "section, and add matching structured data: Service or Product for what you "
+                    "sell, or SoftwareApplication for an online tool."
                 ),
                 expected_signal="Offer Clarity rises once a clear offering is detected.",
-                how_to_verify="Re-scan: services or products are detected.",
+                how_to_verify="Re-scan: your offering (service, product or software) is detected.",
             )
         )
 
