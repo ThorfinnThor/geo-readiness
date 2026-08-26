@@ -5,7 +5,8 @@ export interface ReportComponent {
   key: string;
   name: string;
   score: number;
-  level: string;
+  level: string; // "N/A" when not applicable
+  applicable?: boolean;
 }
 
 export interface ReportRequirement {

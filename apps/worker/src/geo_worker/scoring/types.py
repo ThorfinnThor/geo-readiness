@@ -58,6 +58,9 @@ class ComponentScore(BaseModel):
     name: str
     score: float  # 0..100
     subscores: list[SubScore] = []
+    # False when the component does not apply to this site (§67 at the component
+    # level): excluded from the overall and shown as N/A rather than weak.
+    applicable: bool = True
 
 
 class CrawlMeta(BaseModel):

@@ -13,17 +13,16 @@ from geo_worker.actions.types import Action
 from geo_worker.clusters.types import GeneratedCluster
 from geo_worker.coverage.types import CoverageReport
 from geo_worker.extraction.types import ExtractedPage
+from geo_worker.profile.site_type import NON_COMMERCIAL_SITE_TYPES
 from geo_worker.profile.types import BusinessProfile
 from geo_worker.scoring.types import ReadinessResult
 
 # Base rule → family (so a base action and a new action about the same thing collapse).
 _BASE_FAMILY = {"RDY-004": "sourceability"}
 
-# Content/data archetypes that do not sell products/services; commercial offer
-# advice and Service/Product schema do not apply to them. (A portfolio or a
-# commercial site that simply hasn't stated its offering is NOT here — those still
-# get "state what you offer".)
-_NON_COMMERCIAL = {"publisher_editorial", "documentation_reference"}
+# Content/data archetypes where Offer Clarity is not applicable (scored N/A). They
+# get Dataset/Article advice, not Service/Product, and no commercial offer action.
+_NON_COMMERCIAL = NON_COMMERCIAL_SITE_TYPES
 
 # Site-type-aware rewrite of the structured-data action (RDY-005): a data/content
 # site should be told to add Dataset/Article schema, not Service/Product.
@@ -294,39 +293,12 @@ def compute_actions(
     # (which only suggests dedicated pages for existing services) never covers,
     # leaving a weak component with no finding. Fill that gap so a low, shown
     # component always has an action.
-    # A weak Offer Clarity with no detected offering ALWAYS gets an action — never
-    # a shown-weak component with zero issues. The wording adapts to the archetype:
-    # commercial sites are told to state their offering; content/data sites are told
-    # to make their topic/dataset clear. It is never suppressed.
+    # A weak, APPLICABLE Offer Clarity with no detected offering always gets an
+    # action, so a shown-weak component never has zero issues. On non-commercial
+    # (content/data) sites Offer Clarity is N/A, not weak, so no offer action is
+    # needed there — the Dataset/Article advice in RDY-005 covers them.
     offer_score = next((c.score for c in readiness.components if c.name == "offer_clarity"), 0.0)
-    if offer_score < 50 and not profile.services and not profile.products:
-        if non_commercial:
-            offer_action = dict(
-                title="Make clear what this site is about",
-                problem=(
-                    "It is unclear what this site provides, so AI answer engines cannot tell "
-                    "what it is for."
-                ),
-                recommendation=(
-                    "Clearly describe your main topic, dataset or content on a prominent page, "
-                    "and add matching structured data (Article or Dataset)."
-                ),
-                how_to_verify="Re-scan: a clear topic and content schema are detected.",
-            )
-        else:
-            offer_action = dict(
-                title="State what you offer",
-                problem=(
-                    "No products or services could be identified on the site, so AI answer "
-                    "engines cannot tell what you offer."
-                ),
-                recommendation=(
-                    "State your main products or services in visible page text and headings, "
-                    "ideally on a dedicated page, and add matching Service or Product structured "
-                    "data."
-                ),
-                how_to_verify="Re-scan: services or products are detected.",
-            )
+    if offer_score < 50 and not profile.services and not profile.products and not non_commercial:
         families.append(
             _make(
                 rule_id="RDY-002B",
@@ -336,9 +308,19 @@ def compute_actions(
                 confidence=confidence,
                 impact=0.85,
                 effort=3,
+                title="State what you offer",
+                problem=(
+                    "No products or services could be identified on the site, so AI answer "
+                    "engines cannot tell what you offer."
+                ),
                 evidence=[f"offer_clarity={offer_score}", "services=[]", "products=[]"],
-                expected_signal="Offer Clarity rises once a clear offering or topic is detected.",
-                **offer_action,
+                recommendation=(
+                    "State your main products or services in visible page text and headings, "
+                    "ideally on a dedicated page, and add matching Service or Product structured "
+                    "data."
+                ),
+                expected_signal="Offer Clarity rises once a clear offering is detected.",
+                how_to_verify="Re-scan: services or products are detected.",
             )
         )
 

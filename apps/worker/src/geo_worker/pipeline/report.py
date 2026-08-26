@@ -69,7 +69,8 @@ class ReportComponent(BaseModel):
     key: str
     name: str
     score: float
-    level: str
+    level: str  # "N/A" when not applicable
+    applicable: bool = True
 
 
 class ReportRequirement(BaseModel):
@@ -338,17 +339,24 @@ def build_report(scan: ScanResult) -> ReportDocument:
             or scan.pages_analyzed == 0
         )
     )
+    applicable_by_key = {c.name: c.applicable for c in r.components}
     components = [
         ReportComponent(
             key=key,
             name=name,
             score=getattr(r, f"{key}_score"),
-            level=score_level(getattr(r, f"{key}_score")),
+            level="N/A"
+            if not applicable_by_key.get(key, True)
+            else score_level(getattr(r, f"{key}_score")),
+            applicable=applicable_by_key.get(key, True),
         )
         for key, name in _COMPONENT_NAMES.items()
     ]
 
-    ranked = sorted(components, key=lambda c: c.score, reverse=True)
+    # Strengths/gaps only consider applicable components (N/A is neither).
+    ranked = sorted(
+        (c for c in components if c.applicable), key=lambda c: c.score, reverse=True
+    )
     strengths = [f"{c.name} is strong ({c.score:g}/100)" for c in ranked[:3] if c.score >= 65]
     gaps = [f"{c.name} needs work ({c.score:g}/100)" for c in reversed(ranked[-3:]) if c.score < 80]
 

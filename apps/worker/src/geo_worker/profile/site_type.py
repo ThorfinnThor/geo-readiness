@@ -12,6 +12,10 @@ from __future__ import annotations
 from geo_worker.extraction.types import ExtractedPage
 from geo_worker.profile.types import BusinessProfile
 
+# Content/data archetypes with no commercial offering: Offer Clarity does not
+# apply to them (it is excluded from the score, not shown as weak).
+NON_COMMERCIAL_SITE_TYPES = frozenset({"documentation_reference", "publisher_editorial"})
+
 _ECOM_KW = (
     "add to cart",
     "add to basket",

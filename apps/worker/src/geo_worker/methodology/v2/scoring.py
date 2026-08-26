@@ -11,6 +11,7 @@ import datetime as dt
 
 from geo_worker.coverage.types import CoverageReport
 from geo_worker.extraction.types import ExtractedPage
+from geo_worker.profile.site_type import NON_COMMERCIAL_SITE_TYPES
 from geo_worker.profile.types import BusinessProfile
 from geo_worker.scoring.confidence import compute_confidence
 from geo_worker.scoring.engine import (
@@ -120,14 +121,23 @@ def compute_readiness(
     trust = _component("evidence_trust", _trust_v2(idx, pages))
     technical = _component("technical_access", _technical(idx, crawl_meta))
 
+    # Offer clarity does not apply to a pure content/data site — exclude it from
+    # the score and show it as N/A rather than weak (§67 at the component level).
+    if profile.site_type in NON_COMMERCIAL_SITE_TYPES:
+        offer.applicable = False
+
     components = [entity, offer, coverage_component, source, structured, trust, technical]
     # Calibrate each component onto the readiness grade, then derive the overall
-    # and stages from the calibrated components so everything stays consistent.
+    # and stages from the calibrated APPLICABLE components (weights renormalized).
     for c in components:
         c.score = calibrate_score(c.score)
     by_name = {c.name: c.score for c in components}
-    overall = round(sum(COMPONENT_WEIGHTS[k] * by_name[k] for k in COMPONENT_WEIGHTS), 2)
-    stages = compute_stage_scores(by_name)
+    applicable = {c.name for c in components if c.applicable}
+    total_weight = sum(COMPONENT_WEIGHTS[k] for k in applicable)
+    overall = round(
+        sum(COMPONENT_WEIGHTS[k] * by_name[k] for k in applicable) / total_weight, 2
+    )
+    stages = compute_stage_scores(by_name, applicable=applicable)
 
     confidence_score, confidence_components = compute_confidence(
         pages, profile, coverage, crawl_meta

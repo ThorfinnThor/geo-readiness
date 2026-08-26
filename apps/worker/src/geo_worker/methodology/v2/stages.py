@@ -42,10 +42,16 @@ def load_stage_rollups(version: str = "geo-readiness-v2") -> dict[str, dict[str,
 
 
 def compute_stage_scores(
-    components: dict[str, float], version: str = "geo-readiness-v2"
+    components: dict[str, float],
+    version: str = "geo-readiness-v2",
+    applicable: set[str] | None = None,
 ) -> dict[str, float]:
+    """Roll components up into the three diagnostic stages. Components not in
+    `applicable` are excluded and the stage's weights renormalized over the rest."""
     rollups = load_stage_rollups(version)
-    return {
-        stage: round(sum(components[k] * w for k, w in weights.items()), 2)
-        for stage, weights in rollups.items()
-    }
+    out: dict[str, float] = {}
+    for stage, weights in rollups.items():
+        items = [(k, w) for k, w in weights.items() if applicable is None or k in applicable]
+        total = sum(w for _, w in items)
+        out[stage] = round(sum(components[k] * w for k, w in items) / total, 2) if total else 0.0
+    return out

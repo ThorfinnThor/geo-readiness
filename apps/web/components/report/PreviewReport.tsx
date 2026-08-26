@@ -41,7 +41,12 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
     .filter((c) => c.level === "Weak" || c.level === "Needs improvement")
     .sort((a, b) => a.score - b.score);
   const focus =
-    gaps.length > 0 ? gaps : [...preview.components].sort((a, b) => a.score - b.score).slice(0, 3);
+    gaps.length > 0
+      ? gaps
+      : preview.components
+          .filter((c) => c.level !== "N/A")
+          .sort((a, b) => a.score - b.score)
+          .slice(0, 3);
   const issueCount = preview.issueCount;
   const measured = preview.meta.as_of ? preview.meta.as_of.slice(0, 10) : null;
 

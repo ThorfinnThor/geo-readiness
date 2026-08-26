@@ -17,43 +17,50 @@
       "key": "entity_clarity",
       "name": "Entity Clarity",
       "score": 85.0,
-      "level": "Strong"
+      "level": "Strong",
+      "applicable": true
     },
     {
       "key": "offer_clarity",
       "name": "Offer Clarity",
       "score": 62.5,
-      "level": "Needs improvement"
+      "level": "Needs improvement",
+      "applicable": true
     },
     {
       "key": "prompt_coverage",
       "name": "Prompt Coverage",
       "score": 93.77,
-      "level": "Excellent"
+      "level": "Excellent",
+      "applicable": true
     },
     {
       "key": "sourceability",
       "name": "Sourceability",
       "score": 46.0,
-      "level": "Weak"
+      "level": "Weak",
+      "applicable": true
     },
     {
       "key": "structured_data",
       "name": "Structured Data",
       "score": 51.75,
-      "level": "Needs improvement"
+      "level": "Needs improvement",
+      "applicable": true
     },
     {
       "key": "evidence_trust",
       "name": "Evidence & Trust",
       "score": 43.5,
-      "level": "Weak"
+      "level": "Weak",
+      "applicable": true
     },
     {
       "key": "technical_access",
       "name": "Technical Accessibility",
       "score": 64.0,
-      "level": "Needs improvement"
+      "level": "Needs improvement",
+      "applicable": true
     }
   ],
   "strengths": [

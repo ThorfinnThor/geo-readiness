@@ -115,6 +115,19 @@ export function LevelChip({ level }: { level: string }) {
 
 export function ComponentCard({ component }: { component: ReportComponent }) {
   const guide = COMPONENT_GUIDE[component.key];
+  if (component.applicable === false || component.level === "N/A") {
+    return (
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/40 p-4 text-fg-subtle">
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+            {component.name}
+          </span>
+          <span className="font-mono text-xl font-semibold tabular-nums text-fg-subtle">N/A</span>
+        </div>
+        <span className="text-xs">Not applicable to this site</span>
+      </div>
+    );
+  }
   return (
     <div
       className="flex flex-col gap-3 rounded-xl border border-border bg-surface/60 p-4 transition-colors hover:border-border-strong"

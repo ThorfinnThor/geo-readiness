@@ -49,22 +49,14 @@ def test_data_site_gets_dataset_structured_data_advice() -> None:
     rdy005 = next(a for a in acts if a.rule_id == "RDY-005")
     assert "Dataset" in rdy005.recommendation
     assert "Do not add Service or Product" in rdy005.recommendation
-    # The offer action still fires (invariant: a weak component always has an
-    # issue), but with content wording rather than "state your products/services".
-    rdy002b = next(a for a in acts if a.rule_id == "RDY-002B")
-    assert "topic, dataset or content" in rdy002b.recommendation
-    assert "products or services" not in rdy002b.recommendation
+    # Offer Clarity is N/A on a content/data site → no commercial offer action.
+    assert "RDY-002B" not in {a.rule_id for a in acts}
 
 
-def test_weak_offer_always_has_an_action_on_any_site_type() -> None:
-    # No shown-weak Offer Clarity may ever have zero matching actions.
-    for st in (
-        "unknown",
-        "publisher_editorial",
-        "documentation_reference",
-        "saas",
-        "service_business",
-    ):
+def test_weak_applicable_offer_always_has_an_action() -> None:
+    # A weak Offer Clarity that DOES apply must always yield a matching action
+    # (no shown-weak component with zero issues). N/A site types are excluded.
+    for st in ("unknown", "saas", "service_business", "portfolio_personal_brand"):
         prof = BusinessProfile(canonical_domain="ex.example", site_type=st)
         acts = _actions(prof, _readiness(offer_clarity=0.0))
         assert any(a.category == "offer" for a in acts), f"no offer action for site_type={st}"
