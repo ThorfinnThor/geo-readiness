@@ -109,10 +109,7 @@ def classify_site_type(pages: list[ExtractedPage], profile: BusinessProfile) -> 
     if profile.brand_name and n <= 3:
         return "portfolio_personal_brand", 0.4
 
-    # Content site with no commercial offering: substantial text across several
-    # pages but nothing to sell → treat as editorial/content, not unknown.
-    substantial = sum(1 for p in pages if p.signals.main_word_count >= 150)
-    if substantial >= 4 and not profile.services and not profile.products:
-        return "publisher_editorial", 0.4
-
+    # Otherwise unknown. A content-heavy site with no detected offering is NOT
+    # assumed to be a publisher — its services may simply be undetected, and the
+    # safer default is commercial (so it is told to state its offering).
     return "unknown", 0.2

@@ -294,8 +294,39 @@ def compute_actions(
     # (which only suggests dedicated pages for existing services) never covers,
     # leaving a weak component with no finding. Fill that gap so a low, shown
     # component always has an action.
+    # A weak Offer Clarity with no detected offering ALWAYS gets an action — never
+    # a shown-weak component with zero issues. The wording adapts to the archetype:
+    # commercial sites are told to state their offering; content/data sites are told
+    # to make their topic/dataset clear. It is never suppressed.
     offer_score = next((c.score for c in readiness.components if c.name == "offer_clarity"), 0.0)
-    if offer_score < 50 and not profile.services and not profile.products and not non_commercial:
+    if offer_score < 50 and not profile.services and not profile.products:
+        if non_commercial:
+            offer_action = dict(
+                title="Make clear what this site is about",
+                problem=(
+                    "It is unclear what this site provides, so AI answer engines cannot tell "
+                    "what it is for."
+                ),
+                recommendation=(
+                    "Clearly describe your main topic, dataset or content on a prominent page, "
+                    "and add matching structured data (Article or Dataset)."
+                ),
+                how_to_verify="Re-scan: a clear topic and content schema are detected.",
+            )
+        else:
+            offer_action = dict(
+                title="State what you offer",
+                problem=(
+                    "No products or services could be identified on the site, so AI answer "
+                    "engines cannot tell what you offer."
+                ),
+                recommendation=(
+                    "State your main products or services in visible page text and headings, "
+                    "ideally on a dedicated page, and add matching Service or Product structured "
+                    "data."
+                ),
+                how_to_verify="Re-scan: services or products are detected.",
+            )
         families.append(
             _make(
                 rule_id="RDY-002B",
@@ -305,19 +336,9 @@ def compute_actions(
                 confidence=confidence,
                 impact=0.85,
                 effort=3,
-                title="State what you offer",
-                problem=(
-                    "No products or services could be identified on the site, so AI answer "
-                    "engines cannot tell what you offer."
-                ),
                 evidence=[f"offer_clarity={offer_score}", "services=[]", "products=[]"],
-                recommendation=(
-                    "State your main products or services in visible page text and headings, "
-                    "ideally on a dedicated page, and add matching Service or Product structured "
-                    "data."
-                ),
-                expected_signal="Offer Clarity rises once a clear offering is detected.",
-                how_to_verify="Re-scan: services or products are detected.",
+                expected_signal="Offer Clarity rises once a clear offering or topic is detected.",
+                **offer_action,
             )
         )
 
