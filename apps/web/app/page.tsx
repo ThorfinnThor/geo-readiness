@@ -132,9 +132,7 @@ export default async function HomePage() {
             AI search readiness audit
           </span>
           <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight sm:text-[3.4rem]">
-            Your website,
-            <br />
-            read by machines.
+            Be the source AI answers cite.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
             When people ask ChatGPT, Gemini or Perplexity about your business, is your site the
