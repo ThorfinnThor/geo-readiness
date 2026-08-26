@@ -4,7 +4,9 @@ import { query, withTransaction } from "@/lib/db";
 import type { ReportDocument } from "@/lib/report/types";
 
 const ANON_EMAIL = "anonymous@geo.internal";
-const DOMAIN_COOLDOWN_HOURS = Number(process.env.FREE_DOMAIN_COOLDOWN_HOURS ?? "24");
+// Short by design: a re-scan right after fixing issues is the core loop, so the
+// window only needs to absorb accidental double-submits and abuse bursts.
+const DOMAIN_COOLDOWN_MINUTES = Number(process.env.FREE_DOMAIN_COOLDOWN_MINUTES ?? "10");
 // V2 is the default methodology as of the 2026-08-20 switch (calibrated against
 // the 35-site benchmark corpus). V1 stays reachable by explicit version + frozen
 // behind the worker's golden regression test.
@@ -64,10 +66,10 @@ export async function createQuickScan(domain: string): Promise<{ scanId: string;
       `SELECT id FROM scans
          WHERE project_id = $1
            AND status <> 'failed'
-           AND requested_at > now() - ($2 || ' hours')::interval
+           AND requested_at > now() - ($2 || ' minutes')::interval
          ORDER BY requested_at DESC
          LIMIT 1`,
-      [projectId, String(DOMAIN_COOLDOWN_HOURS)],
+      [projectId, String(DOMAIN_COOLDOWN_MINUTES)],
     );
     if (recent.rows[0]) return { scanId: recent.rows[0].id, reused: true };
 

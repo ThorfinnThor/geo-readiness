@@ -61,9 +61,10 @@ export default function AboutPage() {
             What Find Your AI Score is
           </h1>
           <p className="text-lg text-fg-muted">
-            Find Your AI Score is a readiness audit for the age of AI search. It reads your website
-            the way ChatGPT, Gemini and Perplexity do, then scores how ready your pages are to be
-            found, trusted and quoted, and shows you exactly what to improve.
+            Find Your AI Score is a readiness audit for the age of AI search. It simulates the key
+            retrieval and extraction requirements that systems like ChatGPT, Gemini and Perplexity
+            rely on, scores how ready your pages are to be found, trusted and quoted, and shows you
+            exactly what to improve.
           </p>
         </header>
 
@@ -99,11 +100,11 @@ export default function AboutPage() {
 
           <h2>Who runs it</h2>
           <p>
-            Find Your AI Score is an independent tool. For the legal operator, company details and
-            contact address, see the{" "}
-            <Link href="/imprint">imprint</Link>. Questions or feedback are welcome at{" "}
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. How we handle scan data is described
-            in the <Link href="/privacy">privacy notice</Link>.
+            Find Your AI Score is built by <strong>SeitenHafen361</strong> (operated by Schayan
+            Yousefian), which specializes in tools like this. Full operator, company and contact
+            details are in the <Link href="/imprint">imprint</Link>. Questions or feedback are
+            welcome at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. How we handle scan data is
+            described in the <Link href="/privacy">privacy notice</Link>.
           </p>
         </div>
 

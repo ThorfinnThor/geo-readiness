@@ -61,7 +61,7 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
         {measured && (
           <p className="-mt-6 font-mono text-xs text-fg-subtle">
             Measured {measured}. To limit crawl load, a repeat scan of the same domain may reuse this
-            result for up to 24 hours.
+            result for up to 10 minutes.
           </p>
         )}
 

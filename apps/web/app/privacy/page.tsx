@@ -9,27 +9,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-// Reflects the app's actual data flows. Vercel (hosting + analytics), GitHub
-// Actions (scan processing) and Stripe (payments) are filled; the database
-// vendor/region and the retention period still need confirming, and the notice
-// should be legally reviewed before launch. This is not legal advice.
+// Reflects the app's actual data flows: Vercel (hosting + analytics), Supabase
+// (database), GitHub Actions (scan processing), Stripe (payments), 90-day scan
+// retention. Have it reviewed by a lawyer before relying on it. Not legal advice.
 export default function PrivacyPage() {
   return (
     <>
       <TopBar />
       <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 sm:py-16">
-        <div
-          className="rounded-xl border p-4 text-sm"
-          style={{
-            borderColor: "color-mix(in srgb, var(--warn) 40%, var(--border))",
-            background: "color-mix(in srgb, var(--warn) 8%, transparent)",
-          }}
-        >
-          <strong>Draft.</strong> The database vendor/region and the retention period still need to
-          be confirmed, and this notice should be legally reviewed before launch. This is not legal
-          advice.
-        </div>
-
         <header className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
             Legal
@@ -86,14 +73,13 @@ export default function PrivacyPage() {
               purchase the full audit. We never receive or store your full card details.
             </li>
             <li>
-              <strong>[Database host — to confirm, e.g. Supabase]</strong> — storing scans and
-              results.
+              <strong>Supabase (managed PostgreSQL)</strong> — storing scans and results.
             </li>
           </ul>
           <p>
             A data processing agreement must be concluded with each of these providers. Where a
             provider is located outside the EU/EEA, transfers are made on the basis of appropriate
-            safeguards (e.g. EU standard contractual clauses). [TO BE VERIFIED AND COMPLETED.]
+            safeguards (e.g. EU standard contractual clauses).
           </p>
 
           <h2>5. Cookies and local storage</h2>
@@ -107,15 +93,15 @@ export default function PrivacyPage() {
 
           <h2>6. Accounts (if used)</h2>
           <p>
-            [If you offer accounts:] When you register, we process your email address and a secured
-            (hashed) password in order to give you access to your assessments. The legal basis is
-            the performance of a contract (Art. 6(1)(b) GDPR).
+            If you create an account, we process your email address and a secured (hashed) password
+            in order to give you access to your assessments. The legal basis is the performance of a
+            contract (Art. 6(1)(b) GDPR).
           </p>
 
           <h2>7. Retention period</h2>
           <p>
-            We store scan data [DEFINE PERIOD, e.g. up to 90 days] and delete it afterwards, unless
-            statutory retention obligations require otherwise.
+            We store scan data for up to 90 days and delete it afterwards, unless statutory
+            retention obligations require otherwise.
           </p>
 
           <h2>8. Your rights</h2>

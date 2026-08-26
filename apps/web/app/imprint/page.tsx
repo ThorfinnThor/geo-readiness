@@ -45,12 +45,10 @@ export default function ImprintPage() {
             13359 Berlin
           </p>
 
-          <h2>EU dispute resolution</h2>
+          <h2>Consumer dispute resolution</h2>
           <p>
-            The European Commission provides a platform for online dispute resolution (ODR):{" "}
-            <a href="https://ec.europa.eu/consumers/odr/">https://ec.europa.eu/consumers/odr/</a>.
-            Our email address is given above. We are neither willing nor obliged to take part in
-            dispute resolution proceedings before a consumer arbitration board.
+            We are neither willing nor obliged to take part in dispute resolution proceedings before
+            a consumer arbitration board.
           </p>
         </div>
       </main>
