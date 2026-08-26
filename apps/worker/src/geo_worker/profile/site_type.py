@@ -63,6 +63,10 @@ def classify_site_type(pages: list[ExtractedPage], profile: BusinessProfile) -> 
 
     product_pages = types.count("product")
 
+    # Data / reference: a published dataset is the defining signal.
+    if "dataset" in jl:
+        return "documentation_reference", 0.75
+
     # E-commerce: product schema/pages plus a real cart/checkout affordance.
     if ("product" in jl or product_pages >= 2 or profile.products) and any(
         k in text for k in _ECOM_KW
@@ -104,5 +108,11 @@ def classify_site_type(pages: list[ExtractedPage], profile: BusinessProfile) -> 
     # Portfolio / personal brand: a resolved brand but very few pages.
     if profile.brand_name and n <= 3:
         return "portfolio_personal_brand", 0.4
+
+    # Content site with no commercial offering: substantial text across several
+    # pages but nothing to sell → treat as editorial/content, not unknown.
+    substantial = sum(1 for p in pages if p.signals.main_word_count >= 150)
+    if substantial >= 4 and not profile.services and not profile.products:
+        return "publisher_editorial", 0.4
 
     return "unknown", 0.2

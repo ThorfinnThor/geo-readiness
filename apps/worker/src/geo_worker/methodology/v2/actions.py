@@ -19,6 +19,27 @@ from geo_worker.scoring.types import ReadinessResult
 # Base rule → family (so a base action and a new action about the same thing collapse).
 _BASE_FAMILY = {"RDY-004": "sourceability"}
 
+# Content/data archetypes that do not sell products/services; commercial offer
+# advice and Service/Product schema do not apply to them. (A portfolio or a
+# commercial site that simply hasn't stated its offering is NOT here — those still
+# get "state what you offer".)
+_NON_COMMERCIAL = {"publisher_editorial", "documentation_reference"}
+
+# Site-type-aware rewrite of the structured-data action (RDY-005): a data/content
+# site should be told to add Dataset/Article schema, not Service/Product.
+_RDY005_NON_COMMERCIAL = {
+    "problem": (
+        "Organization structured data is missing or incomplete, and the site's content is not "
+        "described in machine-readable schema."
+    ),
+    "recommendation": (
+        "Add a valid Organization node, and describe your content with the schema that fits it: "
+        "Dataset for a published dataset, or Article / CollectionPage for editorial or reference "
+        "content. Do not add Service or Product markup unless you actually sell those."
+    ),
+    "how_to_verify": "Re-scan: Organization and content schema (Dataset/Article) are detected.",
+}
+
 
 def _severity(priority: float) -> str:
     if priority >= 0.20:
@@ -80,12 +101,15 @@ def compute_actions(
     prompt_coverage = readiness.prompt_coverage_score
 
     families: list[tuple[str, Action]] = []
+    non_commercial = profile.site_type in _NON_COMMERCIAL
 
     # Base V1 actions, minus the generic RDY-004 (superseded by RDY-004A–D) and the
     # combined RDY-009 (split below into two independent findings).
     for action in compute_actions_v1(readiness, profile, coverage, clusters, pages):
         if action.rule_id in ("RDY-004", "RDY-009"):
             continue
+        if action.rule_id == "RDY-005" and non_commercial:
+            action = action.model_copy(update=_RDY005_NON_COMMERCIAL)
         families.append((_BASE_FAMILY.get(action.rule_id, action.rule_id), action))
 
     def sourceability_action(rule_id, family, signal, impact, title, problem, rec, expected):
@@ -271,7 +295,7 @@ def compute_actions(
     # leaving a weak component with no finding. Fill that gap so a low, shown
     # component always has an action.
     offer_score = next((c.score for c in readiness.components if c.name == "offer_clarity"), 0.0)
-    if offer_score < 50 and not profile.services and not profile.products:
+    if offer_score < 50 and not profile.services and not profile.products and not non_commercial:
         families.append(
             _make(
                 rule_id="RDY-002B",

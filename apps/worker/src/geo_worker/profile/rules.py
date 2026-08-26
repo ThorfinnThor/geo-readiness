@@ -464,6 +464,13 @@ def _domain_brand_fallback(pages: list[ExtractedPage], canonical_domain: str) ->
     return None
 
 
+def _plausible_offering_name(name: str) -> bool:
+    """A real product/service name is a short label, not a sentence. Rejects
+    content mis-read as an offering (e.g. a long H1 on a page that merely mentions
+    the word 'products')."""
+    return 0 < len(name) <= 60 and len(name.split()) <= 8 and ":" not in name
+
+
 def _resolve_offerings(
     pages: list[ExtractedPage], profile: BusinessProfile, evidence: list[EvidenceItem]
 ) -> None:
@@ -472,8 +479,10 @@ def _resolve_offerings(
 
     def add(bucket: dict, name: str, url: str | None, source: str) -> None:
         name = " ".join(name.split())
+        if not _plausible_offering_name(name):
+            return
         key = name.lower()
-        if name and key not in bucket:
+        if key not in bucket:
             bucket[key] = (url, source)
 
     for page in pages:
