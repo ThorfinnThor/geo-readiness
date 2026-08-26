@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createCheckoutSession, stripeConfigured } from "@/lib/payments/checkout";
+import {
+  confirmCheckoutSession,
+  createCheckoutSession,
+  stripeConfigured,
+} from "@/lib/payments/checkout";
 import { POST as webhookPost } from "@/app/api/stripe/webhook/route";
 
 const ENV_KEYS = [
@@ -38,6 +42,10 @@ describe("Stripe checkout seam", () => {
     expect(stripeConfigured()).toBe(false); // price still missing
     process.env.STRIPE_PRICE_GEO_READINESS_FULL = "price_x";
     expect(stripeConfigured()).toBe(true);
+  });
+
+  it("confirmCheckoutSession is a no-op when Stripe is not configured", async () => {
+    expect(await confirmCheckoutSession("scan-id", "cs_test_1")).toBe(false);
   });
 });
 
