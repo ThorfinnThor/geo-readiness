@@ -71,7 +71,7 @@ export function ScanForm() {
         </p>
       )}
       <p className="px-1 text-xs text-fg-subtle">
-        Usually takes about a minute. We crawl and analyze your pages live.
+        Usually one to three minutes. We crawl and analyze your pages live.
       </p>
     </form>
   );
