@@ -23,6 +23,16 @@ export const CONTENT: ContentEntry[] = [
     updated: "2026-08-21",
   },
   {
+    slug: "/methodology",
+    title: "How scoring works",
+    description:
+      "How Find Your AI Score turns your website into a 0 to 100 readiness score: the seven " +
+      "weighted components, the three readiness stages, and the deterministic, versioned rules " +
+      "behind every point.",
+    category: "Reference",
+    updated: "2026-08-26",
+  },
+  {
     slug: "/how-ai-reads-your-website",
     title: "How AI answer engines read your website",
     description:

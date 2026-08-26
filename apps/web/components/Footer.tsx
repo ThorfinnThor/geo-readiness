@@ -4,6 +4,7 @@ import Link from "next/link";
 // are reachable from every marketing/content page, which also strengthens
 // internal linking for SEO.
 const LEARN = [
+  { href: "/methodology", label: "How scoring works" },
   { href: "/what-is-geo", label: "What is GEO?" },
   { href: "/how-ai-reads-your-website", label: "How AI reads your site" },
   { href: "/geo-vs-seo", label: "GEO vs SEO" },

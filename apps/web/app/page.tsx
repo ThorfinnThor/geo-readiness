@@ -109,6 +109,9 @@ export default async function HomePage() {
           <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm text-fg-muted">
+          <Link href="/methodology" className="hidden hover:text-fg sm:block">
+            How scoring works
+          </Link>
           <Link href="/learn" className="hover:text-fg">
             Learn
           </Link>
@@ -134,16 +137,15 @@ export default async function HomePage() {
             read by machines.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
-            AI answer engines pull facts out of pages instead of ranking them. We scan your site,
-            work out the questions people ask about your business, and score how well your pages
-            answer them.
+            When people ask ChatGPT, Gemini or Perplexity about your business, is your site the
+            answer they quote, or your competitor’s? We check how ready your pages are to be found
+            and cited, and show you exactly what to fix.
           </p>
 
           <div className="flex flex-col gap-3">
             <ScanForm />
             <p className="font-mono text-xs text-fg-subtle">
-              up to 12 pages &nbsp;·&nbsp; 7 signals &nbsp;·&nbsp; deterministic &nbsp;·&nbsp; 0
-              AI-provider calls
+              free score &nbsp;·&nbsp; results in minutes &nbsp;·&nbsp; no AI-provider calls
             </p>
           </div>
 

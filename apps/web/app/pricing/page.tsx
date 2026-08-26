@@ -64,10 +64,15 @@ export default function PricingPage() {
             See the score free. Unlock the fixes when you’re ready.
           </h1>
           <p className="mx-auto max-w-xl text-sm text-fg-muted">
-            Every scan runs the full deterministic engine, with no AI-provider calls and no
-            guesswork. The free preview shows your readiness. The Premium audit shows exactly
-            what to change.
+            The free preview shows your readiness score. The Premium audit shows exactly what to
+            change, with the evidence and a paste-ready fix for each issue.
           </p>
+          <Link
+            href="/report/demo"
+            className="mx-auto inline-flex items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+          >
+            See a full sample report →
+          </Link>
         </header>
 
         <div className="grid gap-5 md:grid-cols-2">
