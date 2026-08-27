@@ -11,6 +11,7 @@ import {
 import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
 import { TopBar } from "@/components/TopBar";
+import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -284,6 +285,36 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
             </div>
           )}
           <p className="text-xs">{report.disclaimer}</p>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/50 p-5 text-sm text-fg-muted">
+          <span className="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
+            Grounded in published research
+          </span>
+          <p className="text-xs">{RESEARCH_NOTE}</p>
+          <ul className="flex flex-col gap-1 text-xs">
+            {RESEARCH_BASIS.map((s) => (
+              <li key={s.url}>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-fg"
+                >
+                  {s.title}
+                </a>{" "}
+                <span className="text-fg-subtle">
+                  — {s.authors}, {s.venue} {s.year}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href="/methodology"
+            className="text-xs underline underline-offset-2 hover:text-fg"
+          >
+            How scoring works, in full →
+          </a>
         </div>
       </Section>
       </main>

@@ -186,7 +186,7 @@ def test_rebinding_pins_first_validated_ip() -> None:
 
 
 def test_limits_match_spec() -> None:
-    assert QUICK_LIMITS.max_pages == 12
+    assert QUICK_LIMITS.max_pages == 24
     assert QUICK_LIMITS.max_response_bytes == 3 * 1024 * 1024
     assert QUICK_LIMITS.max_browser_renders == 2
     assert FULL_LIMITS.max_pages == 50

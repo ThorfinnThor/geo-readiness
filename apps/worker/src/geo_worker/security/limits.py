@@ -18,10 +18,10 @@ class CrawlLimits:
 
 
 QUICK_LIMITS = CrawlLimits(
-    max_pages=12,
-    max_depth=2,
+    max_pages=24,
+    max_depth=3,
     max_response_bytes=3 * 1024 * 1024,  # 3 MB
-    max_total_bytes=25 * 1024 * 1024,  # 25 MB
+    max_total_bytes=50 * 1024 * 1024,  # 50 MB — headroom for 24 pages
     max_browser_renders=2,
 )
 

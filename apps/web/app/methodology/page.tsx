@@ -1,5 +1,6 @@
 import { ArticleLayout } from "@/components/content/ArticleLayout";
 import { CONTENT } from "@/lib/content/registry";
+import { RESEARCH_BASIS } from "@/lib/content/research-basis";
 import { contentMetadata } from "@/lib/seo/content-metadata";
 
 const meta = CONTENT.find((c) => c.slug === "/methodology")!;
@@ -40,6 +41,10 @@ export default function Page() {
         {
           q: "What if a signal does not apply to my type of site?",
           a: "It is marked not applicable and excluded from the calculation rather than counted as zero. The engine also detects your site type (for example SaaS, local business or publisher) so location- or product-specific checks only apply where they make sense.",
+        },
+        {
+          q: "Is there a scientific basis for the method?",
+          a: "Yes. It is informed by peer-reviewed research on generative-engine optimization, retrieval-augmented generation and citation/verifiability, plus open web standards like Schema.org. The 'The research this builds on' section lists the sources and what each one informs. We translate those principles into deterministic checks rather than reproducing any single study.",
         },
       ]}
     >
@@ -106,7 +111,7 @@ export default function Page() {
       <h2>How each point is earned</h2>
       <p>
         Every point traces back to something we observed on your pages. The engine crawls up to
-        twelve pages, extracts the visible text, structure and metadata, and applies a fixed set of
+        24 pages, extracts the visible text, structure and metadata, and applies a fixed set of
         rules. Three principles keep the score honest:
       </p>
       <ul>
@@ -127,6 +132,47 @@ export default function Page() {
         Confidence is reported separately from the score. If the crawl was incomplete or a page
         could not be read, the report lowers confidence and can mark the result provisional, instead
         of pretending the site failed.
+      </p>
+
+      <h2>The research this builds on</h2>
+      <p>
+        The methodology is <strong>informed by peer-reviewed research</strong> on how generative
+        AI systems retrieve, cite and answer from web content, together with open web standards
+        such as Schema.org. We translate the principles that research establishes into
+        deterministic, observable checks — we do not reproduce any single study, and none of these
+        authors endorse this product. The three readiness stages above map directly onto how this
+        literature separates retrieval from citation from extraction.
+      </p>
+      <div style={{ overflowX: "auto" }}>
+        <table>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>What it informs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {RESEARCH_BASIS.map((s) => (
+              <tr key={s.url}>
+                <td>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer">
+                    {s.title}
+                  </a>
+                  <br />
+                  <span style={{ opacity: 0.7 }}>
+                    {s.authors} · {s.venue} {s.year}
+                  </span>
+                </td>
+                <td>{s.informs}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Where the research is suggestive rather than conclusive, we stay conservative: a signal
+        only enters the core score if we can observe it on your pages, measure it deterministically,
+        explain it, and it is hard to game. Anything weaker is shown as a diagnostic, not scored.
       </p>
 
       <h2>What the score does and does not tell you</h2>
