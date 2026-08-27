@@ -134,9 +134,7 @@ def compute_readiness(
     by_name = {c.name: c.score for c in components}
     applicable = {c.name for c in components if c.applicable}
     total_weight = sum(COMPONENT_WEIGHTS[k] for k in applicable)
-    overall = round(
-        sum(COMPONENT_WEIGHTS[k] * by_name[k] for k in applicable) / total_weight, 2
-    )
+    overall = round(sum(COMPONENT_WEIGHTS[k] * by_name[k] for k in applicable) / total_weight, 2)
     stages = compute_stage_scores(by_name, applicable=applicable)
 
     confidence_score, confidence_components = compute_confidence(

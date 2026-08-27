@@ -373,7 +373,9 @@ def compute_actions(
                     f"products={len(profile.products)}",
                 ],
                 recommendation=recommendation,
-                expected_signal="Offer Clarity rises once a clear, structured offering is detected.",
+                expected_signal=(
+                    "Offer Clarity rises once a clear, structured offering is detected."
+                ),
                 how_to_verify="Re-scan: your offering (service, product or software) is detected.",
             )
         )

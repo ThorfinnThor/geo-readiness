@@ -252,7 +252,7 @@ _CATEGORY_PLAYBOOK: dict[str, str] = {
         "Use one consistent business name in the <title> and a single <h1> on the homepage. "
         "Make sure an About page and a Contact or imprint page exist and are linked in the main "
         "navigation. Confirm identity with Organization JSON-LD in the homepage <head>:\n"
-        "<script type=\"application/ld+json\">\n"
+        '<script type="application/ld+json">\n'
         '{"@context":"https://schema.org","@type":"Organization","name":"__BRAND__",'
         '"url":"https://__DOMAIN__","logo":"https://__DOMAIN__/logo.png",'
         '"sameAs":["https://www.linkedin.com/company/…"]}\n'
@@ -265,7 +265,7 @@ _CATEGORY_PLAYBOOK: dict[str, str] = {
         "attributes, the relevant location, and pricing where you publish it. Back each page "
         "with matching JSON-LD — Service or Product for what you sell, or SoftwareApplication "
         "for an online tool — for example:\n"
-        "<script type=\"application/ld+json\">\n"
+        '<script type="application/ld+json">\n'
         '{"@context":"https://schema.org","@type":"Service","name":"…",'
         '"provider":{"@type":"Organization","name":"__BRAND__"},"areaServed":"…"}\n'
         "</script>"
@@ -481,9 +481,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
     ]
 
     # Strengths/gaps only consider applicable components (N/A is neither).
-    ranked = sorted(
-        (c for c in components if c.applicable), key=lambda c: c.score, reverse=True
-    )
+    ranked = sorted((c for c in components if c.applicable), key=lambda c: c.score, reverse=True)
     strengths = [f"{c.name} is strong ({c.score:g}/100)" for c in ranked[:3] if c.score >= 65]
     gaps = [f"{c.name} needs work ({c.score:g}/100)" for c in reversed(ranked[-3:]) if c.score < 80]
 
