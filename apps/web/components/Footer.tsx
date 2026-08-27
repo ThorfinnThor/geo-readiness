@@ -52,7 +52,10 @@ export function Footer() {
         <Col
           title="More"
           links={[
+            { href: "/product", label: "Product" },
+            { href: "/case-studies", label: "Case study" },
             { href: "/about", label: "About" },
+            { href: "/contact", label: "Contact" },
             { href: "/pricing", label: "Pricing" },
             { href: "/imprint", label: "Imprint" },
             { href: "/privacy", label: "Privacy" },
