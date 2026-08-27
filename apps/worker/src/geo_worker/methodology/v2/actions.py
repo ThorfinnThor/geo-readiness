@@ -317,16 +317,45 @@ def compute_actions(
             )
         )
 
-    # Offer clarity can score 0 because NO offering was detected — a case RDY-002
-    # (which only suggests dedicated pages for existing services) never covers,
-    # leaving a weak component with no finding. Fill that gap so a low, shown
-    # component always has an action.
-    # A weak, APPLICABLE Offer Clarity with no detected offering always gets an
-    # action, so a shown-weak component never has zero issues. On non-commercial
-    # (content/data) sites Offer Clarity is N/A, not weak, so no offer action is
-    # needed there — the Dataset/Article advice in RDY-005 covers them.
+    # INVARIANT: an APPLICABLE Offer Clarity shown below "Good" (< 65 — i.e. "Weak"
+    # or "Needs improvement", the bands the report lists under "What needs
+    # improvement") must always carry an action, so a component shown as needing
+    # improvement never appears with an empty fix list.
+    #
+    # RDY-002 (V1) only covers the case where services ARE detected but lack
+    # dedicated pages. It leaves two gaps this catch-all fills:
+    #   1. no offering detected at all (offer often near 0);
+    #   2. an offering is present in prose but under-specified, so offer lands in
+    #      the 50-64 "Needs improvement" band with no RDY-002 firing.
+    # On non-commercial (content/data) sites Offer Clarity is N/A, not weak, so no
+    # offer action is emitted — the Dataset/Article advice in RDY-005 covers them.
     offer_score = next((c.score for c in readiness.components if c.name == "offer_clarity"), 0.0)
-    if offer_score < 50 and not profile.services and not profile.products and not non_commercial:
+    has_dedicated_action = any(a.rule_id == "RDY-002" for _, a in families)
+    if not non_commercial and offer_score < 65 and not has_dedicated_action:
+        has_offering = bool(profile.services or profile.products)
+        if has_offering:
+            title = "Make your offering explicit and machine-readable"
+            problem = (
+                "Your offering comes across mostly as prose. AI answer engines cannot cleanly "
+                "identify the specific products, services or tools you provide, so Offer Clarity "
+                "stays low even though the site clearly does something."
+            )
+            recommendation = (
+                "Give each core product, service or tool its own clearly named page or section "
+                "with concrete detail, and back it with matching structured data: Service or "
+                "Product for what you sell, or SoftwareApplication for an online tool."
+            )
+        else:
+            title = "State what you offer clearly"
+            problem = (
+                "AI answer engines could not identify what you offer. If your products, services "
+                "or tools are only described in prose, they are not clearly machine-readable."
+            )
+            recommendation = (
+                "State your main products, services or tools plainly on a dedicated page or "
+                "section, and add matching structured data: Service or Product for what you sell, "
+                "or SoftwareApplication for an online tool."
+            )
         families.append(
             _make(
                 rule_id="RDY-002B",
@@ -336,19 +365,15 @@ def compute_actions(
                 confidence=confidence,
                 impact=0.85,
                 effort=3,
-                title="State what you offer clearly",
-                problem=(
-                    "AI answer engines could not identify what you offer. If your products, "
-                    "services or tools are only described in prose, they are not clearly "
-                    "machine-readable."
-                ),
-                evidence=[f"offer_clarity={offer_score}", "services=[]", "products=[]"],
-                recommendation=(
-                    "State your main products, services or tools plainly on a dedicated page or "
-                    "section, and add matching structured data: Service or Product for what you "
-                    "sell, or SoftwareApplication for an online tool."
-                ),
-                expected_signal="Offer Clarity rises once a clear offering is detected.",
+                title=title,
+                problem=problem,
+                evidence=[
+                    f"offer_clarity={offer_score}",
+                    f"services={len(profile.services)}",
+                    f"products={len(profile.products)}",
+                ],
+                recommendation=recommendation,
+                expected_signal="Offer Clarity rises once a clear, structured offering is detected.",
                 how_to_verify="Re-scan: your offering (service, product or software) is detected.",
             )
         )

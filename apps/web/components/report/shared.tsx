@@ -122,7 +122,9 @@ export function ComponentCard({ component }: { component: ReportComponent }) {
           <span className="text-xs font-medium uppercase tracking-wide text-fg-muted">
             {component.name}
           </span>
-          <span className="font-mono text-xl font-semibold tabular-nums text-fg-subtle">N/A</span>
+          <span className="whitespace-nowrap font-mono text-xl font-semibold tabular-nums text-fg-subtle">
+            N/A
+          </span>
         </div>
         <span className="text-xs">Not applicable to this site</span>
       </div>

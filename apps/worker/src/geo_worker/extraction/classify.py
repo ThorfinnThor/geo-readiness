@@ -5,6 +5,7 @@ Rule-based on URL path first, then heading/title keywords. DE + EN keywords.
 
 from __future__ import annotations
 
+import re
 from urllib.parse import urlsplit
 
 # Ordered (type, keywords). First match on the URL path wins; more specific
@@ -35,10 +36,14 @@ def classify_page(final_url: str, title: str | None, headings: dict[str, list[st
         if any(kw in path for kw in keywords):
             return page_type
 
-    # Fall back to heading/title keywords.
+    # Fall back to heading/title keywords. Unlike the URL path (where German
+    # compound slugs like "dienstleistungen" legitimately embed a keyword), the
+    # heading text is natural language, so match on WHOLE WORDS. Otherwise a title
+    # like "production environment checklist" matches "product" and the page is
+    # wrongly read as a product page — inventing offerings that do not exist.
     haystack = " ".join([title or "", *headings.get("h1", []), *headings.get("h2", [])]).lower()
     for page_type, keywords in _PATH_RULES:
-        if any(kw in haystack for kw in keywords):
+        if any(re.search(rf"\b{re.escape(kw)}\b", haystack) for kw in keywords):
             return page_type
 
     return "other"

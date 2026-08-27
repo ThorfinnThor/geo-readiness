@@ -62,6 +62,32 @@ def test_weak_applicable_offer_always_has_an_action() -> None:
         assert any(a.category == "offer" for a in acts), f"no offer action for site_type={st}"
 
 
+def test_needs_improvement_offer_with_products_still_has_an_action() -> None:
+    # Regression (vibefootprint.com): Offer Clarity 54 = "Needs improvement" (the
+    # 50-64 band, shown under "What needs improvement"), with products detected but
+    # no services, produced an EMPTY fix list — RDY-002 needs services, and the old
+    # RDY-002B only fired below 50 with no offering. The catch-all now covers the
+    # whole applicable < 65 range regardless of what was detected.
+    prof = BusinessProfile(
+        canonical_domain="vibefootprint.example",
+        site_type="unknown",
+        products=["some product"],
+    )
+    acts = _actions(prof, _readiness(offer_clarity=54.0))
+    ids = {a.rule_id for a in acts}
+    assert "RDY-002B" in ids
+    offer_action = next(a for a in acts if a.rule_id == "RDY-002B")
+    # An offering WAS detected, so the copy addresses making it explicit, not "state it".
+    assert "explicit" in offer_action.title.lower()
+
+
+def test_good_offer_gets_no_catch_all_action() -> None:
+    # At/above "Good" (>= 65) Offer Clarity is not shown as a gap, so no catch-all.
+    prof = BusinessProfile(canonical_domain="ex.example", site_type="unknown")
+    acts = _actions(prof, _readiness(offer_clarity=65.0))
+    assert "RDY-002B" not in {a.rule_id for a in acts}
+
+
 def test_commercial_site_keeps_service_product_advice() -> None:
     prof = BusinessProfile(canonical_domain="shop.example", site_type="service_business")
     acts = _actions(prof, _readiness(structured_data=40.0, offer_clarity=35.0))
