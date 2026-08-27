@@ -4,6 +4,7 @@
 // never sent to an unpaid browser (see lib/report/preview.toPreviewDoc).
 import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
+import { ScanComparison } from "@/components/report/ScanComparison";
 import { ShareButton } from "@/components/report/ShareButton";
 import { TopBar } from "@/components/TopBar";
 import type { PreviewDoc } from "@/lib/report/preview";
@@ -75,6 +76,13 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
           )}
           <ShareButton score={preview.overall_score} domain={preview.meta.canonical_domain} />
         </div>
+
+        <ScanComparison
+          domain={preview.meta.canonical_domain}
+          scanId={reportId}
+          overall={preview.overall_score}
+          components={preview.components.map((c) => ({ key: c.key, name: c.name, score: c.score }))}
+        />
 
         <section className="flex flex-col gap-3" aria-label="Component scores">
           <SectionLabel>Component scores</SectionLabel>

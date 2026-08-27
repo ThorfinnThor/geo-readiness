@@ -10,6 +10,7 @@ import {
 } from "@/components/report/shared";
 import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
+import { ScanComparison } from "@/components/report/ScanComparison";
 import { TopBar } from "@/components/TopBar";
 import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
@@ -29,7 +30,13 @@ function coverageColor(score: number): string {
   return "var(--weak)";
 }
 
-export function FullReport({ report }: { report: ReportDocument; reportId?: string }) {
+export function FullReport({
+  report,
+  reportId,
+}: {
+  report: ReportDocument;
+  reportId?: string;
+}) {
   const p = report.business_profile;
   const stages = report.stages ?? [];
   const limiting = (report.diagnostics ?? []).filter((d) => d.explanation);
@@ -48,6 +55,15 @@ export function FullReport({ report }: { report: ReportDocument; reportId?: stri
         pages={report.meta.pages_analyzed}
         clusters={report.meta.clusters_evaluated}
       />
+
+      <div className="print:hidden">
+        <ScanComparison
+          domain={report.meta.canonical_domain}
+          scanId={reportId ?? report.meta.canonical_domain}
+          overall={report.overall_score}
+          components={report.components.map((c) => ({ key: c.key, name: c.name, score: c.score }))}
+        />
+      </div>
 
       {report.provisional && (
         <div
