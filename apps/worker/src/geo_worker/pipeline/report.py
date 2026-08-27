@@ -24,7 +24,11 @@ _STAGE_NAMES: dict[str, str] = {
     "answer_extractability": "Answer Extractability",
 }
 
+# Human-readable labels for the internal signal keys, so a customer never sees raw
+# identifiers like "primary_services_explicit" in the report. Any key not listed
+# here falls back to a de-underscored form (see _label), so nothing leaks jargon.
 _SIGNAL_LABELS: dict[str, str] = {
+    # Sourceability
     "quantified_information": "specific quantified information",
     "evidence_attribution": "source attribution",
     "semantic_extractability": "extractable structure",
@@ -32,16 +36,42 @@ _SIGNAL_LABELS: dict[str, str] = {
     "declared_freshness": "freshness signals",
     "author_responsibility": "clear authorship",
     "first_party_evidence_depth": "first-party evidence depth",
-    "definition_comparison_procedure": "definitions/comparisons/procedures",
-    "stable_topic_identity": "stable topic identity",
+    "definition_comparison_procedure": "definitions, comparisons and procedures",
+    "stable_topic_identity": "a stable topic identity",
+    # Offer clarity
+    "primary_services_explicit": "clearly listing your main services",
+    "dedicated_service_product_pages": "a dedicated page for each product or service",
+    "business_offering_relation": "linking your offering to your brand",
+    "differentiating_factual_detail": "specific detail that sets each offering apart",
+    "location_service_relation": "connecting services to the locations you serve",
+    "target_customer_use_case": "stating who each offering is for",
+    "product_service_taxonomy": "a clear structure of products and services",
 }
 
-# §94 — the honest, provider-neutral disclaimer.
+
+def _label(signal: str) -> str:
+    """A customer-facing label for an internal signal key (never the raw key)."""
+    return _SIGNAL_LABELS.get(signal, signal.replace("_", " "))
+
+
+# §94 — the honest, provider-neutral disclaimer. DISCLAIMER is frozen (V1 golden);
+# V2_DISCLAIMER is the current, fuller version: it states the 24-page scope and is
+# explicit that implementing the fixes/prompts does not guarantee any ranking.
 DISCLAIMER = (
     "This audit measures deterministic website readiness for retrieval, citation "
     "and answer extraction using research-supported and heuristic proxies. It does "
     "not measure or guarantee rankings, citations, traffic or visibility in "
     "ChatGPT, Gemini, Perplexity or other AI platforms."
+)
+
+V2_DISCLAIMER = (
+    "This audit measures deterministic website readiness for retrieval, citation and "
+    "answer extraction using research-supported and heuristic proxies, and currently "
+    "analyses up to 24 pages per site. It does not measure or guarantee rankings, "
+    "citations, traffic or visibility in ChatGPT, Gemini, Perplexity or any other AI "
+    "platform — and implementing its findings or fix prompts does not guarantee any "
+    "ranking, citation or inclusion either. No tool controls what an AI system says; "
+    "these changes make your site more ready to be found, trusted and quoted, nothing more."
 )
 
 
@@ -219,7 +249,7 @@ def _build_stages(r) -> list[ReportStage]:
 def _build_diagnostics(r) -> list[ReportDiagnostic]:
     out: list[ReportDiagnostic] = []
     for d in r.component_diagnostics:
-        limiting = ", ".join(_SIGNAL_LABELS.get(s, s) for s in d.limiting_signals)
+        limiting = ", ".join(_label(s) for s in d.limiting_signals)
         explanation = (
             f"{d.component.replace('_', ' ').title()} is primarily limited by {limiting}."
             if limiting
@@ -557,6 +587,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
         business_profile=profile,
         actions=actions,
         clusters=clusters,
+        disclaimer=V2_DISCLAIMER if is_v2 else DISCLAIMER,
         stages=_build_stages(r),
         diagnostics=_build_diagnostics(r),
         fix_prompt_master=_master_fix_prompt(scan.actions, scan.profile, domain) if is_v2 else "",

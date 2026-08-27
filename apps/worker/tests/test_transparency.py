@@ -62,3 +62,30 @@ def test_v1_leaves_transparency_fields_empty() -> None:
     assert rep.crawl is None
     assert rep.provisional is False
     assert rep.cluster_note == ""
+
+
+def test_v2_disclaimer_states_scope_and_no_ranking_guarantee() -> None:
+    # The disclaimer must state the 24-page scope and be explicit that implementing
+    # the findings/fix prompts does not guarantee any ranking (customer honesty).
+    rep = _report("geo-readiness-v2")
+    d = rep.disclaimer.lower()
+    assert "24 pages" in d
+    assert "implementing" in d and "does not guarantee" in d
+    assert "no tool controls what an ai system says" in d
+
+
+def test_v1_disclaimer_is_frozen() -> None:
+    # V1 keeps its original disclaimer (golden output must not drift).
+    rep = _report("geo-readiness-v1")
+    assert "24 pages" not in rep.disclaimer
+    assert "implementing" not in rep.disclaimer
+
+
+def test_diagnostics_never_leak_raw_signal_keys() -> None:
+    # No customer-facing explanation may contain a raw snake_case identifier like
+    # "primary_services_explicit"; every signal is rendered via a friendly label.
+    import re
+
+    rep = _report("geo-readiness-v2")
+    for dg in rep.diagnostics:
+        assert not re.search(r"[a-z]+_[a-z]+", dg.explanation), dg.explanation

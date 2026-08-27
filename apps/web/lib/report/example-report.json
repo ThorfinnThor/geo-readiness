@@ -457,7 +457,7 @@
       "missing_requirements": []
     }
   ],
-  "disclaimer": "This audit measures deterministic website readiness for retrieval, citation and answer extraction using research-supported and heuristic proxies. It does not measure or guarantee rankings, citations, traffic or visibility in ChatGPT, Gemini, Perplexity or other AI platforms.",
+  "disclaimer": "This audit measures deterministic website readiness for retrieval, citation and answer extraction using research-supported and heuristic proxies, and currently analyses up to 24 pages per site. It does not measure or guarantee rankings, citations, traffic or visibility in ChatGPT, Gemini, Perplexity or any other AI platform — and implementing its findings or fix prompts does not guarantee any ranking, citation or inclusion either. No tool controls what an AI system says; these changes make your site more ready to be found, trusted and quoted, nothing more.",
   "stages": [
     {
       "key": "retrieval_readiness",
@@ -491,7 +491,7 @@
       "limiting_signals": [
         "differentiating_factual_detail"
       ],
-      "explanation": "Offer Clarity is primarily limited by differentiating_factual_detail."
+      "explanation": "Offer Clarity is primarily limited by specific detail that sets each offering apart."
     },
     {
       "component": "sourceability",
