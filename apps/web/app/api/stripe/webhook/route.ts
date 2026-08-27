@@ -26,13 +26,19 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "missing_signature" }, { status: 400 });
   }
 
-  const raw = await req.text();
+  // Read the EXACT raw bytes Stripe signed (a Buffer avoids any text-decode edge
+  // case that would break signature verification).
+  const raw = Buffer.from(await req.arrayBuffer());
   let event: Stripe.Event;
   try {
     event = getStripe().webhooks.constructEvent(raw, signature, secret);
-  } catch {
-    // Bad or forged signature — reject without touching the database.
-    return NextResponse.json({ error: "invalid_signature" }, { status: 400 });
+  } catch (err) {
+    // Signature check failed. Surface the exact reason (safe to expose — the
+    // message never contains secrets) so the cause is visible in Stripe's
+    // delivery view and the server logs, instead of a bare "invalid_signature".
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("stripe webhook signature verification failed:", detail);
+    return NextResponse.json({ error: "invalid_signature", detail }, { status: 400 });
   }
 
   // Idempotency ledger: first sighting of this event id wins; a redelivery finds
