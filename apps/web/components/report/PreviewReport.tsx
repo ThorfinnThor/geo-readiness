@@ -4,6 +4,7 @@
 // never sent to an unpaid browser (see lib/report/preview.toPreviewDoc).
 import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
+import { ShareButton } from "@/components/report/ShareButton";
 import { TopBar } from "@/components/TopBar";
 import type { PreviewDoc } from "@/lib/report/preview";
 
@@ -63,12 +64,17 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
           clusters={preview.meta.clusters_evaluated}
         />
 
-        {measured && (
-          <p className="-mt-6 font-mono text-xs text-fg-subtle">
-            Measured {measured}. To limit crawl load, a repeat scan of the same domain may reuse this
-            result for up to 10 minutes.
-          </p>
-        )}
+        <div className="-mt-6 flex flex-wrap items-center justify-between gap-3">
+          {measured ? (
+            <p className="font-mono text-xs text-fg-subtle">
+              Measured {measured}. To limit crawl load, a repeat scan of the same domain may reuse
+              this result for up to 10 minutes.
+            </p>
+          ) : (
+            <span />
+          )}
+          <ShareButton score={preview.overall_score} domain={preview.meta.canonical_domain} />
+        </div>
 
         <section className="flex flex-col gap-3" aria-label="Component scores">
           <SectionLabel>Component scores</SectionLabel>
