@@ -6,6 +6,7 @@ import { absoluteUrl } from "@/lib/seo/site";
 type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 const MARKETING: { path: string; priority: number; changeFrequency: Freq }[] = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
+  { path: "/product", priority: 0.9, changeFrequency: "monthly" },
   { path: "/pricing", priority: 0.8, changeFrequency: "monthly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/learn", priority: 0.7, changeFrequency: "weekly" },

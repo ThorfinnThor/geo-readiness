@@ -21,6 +21,9 @@ export function TopBar() {
           >
             How scoring works
           </Link>
+          <Link href="/product" className="text-sm text-fg-muted transition-colors hover:text-fg">
+            Product
+          </Link>
           <Link href="/learn" className="text-sm text-fg-muted transition-colors hover:text-fg">
             Learn
           </Link>

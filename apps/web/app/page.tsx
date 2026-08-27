@@ -109,10 +109,13 @@ export default async function HomePage() {
           <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm text-fg-muted">
+          <Link href="/product" className="hover:text-fg">
+            Product
+          </Link>
           <Link href="/methodology" className="hidden hover:text-fg sm:block">
             How scoring works
           </Link>
-          <Link href="/learn" className="hover:text-fg">
+          <Link href="/learn" className="hidden hover:text-fg sm:block">
             Learn
           </Link>
           <Link href="/pricing" className="hover:text-fg">
@@ -200,6 +203,32 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* The offering, stated plainly — what you actually get. */}
+      <section className="flex flex-col gap-6 border-t border-border py-16">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-semibold tracking-tight">What you get</h2>
+          <p className="max-w-2xl text-fg-muted">
+            Find Your AI Score is an AI search readiness audit. Enter your domain and get a 0 to 100
+            readiness score for free. The Premium AI Readiness Audit then shows every finding with
+            its evidence, a prioritized, paste-ready fix for each issue, and a downloadable report.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/product"
+            className="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-2"
+          >
+            See what the audit does →
+          </Link>
+          <Link
+            href="/pricing"
+            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+          >
+            Pricing
+          </Link>
         </div>
       </section>
 
