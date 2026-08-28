@@ -30,3 +30,18 @@ def test_case_meets_expectations(case) -> None:
 def test_case_holds_invariants(case) -> None:
     violations = check_invariants(_SCANS[case.name])
     assert not violations, f"{case.name}: " + "; ".join(violations)
+
+
+def test_no_unexpected_dead_or_saturated_signal() -> None:
+    # A signal that reads ~0 (or ~max) across the whole corpus is almost always a
+    # broken detector. Freshness sat at 0 corpus-wide before it was fixed. Anything
+    # degenerate that is not a documented corpus limitation fails here.
+    from geo_worker.benchmark.calibration import (
+        EXPECTED_DEGENERATE,
+        corpus_scans,
+        signal_flags,
+    )
+
+    flags = signal_flags(corpus_scans())
+    unexpected = {k: v for k, v in flags.items() if EXPECTED_DEGENERATE.get(k) != v}
+    assert not unexpected, f"unexpected degenerate signal (dead-detector regression?): {unexpected}"

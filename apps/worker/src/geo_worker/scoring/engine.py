@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from geo_worker.coverage.types import CoverageReport
 from geo_worker.extraction.classify import classify_link
 from geo_worker.extraction.types import ExtractedPage
+from geo_worker.profile.rules import _domain_core_spaceless, _spaceless
 from geo_worker.profile.types import BusinessProfile
 
 from .confidence import compute_confidence
@@ -141,7 +142,14 @@ class _ScoreIndex:
             brand_resolved=bool(brand) and not profile.needs_confirmation,
             brand_present=bool(brand),
             legal_name_present=bool(profile.legal_name),
-            brand_domain_sim=_jaccard(brand_tokens, domain_tokens),
+            # A multi-word brand whose spaceless form equals the domain
+            # ("Select Your Sauna" ~ selectyoursauna) is a full match; token
+            # overlap alone would score it 0.
+            brand_domain_sim=(
+                1.0
+                if brand and _spaceless(brand) == _domain_core_spaceless(profile.canonical_domain)
+                else _jaccard(brand_tokens, domain_tokens)
+            ),
             brand_title_pages=brand_title_pages,
             services_count=len(profile.services),
             products_count=len(profile.products),
