@@ -17,10 +17,19 @@ export const SITE = {
 // Single source of truth for the paid product, shared by the pricing page, the
 // paywall and the Offer structured data so nothing can drift.
 export const FULL_AUDIT_PRODUCT_NAME = "Premium AI Readiness Audit";
-export const FULL_AUDIT_PRICE_EUR = Number(process.env.GEO_FULL_AUDIT_PRICE_EUR ?? "4.99");
+
+// Parse a EUR amount from an env var, tolerating a comma decimal ("4,99") and any
+// junk, so a misconfigured env can never render "€NaN". Falls back to `fallback`.
+function eurEnv(raw: string | undefined, fallback: number): number {
+  const n = Number(String(raw ?? fallback).trim().replace(",", "."));
+  return Number.isFinite(n) ? n : fallback;
+}
+
+export const FULL_AUDIT_PRICE_EUR = eurEnv(process.env.GEO_FULL_AUDIT_PRICE_EUR, 4.99);
 // Regular (post-launch) price, shown as the anchor next to the launch price.
-export const FULL_AUDIT_REGULAR_PRICE_EUR = Number(
-  process.env.GEO_FULL_AUDIT_REGULAR_PRICE_EUR ?? "49",
+export const FULL_AUDIT_REGULAR_PRICE_EUR = eurEnv(
+  process.env.GEO_FULL_AUDIT_REGULAR_PRICE_EUR,
+  49,
 );
 
 /** Absolute URL for a site-relative path. */
