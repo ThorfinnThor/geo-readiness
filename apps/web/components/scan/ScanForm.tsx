@@ -59,7 +59,7 @@ export function ScanForm() {
         <button
           type="submit"
           disabled={loading || domain.trim() === ""}
-          className="rounded-lg px-4 py-2 text-sm font-semibold text-[color:var(--accent-fg)] transition-transform hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-lg px-4 text-sm font-semibold text-[color:var(--accent-fg)] transition-transform hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100"
           style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
         >
           {loading ? "Scanning…" : "Run scan"}

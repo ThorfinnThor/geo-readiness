@@ -101,7 +101,7 @@ export default async function HomePage() {
     <>
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6">
       <header className="flex items-center justify-between py-6">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex min-h-[44px] items-center gap-2">
           <span
             className="h-2.5 w-2.5 rounded-full"
             style={{ background: "linear-gradient(120deg, var(--accent), var(--accent-2))" }}
@@ -109,16 +109,16 @@ export default async function HomePage() {
           <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm text-fg-muted">
-          <Link href="/product" className="hover:text-fg">
+          <Link href="/product" className="flex min-h-[44px] items-center hover:text-fg">
             Product
           </Link>
-          <Link href="/methodology" className="hidden hover:text-fg sm:block">
+          <Link href="/methodology" className="hidden min-h-[44px] items-center hover:text-fg sm:flex">
             How scoring works
           </Link>
-          <Link href="/learn" className="hidden hover:text-fg sm:block">
+          <Link href="/learn" className="hidden min-h-[44px] items-center hover:text-fg sm:flex">
             Learn
           </Link>
-          <Link href="/pricing" className="hover:text-fg">
+          <Link href="/pricing" className="flex min-h-[44px] items-center hover:text-fg">
             Pricing
           </Link>
           <Link href="/scan/demo" className="hidden font-mono text-xs text-fg-subtle hover:text-fg sm:block">
@@ -223,13 +223,13 @@ export default async function HomePage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/product"
-            className="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-2"
+            className="inline-flex min-h-[44px] items-center rounded-lg border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-surface-2"
           >
             See what the audit does →
           </Link>
           <Link
             href="/pricing"
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+            className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-4 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
           >
             Pricing
           </Link>

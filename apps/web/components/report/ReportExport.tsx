@@ -22,14 +22,14 @@ export function ReportExport({ report }: { report: ReportDocument }) {
       <button
         type="button"
         onClick={() => window.print()}
-        className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+        className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-3 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
       >
         Save as PDF
       </button>
       <button
         type="button"
         onClick={downloadMarkdown}
-        className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+        className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-3 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
       >
         Download Markdown
       </button>

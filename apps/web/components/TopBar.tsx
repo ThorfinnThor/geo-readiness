@@ -7,7 +7,7 @@ export function TopBar() {
   return (
     <div className="sticky top-0 z-40 border-b border-border bg-bg/70 backdrop-blur">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex min-h-[44px] items-center gap-2">
           <span
             className="h-2.5 w-2.5 rounded-full"
             style={{ background: "linear-gradient(120deg, var(--accent), var(--accent-2))" }}
@@ -17,20 +17,26 @@ export function TopBar() {
         <nav className="flex items-center gap-4 sm:gap-5">
           <Link
             href="/methodology"
-            className="hidden text-sm text-fg-muted transition-colors hover:text-fg sm:block"
+            className="hidden min-h-[44px] items-center text-sm text-fg-muted transition-colors hover:text-fg sm:flex"
           >
             How scoring works
           </Link>
           <Link
             href="/product"
-            className="hidden text-sm text-fg-muted transition-colors hover:text-fg sm:block"
+            className="hidden min-h-[44px] items-center text-sm text-fg-muted transition-colors hover:text-fg sm:flex"
           >
             Product
           </Link>
-          <Link href="/learn" className="text-sm text-fg-muted transition-colors hover:text-fg">
+          <Link
+            href="/learn"
+            className="flex min-h-[44px] items-center text-sm text-fg-muted transition-colors hover:text-fg"
+          >
             Learn
           </Link>
-          <Link href="/pricing" className="text-sm text-fg-muted transition-colors hover:text-fg">
+          <Link
+            href="/pricing"
+            className="flex min-h-[44px] items-center text-sm text-fg-muted transition-colors hover:text-fg"
+          >
             Pricing
           </Link>
           <ThemeToggle />

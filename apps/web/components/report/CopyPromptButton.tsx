@@ -27,7 +27,7 @@ export function CopyPromptButton({
       type="button"
       onClick={copy}
       aria-live="polite"
-      className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg print:hidden"
+      className="inline-flex min-h-[44px] shrink-0 items-center rounded-lg border border-border px-3 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg print:hidden"
     >
       {copied ? "Copied ✓" : label}
     </button>

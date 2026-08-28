@@ -32,7 +32,7 @@ export function ShareButton({ score, domain }: { score: number; domain: string }
     <button
       type="button"
       onClick={share}
-      className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-surface/60 px-3 py-1.5 text-xs font-medium text-fg-muted transition-colors hover:border-border-strong hover:text-fg"
+      className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border border-border bg-surface/60 px-3 text-xs font-medium text-fg-muted transition-colors hover:border-border-strong hover:text-fg"
     >
       <svg
         width="14"

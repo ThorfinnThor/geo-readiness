@@ -148,7 +148,7 @@ export function ComponentCard({ component }: { component: ReportComponent }) {
       {guide && (
         <Link
           href={guide}
-          className="mt-0.5 text-[0.7rem] text-fg-subtle underline underline-offset-2 hover:text-fg-muted"
+          className="mt-0.5 inline-flex min-h-[44px] items-center text-[0.7rem] text-fg-subtle underline underline-offset-2 hover:text-fg-muted sm:min-h-0"
         >
           How to improve this
         </Link>

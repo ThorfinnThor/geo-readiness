@@ -333,7 +333,7 @@ export function FullReport({
           </ul>
           <a
             href="/methodology"
-            className="text-xs underline underline-offset-2 hover:text-fg"
+            className="inline-flex min-h-[44px] items-center text-xs underline underline-offset-2 hover:text-fg sm:min-h-0"
           >
             How scoring works, in full →
           </a>

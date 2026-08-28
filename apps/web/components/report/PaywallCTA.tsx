@@ -94,7 +94,7 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
         {isDemo ? (
           <Link
             href="/pricing"
-            className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+            className="flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
             Get the Premium Audit
@@ -104,7 +104,7 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
             type="button"
             onClick={startCheckout}
             disabled={checkoutBusy}
-            className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-60"
+            className="flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-60"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
             {checkoutBusy ? "Starting checkout…" : "Get the Premium Audit"}
@@ -129,12 +129,12 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
                 aria-label="Promo code"
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? "promo-error" : undefined}
-                className="min-w-0 flex-1 rounded-lg border border-border bg-surface/70 px-3 py-2 font-mono text-xs text-fg outline-none placeholder:text-fg-subtle focus:border-[color:var(--accent)]"
+                className="min-h-[44px] min-w-0 flex-1 rounded-lg border border-border bg-surface/70 px-3 font-mono text-xs text-fg outline-none placeholder:text-fg-subtle focus:border-[color:var(--accent)]"
               />
               <button
                 type="submit"
                 disabled={busy || code.trim() === ""}
-                className="rounded-lg border border-border-strong px-3 py-2 text-xs font-semibold transition-colors hover:bg-surface-2 disabled:opacity-40"
+                className="inline-flex min-h-[44px] items-center rounded-lg border border-border-strong px-3 text-xs font-semibold transition-colors hover:bg-surface-2 disabled:opacity-40"
               >
                 {busy ? "…" : "Redeem"}
               </button>

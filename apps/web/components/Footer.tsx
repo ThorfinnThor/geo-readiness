@@ -25,7 +25,11 @@ function Col({ title, links }: { title: string; links: { href: string; label: st
         {title}
       </span>
       {links.map((l) => (
-        <Link key={l.href} href={l.href} className="text-sm text-fg-muted hover:text-fg">
+        <Link
+          key={l.href}
+          href={l.href}
+          className="flex min-h-[44px] items-center text-sm text-fg-muted hover:text-fg sm:min-h-0"
+        >
           {l.label}
         </Link>
       ))}
@@ -38,7 +42,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 px-6 py-12 sm:grid-cols-4">
         <div className="col-span-2 flex flex-col gap-2 sm:col-span-1">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex min-h-[44px] items-center gap-2 sm:min-h-0">
             <span
               className="h-2.5 w-2.5 rounded-full"
               style={{ background: "linear-gradient(120deg, var(--accent), var(--accent-2))" }}

@@ -32,7 +32,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       type="button"
       onClick={toggle}
       aria-label="Toggle color theme"
-      className={`flex h-8 w-8 items-center justify-center rounded-lg border border-border text-fg-muted transition-colors hover:border-border-strong hover:text-fg ${className}`}
+      className={`flex h-11 w-11 items-center justify-center rounded-lg border border-border text-fg-muted transition-colors hover:border-border-strong hover:text-fg ${className}`}
     >
       {theme === null ? (
         <span className="h-4 w-4" />
