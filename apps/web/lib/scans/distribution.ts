@@ -5,8 +5,10 @@ import { query } from "@/lib/db";
 // Where a new site sits among the sites people have scanned here. This is NOT a
 // web-wide average — the sites scanned here are self-selected (owners checking
 // their AI readiness), so the percentile is explicitly "vs sites scanned here".
-// Below MIN_SITES the sample is too small to be meaningful and we show nothing.
-const MIN_SITES = 30;
+// Below MIN_SITES the sample is too small to state a percentile at all. The count
+// is always shown alongside, so a reader can weigh how solid it is; it sharpens as
+// more distinct domains are scanned.
+const MIN_SITES = 10;
 
 /** Latest overall score per domain, so repeat/test scans don't skew the curve.
  *  Cached for an hour: at most one DB read per hour regardless of traffic. */

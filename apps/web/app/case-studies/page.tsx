@@ -132,6 +132,40 @@ export default function CaseStudiesPage() {
           </p>
         </section>
 
+        <section className="flex flex-col gap-6 border-t border-border pt-10">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-2xl font-semibold tracking-tight">Another example, on a sample site</h2>
+            <p className="max-w-2xl text-fg-muted">
+              This one is an <strong>illustrative example</strong> — a sample site we built to
+              demonstrate the method, not a real customer. We scored it, applied the exact fixes the
+              report recommended (Organization and Service schema, an About, Contact and imprint
+              page, dedicated service pages with real specs, and dated content), and scored it again.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-6 rounded-2xl border border-border bg-surface/50 p-8 sm:flex-row sm:justify-center sm:gap-12">
+            <div className="flex flex-col items-center gap-2">
+              <RadialScore score={48} level="Weak" size={116} />
+              <span className="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
+                Before
+              </span>
+            </div>
+            <span className="text-3xl text-fg-subtle" aria-hidden>
+              →
+            </span>
+            <div className="flex flex-col items-center gap-2">
+              <RadialScore score={85} level="Strong" size={116} />
+              <span className="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
+                After applying the fixes
+              </span>
+            </div>
+          </div>
+          <p className="text-sm text-fg-subtle">
+            48 to 85, with the biggest gains where the report flagged the biggest gaps: Entity
+            Clarity and Offer Clarity. The numbers are produced by the same deterministic engine
+            that scores any site — nothing here is hand-tuned.
+          </p>
+        </section>
+
         <section className="flex flex-col gap-3 rounded-xl border border-border bg-surface/40 p-5">
           <h2 className="text-lg font-semibold tracking-tight">The honest caveat</h2>
           <p className="text-sm text-fg-muted">
