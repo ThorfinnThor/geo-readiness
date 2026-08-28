@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { MobileMenu } from "@/components/MobileMenu";
 import { ScanCounter } from "@/components/ScanCounter";
 import { ScanForm } from "@/components/scan/ScanForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -108,22 +109,36 @@ export default async function HomePage() {
           />
           <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm text-fg-muted">
-          <Link href="/product" className="flex min-h-[44px] items-center hover:text-fg">
-            Product
-          </Link>
-          <Link href="/methodology" className="hidden min-h-[44px] items-center hover:text-fg sm:flex">
-            How scoring works
-          </Link>
-          <Link href="/learn" className="hidden min-h-[44px] items-center hover:text-fg sm:flex">
-            Learn
-          </Link>
-          <Link href="/pricing" className="flex min-h-[44px] items-center hover:text-fg">
-            Pricing
-          </Link>
-          <Link href="/scan/demo" className="hidden font-mono text-xs text-fg-subtle hover:text-fg sm:block">
-            example
-          </Link>
+        <nav className="flex items-center gap-3 text-sm text-fg-muted sm:gap-6">
+          <div className="hidden items-center gap-6 sm:flex">
+            <Link href="/product" className="flex min-h-[44px] items-center hover:text-fg">
+              Product
+            </Link>
+            <Link href="/methodology" className="flex min-h-[44px] items-center hover:text-fg">
+              How scoring works
+            </Link>
+            <Link href="/learn" className="flex min-h-[44px] items-center hover:text-fg">
+              Learn
+            </Link>
+            <Link href="/pricing" className="flex min-h-[44px] items-center hover:text-fg">
+              Pricing
+            </Link>
+            <Link
+              href="/scan/demo"
+              className="flex min-h-[44px] items-center text-fg-subtle hover:text-fg"
+            >
+              Example
+            </Link>
+          </div>
+          <MobileMenu
+            links={[
+              { href: "/product", label: "Product" },
+              { href: "/methodology", label: "How scoring works" },
+              { href: "/learn", label: "Learn" },
+              { href: "/pricing", label: "Pricing" },
+              { href: "/scan/demo", label: "Example report" },
+            ]}
+          />
           <ThemeToggle />
         </nav>
       </header>
