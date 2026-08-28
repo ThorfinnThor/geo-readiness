@@ -66,6 +66,91 @@ _RDY005_NON_COMMERCIAL = {
 }
 
 
+# Safety net: any applicable component shown below "Good" (< 65) must carry an
+# action of its category, so a shown-weak component never has an empty fix list.
+# The base rules use a 60 cut-off, which leaves the 60-64 "Needs improvement" band
+# uncovered; this fills exactly that gap (offer_clarity has its own RDY-002B).
+_COMPONENT_FALLBACK: dict[str, dict[str, str]] = {
+    "entity_clarity": {
+        "category": "entity",
+        "rule_id": "RDY-001B",
+        "title": "Clarify your business identity",
+        "problem": "The site's business identity is not fully unambiguous.",
+        "recommendation": (
+            "State one consistent business name in the page title and a single <h1>, make sure an "
+            "About and a Contact or imprint page exist, and confirm the identity with Organization "
+            "structured data (name, url, logo, sameAs)."
+        ),
+        "expected_signal": "Higher Entity Clarity and an unambiguous brand.",
+        "how_to_verify": "Re-scan: Entity Clarity rises.",
+    },
+    "prompt_coverage": {
+        "category": "coverage",
+        "rule_id": "RDY-006B",
+        "title": "Answer more of the questions your audience asks",
+        "problem": "Some high-intent questions your customers ask are not clearly answered.",
+        "recommendation": (
+            "Strengthen the strongest page for each under-covered topic so it directly addresses "
+            "the service, product, audience and location behind the question — match the intent, "
+            "not just the keywords."
+        ),
+        "expected_signal": "Higher prompt coverage across your clusters.",
+        "how_to_verify": "Re-scan: coverage for the weak clusters rises.",
+    },
+    "sourceability": {
+        "category": "sourceability",
+        "rule_id": "RDY-004Z",
+        "title": "Make your content more sourceable",
+        "problem": "Pages are not yet specific and extractable enough to be quoted as a source.",
+        "recommendation": (
+            "Add concrete first-party detail an answer engine can quote: real figures in context, "
+            "claims attributed to named sources, genuine tables/lists, and a concise direct answer "
+            "near the top of pages that target a clear question."
+        ),
+        "expected_signal": "Higher Sourceability across its signals.",
+        "how_to_verify": "Re-scan: Sourceability rises.",
+    },
+    "structured_data": {
+        "category": "structured_data",
+        "rule_id": "RDY-005B",
+        "title": "Complete your structured data",
+        "problem": "Structured data is present but incomplete for the site's content.",
+        "recommendation": (
+            "Add or complete a valid Organization node and the schema that fits each page "
+            "(Service/Product for offerings, Article for editorial, Dataset for data), matching "
+            "the visible content, on the relevant pages rather than only the homepage."
+        ),
+        "expected_signal": "Higher Structured Data score.",
+        "how_to_verify": "Re-scan: Organization and content schema are detected.",
+    },
+    "evidence_trust": {
+        "category": "trust",
+        "rule_id": "RDY-008B",
+        "title": "Add trust and transparency evidence",
+        "problem": "Trust signals (identity, references, policies) are still thin.",
+        "recommendation": (
+            "Add the accountability pages you likely already have content for: About, Contact or "
+            "imprint, a privacy/policy page, and references or case studies where they genuinely "
+            "apply, linked from the main navigation and footer."
+        ),
+        "expected_signal": "Higher Evidence & Trust score.",
+        "how_to_verify": "Re-scan: transparency and reference signals are detected.",
+    },
+    "technical_access": {
+        "category": "technical",
+        "rule_id": "RDY-010B",
+        "title": "Improve technical accessibility",
+        "problem": "Something is limiting how cleanly a machine can fetch and read the pages.",
+        "recommendation": (
+            "Ensure core content is in the server-rendered HTML (not JS-only), set a canonical URL "
+            "per page, and remove anything blocking crawlers from the important pages."
+        ),
+        "expected_signal": "Higher Technical Accessibility.",
+        "how_to_verify": "Re-scan: pages are cleanly fetchable and readable.",
+    },
+}
+
+
 def _severity(priority: float) -> str:
     if priority >= 0.20:
         return "critical"
@@ -379,6 +464,34 @@ def compute_actions(
                 how_to_verify="Re-scan: your offering (service, product or software) is detected.",
             )
         )
+
+    # Safety net: guarantee every applicable component shown below "Good" (< 65)
+    # has an action of its category (offer is already covered by RDY-002B above).
+    present_categories = {a.category for _, a in families}
+    for comp in readiness.components:
+        if not getattr(comp, "applicable", True) or comp.score >= 65:
+            continue
+        spec = _COMPONENT_FALLBACK.get(comp.name)
+        if spec is None or spec["category"] in present_categories:
+            continue
+        families.append(
+            _make(
+                rule_id=spec["rule_id"],
+                family=spec["rule_id"],
+                category=spec["category"],
+                component_score=comp.score,
+                confidence=confidence,
+                impact=0.6,
+                effort=3,
+                title=spec["title"],
+                problem=spec["problem"],
+                evidence=[f"{comp.name}={round(comp.score, 2)}"],
+                recommendation=spec["recommendation"],
+                expected_signal=spec["expected_signal"],
+                how_to_verify=spec["how_to_verify"],
+            )
+        )
+        present_categories.add(spec["category"])
 
     # Dedup by family, keep highest priority; then sort.
     best: dict[str, Action] = {}
