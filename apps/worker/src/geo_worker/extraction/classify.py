@@ -11,7 +11,21 @@ from urllib.parse import urlsplit
 # Ordered (type, keywords). First match on the URL path wins; more specific
 # types are listed before generic ones.
 _PATH_RULES: list[tuple[str, tuple[str, ...]]] = [
-    ("legal", ("impressum", "imprint", "datenschutz", "privacy", "terms", "agb", "legal")),
+    (
+        "legal",
+        (
+            "impressum",
+            "imprint",
+            "datenschutz",
+            "privacy",
+            "terms",
+            "agb",
+            "legal",
+            "rechtliches",
+            "rechtliche",
+            "widerruf",
+        ),
+    ),
     ("contact", ("kontakt", "contact")),
     ("pricing", ("preise", "pricing", "kosten", "tarife")),
     ("about", ("ueber-uns", "ueber", "about", "unternehmen", "company", "team")),

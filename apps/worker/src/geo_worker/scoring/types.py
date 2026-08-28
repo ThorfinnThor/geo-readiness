@@ -71,6 +71,10 @@ class CrawlMeta(BaseModel):
 
     pages_requested: int = 0
     pages_crawled: int = 0
+    # Distinct URLs the crawl discovered (frontier + sitemap), even if not fetched
+    # because the page cap was hit. Lets confidence reflect true coverage on a
+    # large site (24 crawled of 400 discovered is not a complete picture).
+    pages_discovered: int = 0
     homepage_reachable: bool = True
     robots_blocked_core: bool = False
     valid_response_ratio: float = 1.0

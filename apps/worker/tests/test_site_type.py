@@ -55,3 +55,24 @@ def test_service_with_location_is_local() -> None:
 def test_bare_site_is_unknown() -> None:
     pages = [_p("https://s/", "home", "hello")]
     assert classify_site_type(pages, _prof())[0] == "unknown"
+
+
+def test_product_catalog_without_cart_is_not_ecommerce() -> None:
+    # Regression (selectyoursauna.com): a comparison/catalog site with product
+    # schema and product pages but NO cart/checkout must NOT be classified as
+    # ecommerce (which would apply the wrong offer expectations).
+    pages = [
+        _p("https://s/", "product", "Sauna im Vergleich", [{"@type": "Product"}]),
+        _p("https://s/p1", "product", "Technische Daten", [{"@type": "Product"}]),
+    ]
+    assert classify_site_type(pages, _prof(products=["Sauna A", "Sauna B"]))[0] != "ecommerce"
+
+
+def test_german_shop_with_warenkorb_is_ecommerce() -> None:
+    # A real German shop is recognised via German cart wording, so removing the
+    # cartless fallback does not lose genuine shops.
+    pages = [
+        _p("https://s/", "product", "In den Warenkorb legen", [{"@type": "Product"}]),
+        _p("https://s/p1", "product", "Zur Kasse", [{"@type": "Product"}]),
+    ]
+    assert classify_site_type(pages, _prof(products=["Widget"]))[0] == "ecommerce"

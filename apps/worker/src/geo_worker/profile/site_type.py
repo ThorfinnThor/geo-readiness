@@ -22,6 +22,13 @@ _ECOM_KW = (
     "add to bag",
     "shopping cart",
     "proceed to checkout",
+    # German shop affordances, so a real DE shop is recognised without relying on
+    # the (now removed) cartless fallback that misread comparison/catalog sites.
+    "in den warenkorb",
+    "warenkorb",
+    "zur kasse",
+    "in den einkaufswagen",
+    "jetzt kaufen",
 )
 _SAAS_KW = (
     "free trial",
@@ -71,13 +78,14 @@ def classify_site_type(pages: list[ExtractedPage], profile: BusinessProfile) -> 
     if "dataset" in jl:
         return "documentation_reference", 0.75
 
-    # E-commerce: product schema/pages plus a real cart/checkout affordance.
+    # E-commerce requires a real cart/checkout affordance, not just product schema
+    # or product pages. Without one, a site listing products is a catalog,
+    # comparison or affiliate/editorial site, not a shop — so it must NOT be
+    # classified as ecommerce (which would apply the wrong offer expectations).
     if ("product" in jl or product_pages >= 2 or profile.products) and any(
         k in text for k in _ECOM_KW
     ):
         return "ecommerce", 0.8
-    if "product" in jl and product_pages >= 2:
-        return "ecommerce", 0.6
 
     # Local business: LocalBusiness schema, or a resolved location with local cues.
     if "localbusiness" in jl or any(t.endswith("business") for t in jl):

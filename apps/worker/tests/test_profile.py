@@ -128,3 +128,39 @@ def test_local_business_fixture_evidence() -> None:
     assert {"language", "country", "location"} <= fields
     # A lone homepage JSON-LD name without corroboration stays conservative.
     assert profile.needs_confirmation is True
+
+
+def test_brand_from_multiword_concatenated_domain() -> None:
+    # Regression (selectyoursauna.com): brand is "Brand — Tagline" (brand first),
+    # there is no og:site_name/Organization JSON-LD, and the domain concatenates
+    # the multi-word brand. Token overlap alone saw sim=0 and returned "unknown";
+    # the spaceless domain match now resolves it.
+    home = ExtractedPage(
+        final_url="https://selectyoursauna.com/",
+        title="Select Your Sauna — die passende Sauna für dein Zuhause",
+        page_type="home",
+        language="de",
+    )
+    profile = build_profile([home], "selectyoursauna.com")
+    assert profile.brand_name == "Select Your Sauna"
+    assert profile.needs_confirmation is False
+
+
+def test_offering_extraction_rejects_ui_fragments() -> None:
+    # Nav labels, link teasers with glyphs, and sentence fragments are not products.
+    page = ExtractedPage(
+        final_url="https://x.example/produkte",
+        page_type="product",
+        h1="Harvia Domo Large",
+        json_ld=[
+            {"@type": "Product", "name": "Karibu Sauna Antonia"},
+            {"@type": "Product", "name": "Datensatz ansehen↗"},
+            {"@type": "Product", "name": "Produkte"},
+            {"@type": "Product", "name": "Sauna-Produkteim Vergleich."},
+        ],
+    )
+    profile = build_profile([page], "x.example")
+    assert "karibu sauna antonia" in profile.products
+    assert "harvia domo large" in profile.products
+    for junk in ("datensatz ansehen↗", "produkte", "sauna-produkteim vergleich."):
+        assert junk not in profile.products

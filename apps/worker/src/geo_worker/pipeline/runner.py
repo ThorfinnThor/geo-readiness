@@ -101,6 +101,7 @@ def run_pipeline(
     crawl_meta = CrawlMeta(
         pages_requested=limits.max_pages,
         pages_crawled=fetched,
+        pages_discovered=crawl_result.metrics.frontier_seen,
         homepage_reachable=crawl_result.homepage_reachable,
         robots_blocked_core=crawl_result.robots_blocked_core,
         valid_response_ratio=(fetched / (fetched + errors)) if (fetched + errors) else 1.0,

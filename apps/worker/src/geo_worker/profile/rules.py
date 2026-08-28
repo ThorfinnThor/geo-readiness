@@ -148,6 +148,33 @@ def _jaccard(a: set[str], b: set[str]) -> float:
     return len(a & b) / len(a | b)
 
 
+def _spaceless(text: str) -> str:
+    """Lowercase text with all non-alphanumerics removed ('Select Your Sauna' ->
+    'selectyoursauna'), so a spaced brand can be matched to a concatenated domain."""
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def _domain_core_spaceless(canonical_domain: str) -> str:
+    """The registrable domain core, concatenated ('selectyoursauna.com' ->
+    'selectyoursauna'), for matching against a multi-word brand."""
+    labels = canonical_domain.lower().split(".")
+    core = labels[:-1] if len(labels) > 1 else labels
+    while len(core) > 1 and core[0] in _COMMON_SUBDOMAINS:
+        core = core[1:]
+    return _spaceless("".join(core))
+
+
+def _title_affixes(title: str | None) -> list[str]:
+    """Both ends of a separated title as brand candidates: the last segment
+    ('Page — Brand') and the first ('Brand — Tagline')."""
+    if not title:
+        return []
+    parts = [p.strip() for p in _TITLE_SEPARATORS.split(title) if p.strip()]
+    if len(parts) < 2:
+        return []
+    return list(dict.fromkeys([parts[-1], parts[0]]))
+
+
 def _type_list(node: dict) -> list[str]:
     t = node.get("@type")
     if isinstance(t, str):
@@ -334,6 +361,7 @@ def _brand_candidates(
 
     domain_tokens = _domain_tokens(canonical_domain)
     domain_key = register("-".join(sorted(domain_tokens))) if domain_tokens else ""
+    domain_spaceless = _domain_core_spaceless(canonical_domain)
     repeated_suffix = {k for k, c in Counter(title_suffixes).items() if c >= 2}
 
     candidates: dict[str, BrandCandidate] = {}
@@ -358,7 +386,13 @@ def _brand_candidates(
         if any(cand_tokens <= s for s in home_token_sets):
             score += 0.15
             sources.append("title_h1")
-        sim = 1.0 if key == domain_key else _jaccard(cand_tokens, domain_tokens)
+        # A multi-word brand whose spaceless form equals the domain ('Select Your
+        # Sauna' ~ selectyoursauna) is as strong a domain match as an exact single
+        # token — token overlap alone would miss it.
+        if domain_spaceless and _spaceless(display[key]) == domain_spaceless:
+            sim = 1.0
+        else:
+            sim = 1.0 if key == domain_key else _jaccard(cand_tokens, domain_tokens)
         if sim > 0:
             score += 0.10 * sim
             sources.append("domain")
@@ -461,14 +495,58 @@ def _domain_brand_fallback(pages: list[ExtractedPage], canonical_domain: str) ->
             for word in re.findall(r"[A-Za-z0-9]+", text):
                 if word.lower() == label:
                     return word
+        # A multi-word identity whose spaceless form equals the domain label
+        # ('Select Your Sauna' ~ selectyoursauna): return the cased, spaced form.
+        for text in (page.open_graph.get("og:site_name"), *_title_affixes(page.title), page.h1):
+            if not text:
+                continue
+            cleaned = " ".join(text.split())
+            if _spaceless(cleaned) == label and not (_tokens(cleaned) <= _GENERIC_BRAND_TOKENS):
+                return cleaned
     return None
 
 
+# Navigation/UI fragments that get mis-read as offering names (a "Products" menu
+# item, a "view dataset" link, a comparison teaser). Never real product names.
+_OFFERING_STOPWORDS = frozenset(
+    {
+        "produkt",
+        "produkte",
+        "product",
+        "products",
+        "details",
+        "mehr",
+        "mehr erfahren",
+        "ansehen",
+        "datensatz ansehen",
+        "im vergleich",
+        "vergleich",
+        "alle produkte",
+        "alle ansehen",
+    }
+)
+
+
 def _plausible_offering_name(name: str) -> bool:
-    """A real product/service name is a short label, not a sentence. Rejects
-    content mis-read as an offering (e.g. a long H1 on a page that merely mentions
-    the word 'products')."""
-    return 0 < len(name) <= 60 and len(name.split()) <= 8 and ":" not in name
+    """A real product/service name is a short label, not a sentence or a UI string.
+
+    Rejects content mis-read as an offering: long H1s on pages that merely mention
+    the word 'products', navigation labels ('Produkte', 'Details'), link teasers
+    with UI glyphs ('Datensatz ansehen ↗'), and sentence-like fragments."""
+    n = name.strip()
+    low = n.lower()
+    if not (0 < len(n) <= 60) or len(n.split()) > 8 or ":" in n:
+        return False
+    if low in _OFFERING_STOPWORDS:
+        return False
+    # UI glyphs (arrows/chevrons) mark a link/teaser, not a product name.
+    if any(ch in n for ch in "↗↘→›»↦"):
+        return False
+    # Sentence-like fragments (end in a period) are prose, not a label.
+    if n.endswith("."):
+        return False
+    # Must contain at least one letter (reject pure counters/glyphs).
+    return re.search(r"[a-zäöüß]", low) is not None
 
 
 def _resolve_offerings(

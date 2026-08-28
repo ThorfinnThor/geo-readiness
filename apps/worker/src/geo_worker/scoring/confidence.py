@@ -32,6 +32,15 @@ def compute_confidence(
 
     if crawl_meta.pages_requested > 0:
         crawl_completeness = min(crawl_meta.pages_crawled / crawl_meta.pages_requested, 1.0)
+        # If the page cap was hit AND the site had many more URLs than we fetched,
+        # we only sampled a slice — so a 24-of-400 crawl must not read as complete.
+        # Gated on hitting the cap, so sites smaller than the cap are unaffected.
+        if (
+            crawl_meta.pages_crawled >= crawl_meta.pages_requested
+            and crawl_meta.pages_discovered > crawl_meta.pages_crawled
+        ):
+            sampled = crawl_meta.pages_crawled / crawl_meta.pages_discovered
+            crawl_completeness = min(crawl_completeness, 0.5 + 0.5 * sampled)
     else:
         crawl_completeness = 1.0 if n else 0.0
 
