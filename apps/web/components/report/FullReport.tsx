@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 // E13 — Full Report: everything, printable HTML, noindex (§26). Rendered from
 // the report contract; page-level access control is enforced by the API layer.
 import type { ReportDocument } from "@/lib/report/types";
@@ -11,6 +12,7 @@ import {
 import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
 import { ScanComparison } from "@/components/report/ScanComparison";
+import { ScorePercentile } from "@/components/report/ScorePercentile";
 import { TopBar } from "@/components/TopBar";
 import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
@@ -55,6 +57,10 @@ export function FullReport({
         pages={report.meta.pages_analyzed}
         clusters={report.meta.clusters_evaluated}
       />
+
+      <Suspense fallback={null}>
+        <ScorePercentile score={report.overall_score} />
+      </Suspense>
 
       <div className="print:hidden">
         <ScanComparison

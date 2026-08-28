@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 // E12 — Free Preview. Shows the free-product data only: overall score, all
 // component scores, and which categories need improvement. The prioritized fixes
 // are represented by content-free locked placeholders — the real issue text is
@@ -5,6 +6,7 @@
 import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
 import { ScanComparison } from "@/components/report/ScanComparison";
+import { ScorePercentile } from "@/components/report/ScorePercentile";
 import { ShareButton } from "@/components/report/ShareButton";
 import { TopBar } from "@/components/TopBar";
 import type { PreviewDoc } from "@/lib/report/preview";
@@ -76,6 +78,10 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
           )}
           <ShareButton score={preview.overall_score} domain={preview.meta.canonical_domain} />
         </div>
+
+        <Suspense fallback={null}>
+          <ScorePercentile score={preview.overall_score} />
+        </Suspense>
 
         <ScanComparison
           domain={preview.meta.canonical_domain}
