@@ -105,7 +105,7 @@ export default function ProductPage() {
           <div className="flex flex-col gap-2">
             <h2 className="text-2xl font-semibold tracking-tight">What the audit checks</h2>
             <p className="max-w-2xl text-fg-muted">
-              Every scan crawls up to 24 of your pages, extracts the text, structure and metadata,
+              Every scan crawls up to 36 of your pages, extracts the text, structure and metadata,
               and scores seven readiness signals. Each one traces back to something observed on your
               pages.
             </p>
@@ -165,7 +165,7 @@ export default function ProductPage() {
           <ol className="flex flex-col gap-4">
             {[
               "Enter your domain. No account, no credit card for the free score.",
-              "We crawl up to 24 pages, build the questions AI search would ask about your business, and check page by page whether you answer them.",
+              "We crawl up to 36 pages, build the questions AI search would ask about your business, and check page by page whether you answer them.",
               "You get a 0 to 100 readiness score in minutes, then unlock the findings and fixes when you are ready.",
             ].map((step, i) => (
               <li key={i} className="flex gap-4">

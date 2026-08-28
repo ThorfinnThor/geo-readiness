@@ -55,7 +55,7 @@ def _label(signal: str) -> str:
 
 
 # §94 — the honest, provider-neutral disclaimer. DISCLAIMER is frozen (V1 golden);
-# V2_DISCLAIMER is the current, fuller version: it states the 24-page scope and is
+# V2_DISCLAIMER is the current, fuller version: it states the 36-page scope and is
 # explicit that implementing the fixes/prompts does not guarantee any ranking.
 DISCLAIMER = (
     "This audit measures deterministic website readiness for retrieval, citation "
@@ -67,7 +67,7 @@ DISCLAIMER = (
 V2_DISCLAIMER = (
     "This audit measures deterministic website readiness for retrieval, citation and "
     "answer extraction using research-supported and heuristic proxies, and currently "
-    "analyses up to 24 pages per site. It does not measure or guarantee rankings, "
+    "analyses up to 36 pages per site. It does not measure or guarantee rankings, "
     "citations, traffic or visibility in ChatGPT, Gemini, Perplexity or any other AI "
     "platform — and implementing its findings or fix prompts does not guarantee any "
     "ranking, citation or inclusion either. No tool controls what an AI system says; "

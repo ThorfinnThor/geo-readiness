@@ -63,7 +63,9 @@ def _freshness(pages: list[ExtractedPage], as_of: dt.datetime) -> tuple[SignalSt
     for p in applicable:
         if p.signals.invalid_future_date:
             continue
-        date = p.signals.date_modified or p.signals.date_published
+        # Machine dates first, then a labeled visible date ('Stand …', a <time>
+        # element) — the future-date guard above already vets all three.
+        date = p.signals.date_modified or p.signals.date_published or p.signals.visible_date
         if date is None:
             continue
         age = (as_of.date() - date).days

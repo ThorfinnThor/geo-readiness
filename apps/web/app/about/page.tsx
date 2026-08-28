@@ -80,7 +80,7 @@ export default function AboutPage() {
 
           <h2>How the method works</h2>
           <p>
-            The scan crawls up to 24 pages of your site, extracts the text, structure and
+            The scan crawls up to 36 pages of your site, extracts the text, structure and
             metadata, and runs a fixed set of deterministic rules. The same site scored twice gives
             the same result, because nothing about the score is guessed. We do not send your pages
             to an AI model to be graded. The engine is versioned, so a score you got last month

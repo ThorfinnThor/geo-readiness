@@ -95,3 +95,28 @@ def test_signals_are_additive_no_content_hash_change() -> None:
     b = _sig("<main><p>same</p></main>")
     assert a.content_hash == b.content_hash
     assert a.content_hash != ""
+
+
+def test_labeled_visible_freshness_date_is_extracted() -> None:
+    # A German product page carries a labeled date in prose, no JSON-LD/<time>
+    # (as on selectyoursauna.com product pages). It must be read as a freshness date.
+    sig = _sig("<main><p>Herstellerdaten geprüft 22.08.2026. Sauna Sandra.</p></main>")
+    assert sig.signals.visible_date is not None
+    assert sig.signals.visible_date.isoformat() == "2026-08-22"
+
+
+def test_bare_copyright_year_is_not_a_freshness_date() -> None:
+    # No update/checked label → not a freshness signal (anti-gaming).
+    sig = _sig("<main><p>Alle Preise inkl. MwSt.</p></main><footer>© 2026</footer>")
+    assert sig.signals.visible_date is None
+
+
+def test_question_heading_with_answer_in_sibling_wrapper_counts() -> None:
+    # The question is in one wrapper and the answer (a spec list) in the next
+    # wrapper — not a direct sibling of the heading. It must still be detected.
+    body = (
+        "<main><section><div><h2>Passt das Modell technisch?</h2></div>"
+        "<div><dl><dt>Außenmaß</dt><dd>145 x 145 x 187 cm</dd>"
+        "<dt>Leistung</dt><dd>3,6 kW</dd></dl></div></section></main>"
+    )
+    assert _sig(body).signals.faq_answer_count >= 1

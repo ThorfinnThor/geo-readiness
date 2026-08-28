@@ -69,7 +69,7 @@ def test_v2_disclaimer_states_scope_and_no_ranking_guarantee() -> None:
     # the findings/fix prompts does not guarantee any ranking (customer honesty).
     rep = _report("geo-readiness-v2")
     d = rep.disclaimer.lower()
-    assert "24 pages" in d
+    assert "36 pages" in d
     assert "implementing" in d and "does not guarantee" in d
     assert "no tool controls what an ai system says" in d
 
@@ -77,7 +77,7 @@ def test_v2_disclaimer_states_scope_and_no_ranking_guarantee() -> None:
 def test_v1_disclaimer_is_frozen() -> None:
     # V1 keeps its original disclaimer (golden output must not drift).
     rep = _report("geo-readiness-v1")
-    assert "24 pages" not in rep.disclaimer
+    assert "36 pages" not in rep.disclaimer
     assert "implementing" not in rep.disclaimer
 
 

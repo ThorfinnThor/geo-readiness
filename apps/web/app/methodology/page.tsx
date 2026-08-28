@@ -111,7 +111,7 @@ export default function Page() {
       <h2>How each point is earned</h2>
       <p>
         Every point traces back to something we observed on your pages. The engine crawls up to
-        24 pages, extracts the visible text, structure and metadata, and applies a fixed set of
+        36 pages, extracts the visible text, structure and metadata, and applies a fixed set of
         rules. Three principles keep the score honest:
       </p>
       <ul>
