@@ -164,3 +164,21 @@ def test_offering_extraction_rejects_ui_fragments() -> None:
     assert "harvia domo large" in profile.products
     for junk in ("datensatz ansehen↗", "produkte", "sauna-produkteim vergleich."):
         assert junk not in profile.products
+
+
+def test_legal_name_and_city_from_german_imprint_text() -> None:
+    # No address/legalName JSON-LD, only a § 5 DDG imprint in prose (as on
+    # selectyoursauna.com): extract the operator name and the city.
+    home = ExtractedPage(final_url="https://selectyoursauna.com/", page_type="home", language="de")
+    imprint = ExtractedPage(
+        final_url="https://selectyoursauna.com/de/rechtliches/",
+        page_type="legal",
+        language="de",
+        visible_text=(
+            "Impressum Betreiber dieser Website ist das Einzelunternehmen SeitenHafen361. "
+            "Inhaber: Schayan Yousefian Freienwalder Str. 34 13359 Berlin"
+        ),
+    )
+    profile = build_profile([home, imprint], "selectyoursauna.com")
+    assert profile.legal_name == "SeitenHafen361"
+    assert profile.locations == ["Berlin"]

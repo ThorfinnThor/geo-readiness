@@ -8,17 +8,21 @@ from urllib.parse import urlsplit, urlunsplit
 from geo_worker.extraction.classify import classify_page
 
 # Crawl priority by page type (§10). Higher is crawled first.
+# Identity/trust pages (about/contact/legal/case_study/reference) rank ABOVE bulk
+# offering pages (service/product), so that on a large catalog site the handful of
+# imprint/about/contact pages are always fetched within the page budget instead of
+# being crowded out by dozens of product pages.
 _TYPE_PRIORITY: dict[str, int] = {
     "home": 100,
-    "about": 90,
+    "about": 95,
+    "contact": 93,
+    "legal": 91,
+    "case_study": 89,
+    "reference": 87,
+    "location": 86,
     "service": 85,
     "product": 80,
     "pricing": 75,
-    "location": 70,
-    "contact": 65,
-    "legal": 60,
-    "case_study": 58,
-    "reference": 56,
     "faq": 54,
     "guide": 50,
     "blog": 40,

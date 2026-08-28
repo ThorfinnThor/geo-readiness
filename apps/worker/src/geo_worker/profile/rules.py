@@ -207,7 +207,7 @@ def build_profile(
 
     org_nodes = _collect_org_nodes(pages)
     _resolve_languages(pages, profile, evidence)
-    _resolve_geography(org_nodes, profile, evidence)
+    _resolve_geography(org_nodes, pages, profile, evidence)
     legal_name = _resolve_legal_name(org_nodes, pages, evidence)
     profile.legal_name = legal_name
 
@@ -247,8 +247,94 @@ def _resolve_languages(
         )
 
 
+# German imprint (§ 5 DDG/TMG) parsing: high-precision markers that name the
+# operator, plus a postal-code + city pattern. visible_text is flattened to spaces,
+# so these run over a single string. Gated to legal/about pages only.
+_LEGAL_TEXT_PAGE_TYPES = {"legal", "about"}
+_LEGAL_NAME_RE = [
+    # Company with an explicit legal form ("Foo Bar GmbH").
+    re.compile(
+        r"([A-ZÄÖÜ][\wäöüß.&'\-]*(?:\s+[A-ZÄÖÜ0-9][\wäöüß.&'\-]*){0,4}\s"
+        r"(?:GmbH(?:\s?&\s?Co\.?\s?KG)?|UG(?:\s?\(haftungsbeschränkt\))?|AG|"
+        r"e\.?\s?K\.?|e\.?\s?V\.?|GbR|mbH|KG|OHG|Ltd\.?|LLC|Inc\.?))"
+    ),
+    # Operator markers ("Betreiber … ist [das Einzelunternehmen] X").
+    re.compile(
+        r"[Bb]etreiber(?:\s+dieser\s+[Ww]ebsite)?\s+ist\s+"
+        r"(?:das\s+[Ee]inzelunternehmen\s+|die\s+[Ff]irma\s+)?"
+        r"([A-ZÄÖÜ][\wäöüß.&'\-]+(?:\s+[A-ZÄÖÜ0-9][\wäöüß.&'\-]+){0,3})"
+    ),
+    re.compile(
+        r"(?:Diensteanbieter|Anbieter|Herausgeber)\s*:?\s+"
+        r"([A-ZÄÖÜ][\wäöüß.&'\-]+(?:\s+[A-ZÄÖÜ0-9][\wäöüß.&'\-]+){0,3})"
+    ),
+    re.compile(r"Inhaber(?:in)?\s*:?\s+([A-ZÄÖÜ][\wäöüß.\-]+(?:\s+[A-ZÄÖÜ][\wäöüß.\-]+){0,1})"),
+]
+_POSTAL_CITY_RE = re.compile(
+    r"\b\d{5}\s+([A-ZÄÖÜ][A-Za-zäöüß.\-]+(?:\s[A-ZÄÖÜ][A-Za-zäöüß.\-]+){0,2})"
+)
+# Heading/marker words that leak into a captured name and must be trimmed.
+_LEGAL_STOPWORDS = frozenset(
+    {
+        "impressum",
+        "kontakt",
+        "angaben",
+        "datenschutz",
+        "rechtliches",
+        "betreiber",
+        "anbieter",
+        "diensteanbieter",
+        "herausgeber",
+        "inhaber",
+        "die",
+        "der",
+        "das",
+    }
+)
+
+
+def _clean_legal_name(raw: str) -> str:
+    words = raw.split()
+    while words and words[0].lower().strip(".,:") in _LEGAL_STOPWORDS:
+        words = words[1:]
+    # Stop at the first word that closes a sentence (a period), so a trailing
+    # sentence continuation ("SeitenHafen361. Die Website") is not absorbed.
+    out: list[str] = []
+    for w in words:
+        out.append(w)
+        if w.endswith("."):
+            break
+    return " ".join(out).strip(" .,-")
+
+
+def _legal_pages(pages: list[ExtractedPage]) -> list[ExtractedPage]:
+    return [p for p in pages if p.page_type in _LEGAL_TEXT_PAGE_TYPES and p.visible_text]
+
+
+def _legal_name_from_text(pages: list[ExtractedPage]) -> tuple[str, str] | None:
+    for page in _legal_pages(pages):
+        for rx in _LEGAL_NAME_RE:
+            m = rx.search(page.visible_text)
+            if m:
+                name = _clean_legal_name(m.group(1))
+                if 2 <= len(name) <= 80:
+                    return name, page.final_url
+    return None
+
+
+def _city_from_text(pages: list[ExtractedPage]) -> tuple[str, str] | None:
+    for page in _legal_pages(pages):
+        m = _POSTAL_CITY_RE.search(page.visible_text)
+        if m:
+            city = " ".join(m.group(1).split()).strip(" .,-")
+            if 2 <= len(city) <= 40:
+                return city, page.final_url
+    return None
+
+
 def _resolve_geography(
     org_nodes: list[tuple[dict, ExtractedPage]],
+    pages: list[ExtractedPage],
     profile: BusinessProfile,
     evidence: list[EvidenceItem],
 ) -> None:
@@ -266,6 +352,13 @@ def _resolve_geography(
         locality = address.get("addressLocality")
         if isinstance(locality, str) and locality.strip():
             locations.setdefault(locality.strip(), page.final_url)
+
+    # Fallback: a German imprint gives the city in postal-code + city form even
+    # when there is no address JSON-LD.
+    if not locations:
+        city = _city_from_text(pages)
+        if city:
+            locations.setdefault(city[0], city[1])
 
     profile.countries = sorted(countries)
     profile.locations = sorted(locations)
@@ -309,6 +402,20 @@ def _resolve_legal_name(
                 )
             )
             return legal.strip()
+
+    # Fallback: the operator name from a German imprint (§ 5 DDG/TMG) text.
+    found = _legal_name_from_text(pages)
+    if found:
+        evidence.append(
+            EvidenceItem(
+                field_name="legal_name",
+                value=found[0],
+                source_url=found[1],
+                source_type="imprint_text",
+                confidence=0.7,
+            )
+        )
+        return found[0]
     return None
 
 
