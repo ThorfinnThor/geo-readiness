@@ -35,7 +35,7 @@ function Row({ k, v, ok }: { k: string; v: string; ok?: boolean }) {
 
 function Inspector() {
   return (
-    <div className="panel overflow-hidden shadow-2xl" aria-hidden>
+    <div className="panel w-full max-w-full overflow-hidden shadow-2xl" aria-hidden>
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-weak/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-warn/70" />
@@ -130,7 +130,7 @@ export default async function HomePage() {
 
       {/* Hero — asymmetric: the pitch on the left, the product's own output on the right. */}
       <main className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:py-16">
-        <section className="flex flex-col gap-6">
+        <section className="flex min-w-0 flex-col gap-6">
           <span className="font-mono text-xs uppercase tracking-[0.22em] text-fg-subtle">
             AI search readiness audit
           </span>
@@ -145,15 +145,19 @@ export default async function HomePage() {
 
           <div className="flex flex-col gap-3">
             <ScanForm />
-            <p className="font-mono text-xs text-fg-subtle">
-              free score &nbsp;·&nbsp; results in minutes &nbsp;·&nbsp; no AI-provider calls
+            <p className="flex flex-wrap gap-x-2 font-mono text-xs text-fg-subtle">
+              <span>free score</span>
+              <span aria-hidden>·</span>
+              <span>results in minutes</span>
+              <span aria-hidden>·</span>
+              <span>no AI-provider calls</span>
             </p>
           </div>
 
           <ScanCounter />
         </section>
 
-        <section className="lg:pl-4">
+        <section className="min-w-0 lg:pl-4">
           <Inspector />
         </section>
       </main>

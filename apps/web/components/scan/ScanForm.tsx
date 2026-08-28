@@ -54,7 +54,7 @@ export function ScanForm() {
           aria-label="Website domain"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "scan-error" : undefined}
-          className="min-w-0 flex-1 bg-transparent font-mono text-base text-fg outline-none placeholder:text-fg-subtle"
+          className="min-w-0 flex-1 bg-transparent font-mono text-sm text-fg outline-none placeholder:text-fg-subtle sm:text-base"
         />
         <button
           type="submit"

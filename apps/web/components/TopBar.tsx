@@ -14,14 +14,17 @@ export function TopBar() {
           />
           <span className="font-mono text-sm font-medium tracking-tight">findyouraiscore</span>
         </Link>
-        <nav className="flex items-center gap-5">
+        <nav className="flex items-center gap-4 sm:gap-5">
           <Link
             href="/methodology"
             className="hidden text-sm text-fg-muted transition-colors hover:text-fg sm:block"
           >
             How scoring works
           </Link>
-          <Link href="/product" className="text-sm text-fg-muted transition-colors hover:text-fg">
+          <Link
+            href="/product"
+            className="hidden text-sm text-fg-muted transition-colors hover:text-fg sm:block"
+          >
             Product
           </Link>
           <Link href="/learn" className="text-sm text-fg-muted transition-colors hover:text-fg">
