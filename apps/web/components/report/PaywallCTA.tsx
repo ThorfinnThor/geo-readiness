@@ -63,6 +63,8 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
       }
       if (res.status === 429) {
         setError("Too many attempts. Please wait a few minutes and try again.");
+      } else if (res.status === 409) {
+        setError("This promo code has reached its usage limit.");
       } else if (res.status === 403) {
         setError("That code isn’t valid.");
       } else {

@@ -31,8 +31,11 @@ export async function POST(
       return NextResponse.json({ error: "invalid_code" }, { status: 403 });
     }
 
-    const granted = await grantPromoEntitlement(id);
-    if (!granted) return NextResponse.json({ error: "not_found" }, { status: 404 });
+    const result = await grantPromoEntitlement(id);
+    if (result === "not_found") return NextResponse.json({ error: "not_found" }, { status: 404 });
+    if (result === "limit_reached") {
+      return NextResponse.json({ error: "limit_reached" }, { status: 409 });
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (err) {

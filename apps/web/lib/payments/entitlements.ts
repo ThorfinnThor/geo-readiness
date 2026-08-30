@@ -9,6 +9,33 @@ import { query } from "@/lib/db";
 
 export const FULL_AUDIT_PRODUCT = "geo_readiness_full";
 
+// Promo redemption cap. The promo code (env PROMO_CODE) is a single shared code;
+// this bounds how many times it can unlock a full report. The count is scoped to
+// redemptions on or after PROMO_CAP_SINCE, so switching to a fresh code (e.g.
+// PROMO10) starts a clean budget and older promo unlocks never eat into it.
+const PROMO_CAP_SINCE = "2026-08-30T10:50:30Z";
+const DEFAULT_PROMO_MAX_REDEMPTIONS = 11;
+
+function promoMaxRedemptions(): number {
+  const raw = process.env.PROMO_MAX_REDEMPTIONS;
+  if (raw == null || raw.trim() === "") return DEFAULT_PROMO_MAX_REDEMPTIONS;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_PROMO_MAX_REDEMPTIONS;
+}
+
+/** True once promo redemptions since PROMO_CAP_SINCE have hit the configured cap. */
+async function promoLimitReached(): Promise<boolean> {
+  const rows = await query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM payments
+      WHERE provider = 'promo' AND status = 'paid' AND paid_at >= $1`,
+    [PROMO_CAP_SINCE],
+  );
+  return (rows[0]?.n ?? 0) >= promoMaxRedemptions();
+}
+
+/** Outcome of a promo redemption attempt against a scan. */
+export type PromoGrant = "granted" | "already_entitled" | "not_found" | "limit_reached";
+
 /** True if the scan's full report has been unlocked (paid or promo). */
 export async function hasEntitlement(scanId: string): Promise<boolean> {
   const rows = await query<{ one: number }>(
@@ -42,15 +69,19 @@ async function resolveScanOwner(
 }
 
 /**
- * Grant the full-report entitlement for a scan via promo code. Idempotent:
- * a second call is a no-op. Resolves the scan's org/project (both required on
- * the payments row) from the scan itself.
+ * Grant the full-report entitlement for a scan via promo code. Idempotent: a
+ * scan that is already entitled returns "already_entitled" without consuming a
+ * redemption. Enforces the promo cap (promoLimitReached) before granting, so a
+ * fresh grant past the limit returns "limit_reached". Resolves the scan's
+ * org/project (both required on the payments row) from the scan itself.
  */
-export async function grantPromoEntitlement(scanId: string): Promise<boolean> {
-  if (await hasEntitlement(scanId)) return true;
+export async function grantPromoEntitlement(scanId: string): Promise<PromoGrant> {
+  if (await hasEntitlement(scanId)) return "already_entitled";
 
   const owner = await resolveScanOwner(scanId);
-  if (owner === null) return false;
+  if (owner === null) return "not_found";
+
+  if (await promoLimitReached()) return "limit_reached";
 
   await query(
     `INSERT INTO payments
@@ -59,7 +90,7 @@ export async function grantPromoEntitlement(scanId: string): Promise<boolean> {
      VALUES ($1, $2, $3, 'promo', $4, 0, 'eur', 'paid', now())`,
     [owner.organization_id, owner.project_id, scanId, FULL_AUDIT_PRODUCT],
   );
-  return true;
+  return "granted";
 }
 
 export interface StripePaymentFacts {
