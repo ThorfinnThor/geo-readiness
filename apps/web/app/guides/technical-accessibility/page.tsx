@@ -88,6 +88,18 @@ export default function Page() {
         A free readiness scan fetches your site exactly as an AI crawler would and reports what it
         could actually reach and read, including pages that came back blocked or empty.
       </p>
+
+      <h2>A related but separate check</h2>
+      <p>
+        Reachability is one lens on your public surface. The wider health of that same surface,
+        things like security headers, code quality and how original your frontend really is, sits
+        outside a readiness score. If you want a read on that side, we build a sibling tool,{" "}
+        <a href="https://vibefootprint.com" target="_blank" rel="noopener">
+          VibeFootprint
+        </a>
+        , that scans the public surface of a site with the same evidence-led, deterministic approach
+        and scores its code and security footprint.
+      </p>
     </ArticleLayout>
   );
 }
