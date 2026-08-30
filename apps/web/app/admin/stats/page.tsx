@@ -32,6 +32,46 @@ function Tile({ label, value, hint }: { label: string; value: string | number; h
   );
 }
 
+/** Integer percentage a/b, guarding divide-by-zero. */
+function pct(a: number, b: number): number {
+  return b > 0 ? Math.round((100 * a) / b) : 0;
+}
+
+// One funnel stage: a bar sized to its share of the top of the funnel, with the
+// count and the stage-to-stage conversion.
+function FunnelRow({
+  label,
+  value,
+  ofTop,
+  conversion,
+}: {
+  label: string;
+  value: number;
+  ofTop: number; // width as a share of the top stage
+  conversion?: string; // e.g. "42% of started"
+}) {
+  return (
+    <li className="flex items-center gap-4 px-5 py-3.5">
+      <span className="w-36 shrink-0 text-sm font-medium">{label}</span>
+      <span className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2" aria-hidden>
+        <span
+          className="block h-full rounded-full"
+          style={{
+            width: `${Math.max(2, ofTop)}%`,
+            background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+          }}
+        />
+      </span>
+      <span className="flex w-28 shrink-0 flex-col items-end">
+        <span className="font-mono text-sm tabular-nums text-fg">
+          {value.toLocaleString("en-US")}
+        </span>
+        {conversion && <span className="text-[0.7rem] text-fg-subtle">{conversion}</span>}
+      </span>
+    </li>
+  );
+}
+
 export default async function AdminStatsPage({
   searchParams,
 }: {
@@ -53,6 +93,8 @@ export default async function AdminStatsPage({
       count(`SELECT count(*) AS n FROM payments WHERE status = 'paid' AND provider = 'promo'`),
       limitedPromoUsage(),
     ]);
+
+  const paidUnlocks = Math.max(0, unlocks - promoUnlocks); // Stripe-paid, excluding promo
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-12">
@@ -84,6 +126,39 @@ export default async function AdminStatsPage({
           hint={`${limitedPromo.used} of ${limitedPromo.limit} used`}
         />
       </div>
+
+      {/* Funnel from existing data: every completed scan lands on the results/paywall
+          page, so 'completed' is the paywall-reached stage. Paid = Stripe unlocks. */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
+          Conversion funnel
+        </h2>
+        <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/50">
+          <FunnelRow label="Scans started" value={total} ofTop={100} />
+          <FunnelRow
+            label="Reached paywall"
+            value={completed}
+            ofTop={pct(completed, total)}
+            conversion={`${pct(completed, total)}% of started`}
+          />
+          <FunnelRow
+            label="Unlocked (any)"
+            value={unlocks}
+            ofTop={pct(unlocks, total)}
+            conversion={`${pct(unlocks, completed)}% of paywall`}
+          />
+          <FunnelRow
+            label="Paid unlock"
+            value={paidUnlocks}
+            ofTop={pct(paidUnlocks, total)}
+            conversion={`${pct(paidUnlocks, completed)}% of paywall`}
+          />
+        </ul>
+        <p className="text-[0.7rem] text-fg-subtle">
+          Every completed scan lands on the results page with the paywall, so “reached paywall”
+          equals completed scans. “Paid” excludes promo unlocks.
+        </p>
+      </section>
 
       <p className="text-xs text-fg-subtle">
         Live counts from the database. Bookmark this URL with your token — it 404s without it.
