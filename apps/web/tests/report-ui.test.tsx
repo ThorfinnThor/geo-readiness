@@ -31,7 +31,7 @@ describe("PreviewReport (E12)", () => {
     // and every paste-ready prompt (the sample's included), must stay premium.
     const topId = [...exampleReport.actions].sort(
       (a, b) => b.priority_score - a.priority_score,
-    )[0].rule_id;
+    )[0]!.rule_id;
     const report = {
       ...exampleReport,
       actions: exampleReport.actions.map((a) =>

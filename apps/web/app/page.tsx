@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { SignalInsights } from "@/components/marketing/SignalInsights";
 import { MobileMenu } from "@/components/MobileMenu";
 import { ScanCounter } from "@/components/ScanCounter";
 import { ScanForm } from "@/components/scan/ScanForm";
@@ -224,6 +226,11 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Real aggregate from actual scans — renders only once the sample is large enough. */}
+      <Suspense fallback={null}>
+        <SignalInsights />
+      </Suspense>
 
       {/* The offering, stated plainly — what you actually get. */}
       <section className="flex flex-col gap-6 border-t border-border py-16">
