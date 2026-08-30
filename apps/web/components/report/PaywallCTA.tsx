@@ -91,6 +91,9 @@ export function PaywallCTA({ reportId, issueCount }: { reportId: string; issueCo
           launch price · €{REGULAR_EUR.toLocaleString("en-US")} after launch
         </span>
       </p>
+      <p className="mt-1 font-mono text-[0.7rem] text-fg-subtle">
+        one-time · no account · no subscription
+      </p>
 
       <div className="mt-4 flex flex-col items-center gap-2">
         {isDemo ? (

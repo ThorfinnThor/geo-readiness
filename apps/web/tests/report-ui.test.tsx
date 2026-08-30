@@ -24,19 +24,31 @@ describe("PreviewReport (E12)", () => {
     expect(screen.getByText(/issues found/i)).toBeDefined();
   });
 
-  it("does not expose premium fix text in the preview DTO or DOM", () => {
-    const SENTINEL = "PREMIUM_SENTINEL_DO_NOT_EXPOSE";
+  it("exposes only the one sample fix, never a fix_prompt or the other fixes", () => {
+    const LOCKED = "LOCKED_SENTINEL_DO_NOT_EXPOSE";
+    const PROMPT = "PROMPT_SENTINEL_DO_NOT_EXPOSE";
+    // The teaser samples the single highest-priority action; every other action,
+    // and every paste-ready prompt (the sample's included), must stay premium.
+    const topId = [...exampleReport.actions].sort(
+      (a, b) => b.priority_score - a.priority_score,
+    )[0].rule_id;
     const report = {
       ...exampleReport,
-      actions: exampleReport.actions.map((a, i) =>
-        i === 0 ? { ...a, title: SENTINEL, problem: SENTINEL, recommendation: SENTINEL } : a,
+      actions: exampleReport.actions.map((a) =>
+        a.rule_id === topId
+          ? { ...a, fix_prompt: PROMPT }
+          : { ...a, title: LOCKED, problem: LOCKED, recommendation: LOCKED, fix_prompt: PROMPT },
       ),
     };
     const preview = toPreviewDoc(report);
-    // The DTO carries only counts + severities, never the fix text.
-    expect(JSON.stringify(preview)).not.toContain(SENTINEL);
+    const json = JSON.stringify(preview);
+    // No paste-ready prompt ever crosses to the preview, not even the sample's.
+    expect(json).not.toContain(PROMPT);
+    // No non-sample fix text is exposed.
+    expect(json).not.toContain(LOCKED);
     const { container } = render(<PreviewReport preview={preview} reportId="x" />);
-    expect(container.textContent).not.toContain(SENTINEL);
+    expect(container.textContent).not.toContain(PROMPT);
+    expect(container.textContent).not.toContain(LOCKED);
   });
 });
 

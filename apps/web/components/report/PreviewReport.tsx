@@ -4,6 +4,7 @@ import { Suspense } from "react";
 // are represented by content-free locked placeholders — the real issue text is
 // never sent to an unpaid browser (see lib/report/preview.toPreviewDoc).
 import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
+import { ActionCard } from "@/components/report/ActionCard";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
 import { ScanComparison } from "@/components/report/ScanComparison";
 import { ScorePercentile } from "@/components/report/ScorePercentile";
@@ -120,16 +121,33 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
           </ul>
         </section>
 
+        {/* Teaser: one real fix, in full, so the paid value is concrete not abstract. */}
+        {preview.sampleAction && (
+          <section className="flex flex-col gap-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <SectionLabel>One of your fixes, in full</SectionLabel>
+              <span className="font-mono text-xs text-fg-subtle">sample</span>
+            </div>
+            <ActionCard action={preview.sampleAction} />
+            <p className="text-xs text-fg-subtle">
+              This is one fix from your report, exactly as you would receive it. The Premium audit
+              adds a paste-ready prompt to this one and every other fix below.
+            </p>
+          </section>
+        )}
+
         {/* Locked: how many fixes and how severe, but not what they are. */}
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between gap-4">
-            <SectionLabel>Prioritized fixes</SectionLabel>
+            <SectionLabel>
+              {preview.sampleAction ? "The remaining fixes" : "Prioritized fixes"}
+            </SectionLabel>
             <span className="font-mono text-xs" style={{ color: "var(--weak)" }}>
               {issueCount} issues found
             </span>
           </div>
           <div className="relative">
-            <div className="pointer-events-none max-h-[420px] select-none space-y-3 overflow-hidden">
+            <div className="pointer-events-none max-h-[420px] min-h-[260px] select-none space-y-3 overflow-hidden">
               {preview.issueSeverities.map((severity, i) => (
                 <LockedCard key={i} severity={severity} />
               ))}
