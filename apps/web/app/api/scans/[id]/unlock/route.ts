@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { assertSameOrigin, clientIpHash } from "@/lib/auth/http";
 import { AuthError } from "@/lib/auth/errors";
-import { grantPromoEntitlement, isValidPromoCode } from "@/lib/payments/entitlements";
+import { classifyPromoCode, grantPromoEntitlement } from "@/lib/payments/entitlements";
 import { checkPromoRateLimit } from "@/lib/scans/abuse";
 import { isUuid } from "@/lib/scans/repository";
 
@@ -27,11 +27,12 @@ export async function POST(
     if (!isUuid(id)) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
     const body = (await req.json()) as { code?: unknown };
-    if (typeof body.code !== "string" || !isValidPromoCode(body.code.trim())) {
+    const kind = typeof body.code === "string" ? classifyPromoCode(body.code.trim()) : null;
+    if (kind === null) {
       return NextResponse.json({ error: "invalid_code" }, { status: 403 });
     }
 
-    const result = await grantPromoEntitlement(id);
+    const result = await grantPromoEntitlement(id, kind);
     if (result === "not_found") return NextResponse.json({ error: "not_found" }, { status: 404 });
     if (result === "limit_reached") {
       return NextResponse.json({ error: "limit_reached" }, { status: 409 });
