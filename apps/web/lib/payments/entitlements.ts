@@ -59,14 +59,30 @@ export function classifyPromoCode(code: string): PromoKind | null {
   return null;
 }
 
-/** True once redemptions of the limited promo code have reached its cap. */
-async function limitedPromoLimitReached(): Promise<boolean> {
+/**
+ * Redemption usage of the limited promo code: how many unlocks it has granted,
+ * its configured cap, and how many remain. Single source of truth for both the
+ * gate (limitedPromoLimitReached) and internal reporting (admin stats).
+ */
+export async function limitedPromoUsage(): Promise<{
+  used: number;
+  limit: number;
+  remaining: number;
+}> {
   const rows = await query<{ n: number }>(
     `SELECT count(*)::int AS n FROM payments
       WHERE provider = 'promo' AND status = 'paid' AND product_code = $1`,
     [LIMITED_PROMO_PRODUCT],
   );
-  return (rows[0]?.n ?? 0) >= limitedPromoMax();
+  const used = rows[0]?.n ?? 0;
+  const limit = limitedPromoMax();
+  return { used, limit, remaining: Math.max(0, limit - used) };
+}
+
+/** True once redemptions of the limited promo code have reached its cap. */
+async function limitedPromoLimitReached(): Promise<boolean> {
+  const { used, limit } = await limitedPromoUsage();
+  return used >= limit;
 }
 
 /** True if the scan's full report has been unlocked (paid or promo). */

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { timingSafeEqual } from "node:crypto";
 
 import { query } from "@/lib/db";
+import { limitedPromoUsage } from "@/lib/payments/entitlements";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -40,7 +41,7 @@ export default async function AdminStatsPage({
   // Hide the page's existence entirely when the token is wrong/missing.
   if (!tokenOk(token)) notFound();
 
-  const [total, last24h, last7d, completed, failed, domains, unlocks, promoUnlocks] =
+  const [total, last24h, last7d, completed, failed, domains, unlocks, promoUnlocks, limitedPromo] =
     await Promise.all([
       count(`SELECT count(*) AS n FROM scans`),
       count(`SELECT count(*) AS n FROM scans WHERE created_at > now() - interval '24 hours'`),
@@ -50,6 +51,7 @@ export default async function AdminStatsPage({
       count(`SELECT count(DISTINCT canonical_domain) AS n FROM projects`),
       count(`SELECT count(*) AS n FROM payments WHERE status = 'paid'`),
       count(`SELECT count(*) AS n FROM payments WHERE status = 'paid' AND provider = 'promo'`),
+      limitedPromoUsage(),
     ]);
 
   return (
@@ -75,6 +77,11 @@ export default async function AdminStatsPage({
           label="Full unlocks"
           value={unlocks.toLocaleString("en-US")}
           hint={`${promoUnlocks.toLocaleString("en-US")} via promo`}
+        />
+        <Tile
+          label="PROMO10 left"
+          value={limitedPromo.remaining.toLocaleString("en-US")}
+          hint={`${limitedPromo.used} of ${limitedPromo.limit} used`}
         />
       </div>
 
