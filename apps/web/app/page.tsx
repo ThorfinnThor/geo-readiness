@@ -124,7 +124,7 @@ export default async function HomePage() {
               Pricing
             </Link>
             <Link
-              href="/scan/demo"
+              href="/report/demo"
               className="flex min-h-[44px] items-center text-fg-subtle hover:text-fg"
             >
               Example
@@ -136,7 +136,7 @@ export default async function HomePage() {
               { href: "/methodology", label: "How scoring works" },
               { href: "/learn", label: "Learn" },
               { href: "/pricing", label: "Pricing" },
-              { href: "/scan/demo", label: "Example report" },
+              { href: "/report/demo", label: "Example report" },
             ]}
           />
           <ThemeToggle />
