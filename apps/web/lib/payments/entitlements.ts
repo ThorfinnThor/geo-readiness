@@ -32,11 +32,17 @@ export type PromoKind = "unlimited" | "limited";
 /** Outcome of a promo redemption attempt against a scan. */
 export type PromoGrant = "granted" | "already_entitled" | "not_found" | "limit_reached";
 
-/** Constant-time compare of a submitted code against an expected value. */
+/**
+ * Constant-time compare of a submitted code against an expected value. Both
+ * sides are trimmed so a stray space or newline in the configured env value
+ * (a common copy-paste artefact) does not silently reject a correct code.
+ */
 function codeMatches(code: string, expected: string | undefined): boolean {
-  if (!expected || !code) return false;
-  const a = Buffer.from(code);
-  const b = Buffer.from(expected);
+  const want = expected?.trim();
+  const got = code.trim();
+  if (!want || !got) return false;
+  const a = Buffer.from(got);
+  const b = Buffer.from(want);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
 }
