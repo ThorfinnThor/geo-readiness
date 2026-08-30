@@ -69,7 +69,7 @@ export default function PricingPage() {
           </p>
           <Link
             href="/report/demo"
-            className="mx-auto inline-flex items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+            className="mx-auto inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
           >
             See a full sample report →
           </Link>
@@ -91,7 +91,7 @@ export default function PricingPage() {
             </ul>
             <Link
               href="/"
-              className="mt-auto rounded-lg border border-border-strong px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:bg-surface-2"
+              className="mt-auto inline-flex min-h-[44px] items-center justify-center rounded-lg border border-border-strong px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:bg-surface-2"
             >
               Run a free scan
             </Link>
@@ -151,7 +151,7 @@ export default function PricingPage() {
             <div className="mt-auto flex flex-col gap-2">
               <Link
                 href="/"
-                className="rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
                 style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
               >
                 Run a free scan

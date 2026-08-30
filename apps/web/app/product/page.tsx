@@ -88,13 +88,13 @@ export default function ProductPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/"
-              className="rounded-lg bg-[color:var(--accent)] px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] transition-opacity hover:opacity-90"
+              className="inline-flex min-h-[44px] items-center rounded-lg bg-[color:var(--accent)] px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] transition-opacity hover:opacity-90"
             >
               Run a free scan
             </Link>
             <Link
               href="/report/demo"
-              className="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-2"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-2"
             >
               See a full sample report
             </Link>

@@ -116,7 +116,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/"
-            className="rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+            className="inline-flex min-h-[44px] items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
             Run a free scan

@@ -16,14 +16,14 @@ export default function NotFound() {
         <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/"
-            className="rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+            className="inline-flex min-h-[44px] items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
             style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
           >
             Run a free scan
           </Link>
           <Link
             href="/learn"
-            className="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-2"
+            className="inline-flex min-h-[44px] items-center rounded-lg border border-border-strong px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-2"
           >
             Browse the guides
           </Link>
