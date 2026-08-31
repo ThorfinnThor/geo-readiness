@@ -52,6 +52,8 @@ This produces a much stronger commercial question — “why are they ahead of m
 
 ## Review
 
-Open `prototype.html` directly in a browser. The top navigation switches among the five proposed screens.
+Open `prototype.html` directly in a browser. Use the top tabs on desktop or the screen selector on narrow/mobile viewports to switch among the five proposals.
+
+See [`QA.md`](./QA.md) for the static and browser checks performed on this branch.
 
 No live Next.js route, checkout behavior, database schema or production pricing has been changed in this review artifact.
