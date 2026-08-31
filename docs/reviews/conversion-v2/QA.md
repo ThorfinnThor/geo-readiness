@@ -1,6 +1,6 @@
 # Conversion v2 prototype — QA record
 
-Validated against branch `review/conversion-v2-no-deploy` on 2026-08-31.
+Validated against branch `review/conversion-v2-no-deploy` on 2026-09-01 (Europe/Berlin).
 
 ## Scope
 
