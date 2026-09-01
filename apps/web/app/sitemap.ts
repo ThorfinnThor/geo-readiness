@@ -13,6 +13,7 @@ const MARKETING: { path: string; priority: number; changeFrequency: Freq }[] = [
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
   { path: "/learn", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/insights", priority: 0.8, changeFrequency: "weekly" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

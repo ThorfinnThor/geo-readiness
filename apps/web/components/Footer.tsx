@@ -9,6 +9,7 @@ const LEARN = [
   { href: "/how-ai-reads-your-website", label: "How AI reads your site" },
   { href: "/geo-vs-seo", label: "GEO vs SEO" },
   { href: "/glossary", label: "Glossary" },
+  { href: "/insights", label: "Insights" },
 ];
 
 const GUIDES = [

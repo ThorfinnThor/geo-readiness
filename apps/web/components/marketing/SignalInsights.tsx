@@ -2,6 +2,8 @@
 // signal, weakest first. Renders nothing until the sample is large enough to be
 // honest (see lib/scans/insights). Framed explicitly as "sites scanned here",
 // never as a web-wide benchmark.
+import Link from "next/link";
+
 import { signalInsights } from "@/lib/scans/insights";
 
 export async function SignalInsights() {
@@ -47,9 +49,17 @@ export async function SignalInsights() {
         })}
       </ul>
 
-      <p className="text-xs text-fg-subtle">
-        Live average from real scans, updated hourly. Each site counts once (its latest scan).
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-fg-subtle">
+          Live average from real scans, updated hourly. Each site counts once (its latest scan).
+        </p>
+        <Link
+          href="/insights"
+          className="inline-flex min-h-[44px] items-center text-sm font-medium text-[color:var(--accent)] hover:underline sm:min-h-0"
+        >
+          See the full benchmark →
+        </Link>
+      </div>
     </section>
   );
 }
