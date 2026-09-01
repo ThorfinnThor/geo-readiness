@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
+import { breadcrumbJsonLd } from "@/lib/seo/site";
 
 const LEARN_TITLE = "Learn AI search readiness, in plain language";
 const LEARN_DESC =
@@ -43,6 +45,12 @@ export default function LearnPage() {
   return (
     <>
       <TopBar />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Learn", path: "/learn" },
+        ])}
+      />
       <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 py-12 sm:py-16">
         <header className="flex flex-col gap-3">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">

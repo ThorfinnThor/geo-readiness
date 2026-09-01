@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
 import {
+  breadcrumbJsonLd,
   FULL_AUDIT_PRICE_EUR as PRICE_EUR,
   FULL_AUDIT_PRODUCT_NAME as PRODUCT,
   FULL_AUDIT_REGULAR_PRICE_EUR as REGULAR_EUR,
@@ -71,6 +73,12 @@ export default function ProductPage() {
   return (
     <>
       <TopBar />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Product", path: "/product" },
+        ])}
+      />
       <main className="mx-auto flex max-w-4xl flex-col gap-14 px-6 py-12 sm:py-16">
         <header className="flex flex-col gap-4">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">

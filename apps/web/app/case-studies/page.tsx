@@ -3,8 +3,10 @@ import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
 import { RadialScore } from "@/components/report/shared";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
+import { breadcrumbJsonLd } from "@/lib/seo/site";
 
 const CASE_DESC =
   "A real before-and-after case study: we ran Find Your AI Score on our own site, found a weak " +
@@ -41,6 +43,12 @@ export default function CaseStudiesPage() {
   return (
     <>
       <TopBar />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Case study", path: "/case-studies" },
+        ])}
+      />
       <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-12 sm:py-16">
         <header className="flex flex-col gap-4">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">

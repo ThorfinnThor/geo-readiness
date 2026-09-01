@@ -45,6 +45,22 @@ const ORG_ID = `${SITE.url}/#organization`;
  * Service states the single offering with its two real price tiers. Everything
  * here matches visible content (the pricing page) — no invented facts.
  */
+/** BreadcrumbList for a page, from a Home→…→page trail of {name, path}. */
+export function breadcrumbJsonLd(
+  trail: { name: string; path: string }[],
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((t, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: t.name,
+      item: absoluteUrl(t.path),
+    })),
+  };
+}
+
 export function siteJsonLd(): Record<string, unknown>[] {
   const organization = {
     "@context": "https://schema.org",

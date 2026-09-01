@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { GLOSSARY } from "@/lib/content/glossary";
 import { CONTENT } from "@/lib/content/registry";
 import { absoluteUrl } from "@/lib/seo/site";
 
@@ -28,5 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as Freq,
     priority: 0.6,
   }));
-  return [...marketing, ...content];
+  const glossaryTerms = GLOSSARY.map((t) => ({
+    url: absoluteUrl(`/glossary/${t.slug}`),
+    lastModified: now,
+    changeFrequency: "monthly" as Freq,
+    priority: 0.5,
+  }));
+  return [...marketing, ...content, ...glossaryTerms];
 }
