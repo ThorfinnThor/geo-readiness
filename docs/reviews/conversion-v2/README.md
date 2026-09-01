@@ -8,9 +8,9 @@ This prototype covers the requested conversion changes:
 
 1. **Homepage / offer framing** — lead with the buyer problem and paid deliverable, keep deterministic/no-provider-call positioning as trust support.
 2. **Free results → purchase moment** — surface issue count, severity and weakest categories; reveal one complete fix; keep all other premium text server-side; sell “all fixes + evidence + implementation prompts.”
-4. **Pricing** — use a concrete founding offer rather than an unexplained 10× anchor. Prototype: €4.99 for the first 100 paid audits, one-time/no subscription.
-5. **Sample report** — make it strong sales collateral with realistic crawl depth, high confidence and 3 complete findings. Keep fictional/illustrative labels until a consenting real customer can replace the example.
-6. **Competitor comparison** — compare two sites with the same deterministic engine. This does not require LLM API calls. Free comparison creates purchase intent; Premium monetizes the gap-closing action plan.
+3. **Pricing** — use a concrete founding offer rather than an unexplained 10× anchor. Prototype: €4.99 for the first 100 paid audits, one-time/no subscription.
+4. **Sample report** — make it strong sales collateral with realistic crawl depth, high confidence and 3 complete findings. Keep fictional/illustrative labels until a consenting real customer can replace the example.
+5. **Competitor comparison** — compare two sites with the same deterministic engine. This does not require LLM API calls. Free comparison creates purchase intent; Premium monetizes the gap-closing action plan.
 
 ## Recommended buyer funnel
 

@@ -6,8 +6,7 @@ Validated against branch `review/conversion-v2-no-deploy` on 2026-09-01 (Europe/
 
 The branch changes only these review artifacts/configuration files:
 
-- `docs/reviews/conversion-v2/prototype.html`
-- `docs/reviews/conversion-v2/prototype.payload/*.js` (the compressed, self-contained prototype snapshot loaded by `prototype.html`)
+- `docs/reviews/conversion-v2/prototype.html` (the self-contained, plain-text prototype: HTML, CSS and JS inline, opened directly in a browser)
 - `docs/reviews/conversion-v2/README.md`
 - `docs/reviews/conversion-v2/QA.md`
 - `apps/web/vercel.json` (branch-specific deployment suppression)
@@ -19,9 +18,8 @@ It does not implement the proposal in the production Next.js routes, scanner, da
 - HTML parsed with no structural parser diagnostics.
 - CSS parsed with no syntax errors.
 - Inline JavaScript passed `node --check`.
-- The compressed prototype payload reconstructed byte-for-byte to the reviewed source.
-- The lightweight loader successfully reconstructed and rendered that source in Chromium.
-- JSON in `apps/web/vercel.json` parsed successfully and uses Vercel's supported per-branch `git.deploymentEnabled` mapping.
+- `prototype.html` opened and rendered directly in Chromium with no build or decode step.
+- JSON in `apps/web/vercel.json` parsed successfully and uses Vercel's supported per-branch `git.deploymentEnabled` mapping. Note: this only suppresses deploys if the Vercel project's Root Directory is `apps/web` (where the Next app lives); otherwise the file is ignored and the branch would still deploy. This is also the repo's first `vercel.json`, so it must not be merged into `main`.
 - Every proposed screen has exactly one page-level `h1`.
 - All IDs are unique; every desktop tab, mobile option and internal jump points to an existing screen.
 - Prototype buttons explicitly use `type="button"`.
@@ -46,5 +44,5 @@ It does not implement the proposal in the production Next.js routes, scanner, da
 
 - Scan, checkout, unlock and competitor buttons are visual design controls only; they intentionally do not call production APIs.
 - The scores, findings and before/after values are fictional prototype content, clearly labelled as such.
-- The review file uses the browser's built-in gzip decompression API; open it in a current mainstream browser.
+- `prototype.html` is a single self-contained file (HTML, CSS and JS inline); open it directly in a current mainstream browser.
 - This QA verifies the standalone review prototype in Chromium. Production implementation will require separate unit, integration, accessibility and end-to-end tests against real report data and payment flows.
