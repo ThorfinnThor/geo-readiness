@@ -152,7 +152,7 @@ export default async function HomePage() {
             AI search readiness audit
           </span>
           <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight sm:text-[3.4rem]">
-            Be the source AI answers cite.
+            Find out why AI search might skip your website.
           </h1>
           <p className="max-w-xl text-lg text-fg-muted">
             When people ask ChatGPT, Gemini or Perplexity about your business, is your site the
@@ -161,9 +161,6 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col gap-3">
-            <p className="text-base font-medium text-fg">
-              Find out why AI search might skip your website.
-            </p>
             <ScanForm />
             <p className="flex flex-wrap gap-x-2 font-mono text-xs text-fg-subtle">
               <span>free score</span>
