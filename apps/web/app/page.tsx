@@ -161,6 +161,9 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col gap-3">
+            <p className="text-base font-medium text-fg">
+              Find out why AI search might skip your website.
+            </p>
             <ScanForm />
             <p className="flex flex-wrap gap-x-2 font-mono text-xs text-fg-subtle">
               <span>free score</span>
