@@ -218,6 +218,7 @@ def build_profile(
     profile.profile_hash = _profile_hash(profile)
     # Derived after the hash so it never affects reproducibility (§v2-plan 6).
     profile.site_type, profile.site_type_confidence = classify_site_type(pages, profile)
+    _resolve_topics(pages, profile)
     return profile
 
 
@@ -766,6 +767,91 @@ def _resolve_offerings(
 
     _finalize_offering(services, "service", profile, evidence, is_service=True)
     _finalize_offering(products, "product", profile, evidence, is_service=False)
+
+
+# Content topics (fallback for informational sites with no offerings).
+_TOPIC_EXCLUDE_PAGE_TYPES = frozenset(
+    {
+        "home",
+        "index",
+        "legal",
+        "imprint",
+        "impressum",
+        "datenschutz",
+        "agb",
+        "nutzungsbedingungen",
+        "contact",
+        "kontakt",
+        "about",
+        "company",
+        "faq",
+    }
+)
+
+
+def _primary_gen_language(profile: BusinessProfile) -> str:
+    """The language the cluster generator will use (first supported, en fallback)."""
+    for lg in profile.languages:
+        base = lg.split("-")[0].lower()
+        if base in ("de", "en"):
+            return base
+    return "en"
+
+
+def _clean_topic(raw: str, brand: str | None, canonical_domain: str) -> str | None:
+    """A page's subject as a short topic phrase, or None if it is not usable."""
+    t = " ".join(raw.split())
+    # Drop a trailing separated brand affix ("Madeira in October | BestTravelClimate").
+    parts = [p.strip() for p in _TITLE_SEPARATORS.split(t) if p.strip()]
+    if len(parts) >= 2:
+        core = _domain_core_spaceless(canonical_domain)
+        parts = [
+            p
+            for p in parts
+            if not (brand and _spaceless(p) == _spaceless(brand)) and _spaceless(p) != core
+        ]
+        t = parts[0] if parts else t
+    # Strip a standalone brand token, then tidy.
+    if brand:
+        escaped = re.escape(brand)
+        t = re.sub(rf"\b{escaped}\b", "", t, flags=re.IGNORECASE)
+    t = " ".join(t.split()).strip(" .,-–—|:")
+    words = t.split()
+    if not (1 <= len(words) <= 6) or len(t) > 60:
+        return None
+    if not re.search(r"[a-zäöüß]", t.lower()):
+        return None
+    if set(_tokens(t)) <= _GENERIC_BRAND_TOKENS:  # purely navigational/generic
+        return None
+    return t
+
+
+def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> None:
+    """Populate content topics ONLY for informational sites (no offerings), from
+    content-page headings in the generation language, so a citation self-test can
+    ask real questions about the site instead of falling back to the brand name."""
+    if profile.services or profile.products:
+        return
+    lang = _primary_gen_language(profile)
+    seen: dict[str, str] = {}
+    for page in pages:
+        if page.page_type in _TOPIC_EXCLUDE_PAGE_TYPES:
+            continue
+        plang = (page.language or "").split("-")[0].lower()
+        if plang and plang != lang:
+            continue
+        raw = page.h1 or page.title
+        if not raw:
+            continue
+        topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain)
+        if not topic:
+            continue
+        key = topic.lower()
+        if key not in seen:
+            seen[key] = topic
+        if len(seen) >= 8:
+            break
+    profile.topics = list(seen.values())
 
 
 def _finalize_offering(

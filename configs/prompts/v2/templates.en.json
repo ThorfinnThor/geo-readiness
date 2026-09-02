@@ -45,6 +45,10 @@
     "branded": [
       { "id": "branded_en_1", "text": "What does {brand} offer?", "placeholders": ["brand"] },
       { "id": "branded_en_2", "text": "Is {brand} recommended?", "placeholders": ["brand"] }
+    ],
+    "topic_info": [
+      { "id": "topic_info_en_1", "text": "What should you know about {topic}?", "placeholders": ["topic"] },
+      { "id": "topic_info_en_2", "text": "What are the best sources to learn about {topic}?", "placeholders": ["topic"] }
     ]
   }
 }

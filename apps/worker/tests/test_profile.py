@@ -200,3 +200,58 @@ def test_imprint_city_trims_trailing_country_and_nav_label() -> None:
     )
     profile = build_profile([home, imprint], "findyouraiscore.com")
     assert profile.locations == ["Berlin"]
+
+
+def test_topics_extracted_for_content_site_without_offerings() -> None:
+    # A content/informational site (no services/products) yields content topics
+    # from its content-page headings, excluding home/legal, for the citation kit.
+    home = ExtractedPage(
+        final_url="https://besttravelclimate.com/",
+        page_type="home",
+        language="de",
+        h1="Best Travel Climate",
+    )
+    p1 = ExtractedPage(
+        final_url="https://besttravelclimate.com/madeira",
+        page_type="other",
+        language="de",
+        h1="Madeira im Oktober",
+    )
+    p2 = ExtractedPage(
+        final_url="https://besttravelclimate.com/kreta",
+        page_type="guide",
+        language="de",
+        h1="Beste Reisezeit für Kreta",
+    )
+    legal = ExtractedPage(
+        final_url="https://besttravelclimate.com/impressum",
+        page_type="legal",
+        language="de",
+        h1="Impressum",
+    )
+    profile = build_profile([home, p1, p2, legal], "besttravelclimate.com")
+    assert profile.services == []
+    assert profile.products == []
+    assert "Madeira im Oktober" in profile.topics
+    assert "Beste Reisezeit für Kreta" in profile.topics
+    assert "Impressum" not in profile.topics  # legal page excluded
+    assert "Best Travel Climate" not in profile.topics  # home page excluded
+
+
+def test_topics_empty_when_offerings_exist() -> None:
+    # Provider sites (with services) never get topic fallback, keeping golden safe.
+    home = ExtractedPage(
+        final_url="https://acme.example/", page_type="home", language="en", h1="Acme"
+    )
+    svc = ExtractedPage(
+        final_url="https://acme.example/service",
+        page_type="service",
+        language="en",
+        h1="Solar panels",
+    )
+    content = ExtractedPage(
+        final_url="https://acme.example/blog/x", page_type="blog", language="en", h1="Some article"
+    )
+    profile = build_profile([home, svc, content], "acme.example")
+    assert profile.services  # has an offering
+    assert profile.topics == []  # so no topic fallback

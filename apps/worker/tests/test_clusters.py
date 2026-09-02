@@ -124,3 +124,20 @@ def test_generated_prompts_recase_acronym_offering() -> None:
     # The acronym is cased and no lowercased 'ai' token leaks into any prompt.
     assert any("AI readiness audit" in t for t in texts)
     assert not any(" ai " in f" {t.lower()} " and " AI " not in t for t in texts)
+
+
+def test_topic_info_clusters_for_content_site() -> None:
+    profile = BusinessProfile(
+        canonical_domain="besttravelclimate.com",
+        brand_name="Best Travel Climate",
+        languages=["de"],
+        topics=["Madeira im Oktober", "Beste Reisezeit für Kreta"],
+    )
+    clusters = generate_clusters(profile, "geo-readiness-v2", "quick", "de", "v2")
+    topic_clusters = [c for c in clusters if c.intent == "topic_info"]
+    assert topic_clusters, "expected topic_info clusters for a content site"
+    texts = [p.prompt_text for c in topic_clusters for p in c.prompts]
+    assert any("Madeira im Oktober" in t for t in texts)
+    assert any("Was sollte man über" in t for t in texts)
+    # Provider-shaped 'Anbieter für' wording must not wrap a content topic.
+    assert not any("Anbieter für Madeira" in t for t in texts)

@@ -41,6 +41,8 @@ _RELEVANCE_BASE: dict[str, float] = {
     "alternative": 0.75,
     "integration": 0.60,
     "branded": 0.40,
+    # Informational fallback for content sites with no offerings.
+    "topic_info": 0.90,
 }
 
 
@@ -162,6 +164,13 @@ def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
                 topic=profile.brand_name,
                 evidence_keys=[("brand_name", profile.brand_name.lower())],
             )
+        )
+
+    # Informational fallback: content sites with no offerings get topic questions
+    # about what the site actually covers, instead of only brand-name clusters.
+    for t in profile.topics:
+        specs.append(
+            _Spec("topic_info", {"topic": t}, topic=t, evidence_keys=[("topic", t.lower())])
         )
 
     return specs
