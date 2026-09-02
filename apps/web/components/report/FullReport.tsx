@@ -21,6 +21,7 @@ import {
   measurementPrompt,
   proProtocolMarkdown,
 } from "@/lib/report/citationTest";
+import { humanizeOffering, humanizeOfferingList } from "@/lib/report/humanize";
 import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -144,8 +145,8 @@ export function FullReport({
           <Field label="Brand" value={p.brand_name ?? "Unknown, needs confirmation"} />
           <Field label="Legal name" value={p.legal_name ?? "None"} />
           <Field label="Locations" value={p.locations.join(", ") || "None"} />
-          <Field label="Services" value={p.services.join(", ") || "None"} />
-          <Field label="Products" value={p.products.join(", ") || "None"} />
+          <Field label="Services" value={humanizeOfferingList(p.services)} />
+          <Field label="Products" value={humanizeOfferingList(p.products)} />
           <Field label="Languages" value={p.languages.join(", ") || "None"} />
         </dl>
       </Section>
@@ -171,7 +172,7 @@ export function FullReport({
               {report.clusters.map((c) => (
                 <tr key={c.cluster_key} className="border-t border-border">
                   <td className="px-4 py-2.5 font-mono text-xs text-fg-muted">{c.intent}</td>
-                  <td className="px-4 py-2.5">{c.label}</td>
+                  <td className="px-4 py-2.5">{humanizeOffering(c.label)}</td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2" style={{ color: coverageColor(c.coverage_score) }}>
                       <span className="font-mono tabular-nums text-fg">
