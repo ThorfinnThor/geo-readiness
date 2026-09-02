@@ -9,11 +9,18 @@ import {
   StageCard,
   severityColor,
 } from "@/components/report/shared";
+import { CitationSelfTest } from "@/components/report/CitationSelfTest";
 import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
 import { ScanComparison } from "@/components/report/ScanComparison";
 import { ScorePercentile } from "@/components/report/ScorePercentile";
 import { TopBar } from "@/components/TopBar";
+import {
+  citationQueries,
+  evaluationPrompt,
+  measurementPrompt,
+  proProtocolMarkdown,
+} from "@/lib/report/citationTest";
 import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -277,6 +284,23 @@ export function FullReport({
           ))}
         </ol>
       </Section>
+
+      {(() => {
+        const queries = citationQueries(report);
+        if (queries.length === 0) return null;
+        const domain = report.meta.canonical_domain;
+        return (
+          <Section title="Test it yourself in ChatGPT or Claude">
+            <CitationSelfTest
+              queries={queries}
+              measurement={measurementPrompt(queries)}
+              evaluation={evaluationPrompt(domain)}
+              protocol={proProtocolMarkdown(report)}
+              domain={domain}
+            />
+          </Section>
+        );
+      })()}
 
       <Section title="Methodology & limitations">
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/50 p-5 text-sm text-fg-muted">

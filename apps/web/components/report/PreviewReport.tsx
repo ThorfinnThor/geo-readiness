@@ -164,6 +164,27 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
           </div>
         </section>
 
+        {preview.sampleCitationQuery && (
+          <section className="flex flex-col gap-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <SectionLabel>Test it yourself in ChatGPT or Claude</SectionLabel>
+              <span className="font-mono text-xs text-fg-subtle">sample</span>
+            </div>
+            <p className="text-sm text-fg-muted">
+              The audit scores readiness deterministically. To check whether AI search actually cites
+              you, paste one of your neutral test questions into ChatGPT or Claude and see who gets
+              cited. Here is one of them.
+            </p>
+            <blockquote className="rounded-xl border border-border bg-surface/50 p-4 text-sm text-fg">
+              {preview.sampleCitationQuery}
+            </blockquote>
+            <p className="text-xs text-fg-subtle">
+              The Premium audit gives you the full kit: every question, a blinded measurement prompt,
+              an evaluation prompt that checks if your domain was cited, and a downloadable protocol.
+            </p>
+          </section>
+        )}
+
         <p className="border-t border-border pt-6 text-xs text-fg-subtle">{preview.disclaimer}</p>
       </main>
     </>

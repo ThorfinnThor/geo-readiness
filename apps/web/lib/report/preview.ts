@@ -6,6 +6,7 @@
 // exactly ONE full fix as an honest sample of what the paid report contains. Its
 // paste-ready `fix_prompt` is stripped, so the premium payload still never ships
 // for free.
+import { sampleCitationQuery } from "@/lib/report/citationTest";
 import type { ReportAction, ReportComponent, ReportDocument, ReportMeta } from "@/lib/report/types";
 
 export interface PreviewDoc {
@@ -16,6 +17,7 @@ export interface PreviewDoc {
   issueCount: number;
   issueSeverities: string[];
   sampleAction: ReportAction | null;
+  sampleCitationQuery: string | null;
   disclaimer: string;
 }
 
@@ -35,6 +37,7 @@ export function toPreviewDoc(report: ReportDocument): PreviewDoc {
     issueCount: report.actions.length,
     issueSeverities: remaining.map((a) => a.severity),
     sampleAction,
+    sampleCitationQuery: sampleCitationQuery(report),
     disclaimer: report.disclaimer,
   };
 }
