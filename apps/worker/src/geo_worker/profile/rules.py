@@ -705,7 +705,9 @@ def _plausible_offering_name(name: str) -> bool:
     with UI glyphs ('Datensatz ansehen ↗'), and sentence-like fragments."""
     n = name.strip()
     low = n.lower()
-    if not (0 < len(n) <= 60) or len(n.split()) > 8 or ":" in n:
+    # A comma marks a heading/enumeration ("Methodology, data & limitations"),
+    # never a single product/service name.
+    if not (0 < len(n) <= 60) or len(n.split()) > 8 or ":" in n or "," in n:
         return False
     if low in _OFFERING_STOPWORDS:
         return False

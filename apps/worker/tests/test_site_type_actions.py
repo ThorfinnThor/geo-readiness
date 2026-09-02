@@ -105,3 +105,12 @@ def test_plausible_offering_name_rejects_sentences() -> None:
         "failure signals"
     )
     assert not _plausible_offering_name("word " * 12)
+
+
+def test_plausible_offering_rejects_comma_heading() -> None:
+    # A comma marks a heading/enumeration, not a single product/service name.
+    assert not _plausible_offering_name("Methodology, data & limitations")
+    assert not _plausible_offering_name("Products, guides and pricing")
+    # Real single labels still pass.
+    assert _plausible_offering_name("solar panels")
+    assert _plausible_offering_name("battery storage")
