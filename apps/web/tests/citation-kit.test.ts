@@ -6,6 +6,7 @@ import {
   kitLanguage,
   measurementPrompt,
 } from "@/lib/report/citationTest";
+import { crawlLanguageInfo } from "@/lib/report/crawlLanguage";
 import { exampleReport } from "@/lib/report/example";
 import type { ReportCluster, ReportDocument } from "@/lib/report/types";
 
@@ -86,5 +87,31 @@ describe("citation kit filtering", () => {
     // No dangling "für?" or leftover brand anywhere.
     expect(qs.some((q) => /\bfür\?/i.test(q.query))).toBe(false);
     expect(qs.some((q) => /besttravelclimate/i.test(q.query))).toBe(false);
+  });
+});
+
+describe("crawler-language insight", () => {
+  it("flags the crawl language and others for a multilingual site, and matches the question language", () => {
+    const report = germanReport([
+      cluster({ intent: "recommendation", sample_prompt: "Welcher Anbieter für Klimadaten ist empfehlenswert?" }),
+    ]);
+    // besttravelclimate case: languages de/en/es/fr, questions in German.
+    const rep: ReportDocument = {
+      ...report,
+      business_profile: { ...report.business_profile, languages: ["de", "en", "es", "fr"] },
+    };
+    const info = crawlLanguageInfo(rep);
+    expect(info).not.toBeNull();
+    expect(info!.language).toBe("German");
+    expect(info!.others).toEqual(expect.arrayContaining(["English", "Spanish", "French"]));
+    expect(info!.others).not.toContain("German");
+  });
+
+  it("returns null for a single-language site (no ambiguity)", () => {
+    const rep: ReportDocument = {
+      ...germanReport([cluster({ intent: "recommendation", sample_prompt: "What is X?" })]),
+      business_profile: { ...exampleReport.business_profile, languages: ["en"] },
+    };
+    expect(crawlLanguageInfo(rep)).toBeNull();
   });
 });

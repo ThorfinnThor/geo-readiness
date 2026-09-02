@@ -22,6 +22,7 @@ import {
   measurementPrompt,
   proProtocolMarkdown,
 } from "@/lib/report/citationTest";
+import { crawlLanguageInfo } from "@/lib/report/crawlLanguage";
 import { humanizeOffering, humanizeOfferingList } from "@/lib/report/humanize";
 import { RESEARCH_BASIS, RESEARCH_NOTE } from "@/lib/content/research-basis";
 
@@ -95,6 +96,28 @@ export function FullReport({
           once the pages are reachable.
         </div>
       )}
+
+      {(() => {
+        const cl = crawlLanguageInfo(report);
+        if (!cl) return null;
+        return (
+          <div
+            className="rounded-xl border p-4 text-sm"
+            style={{
+              borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))",
+              background: "color-mix(in srgb, var(--accent) 7%, transparent)",
+            }}
+          >
+            <strong>AI crawlers see this site in {cl.language}.</strong> Our crawler, like AI search
+            crawlers such as GPTBot and PerplexityBot, has no language preference, so it gets whatever
+            version your site serves by default — here, {cl.language}. It also has{" "}
+            {cl.others.join(", ")} content, but a crawler lands on the default. If you expect a
+            different language to be cited, that is a real gap: make sure the version you want indexed
+            is the one crawlers reach (a clear default language and an <code>x-default</code> hreflang
+            help). The questions below are in {cl.language} for the same reason.
+          </div>
+        );
+      })()}
 
       <Section title="Component scores">
         {/* Flex-fill so the 7 cards form two full rows (4 + 3) with no orphan. */}
