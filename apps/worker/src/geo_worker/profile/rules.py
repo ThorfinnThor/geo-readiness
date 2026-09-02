@@ -819,14 +819,10 @@ _TOPIC_FOREIGN_MARKERS = {
             "weather",
             "travel",
             "finder",
-            "guide",
-            "winter",
-            "warm",
             "seas",
             "escape",
             "vers",
             "une",
-            "des",
             "les",
             "pour",
             "del",
@@ -844,13 +840,10 @@ _TOPIC_FOREIGN_MARKERS = {
             "oder",
             "für",
             "über",
-            "die",
             "der",
             "das",
             "wie",
-            "was",
             "welche",
-            "man",
             "sollte",
             "beste",
             "reise",
@@ -861,7 +854,6 @@ _TOPIC_FOREIGN_MARKERS = {
             "meer",
             "vers",
             "une",
-            "des",
             "les",
             "pour",
             "del",
@@ -920,29 +912,44 @@ def _clean_topic(raw: str, brand: str | None, canonical_domain: str, lang: str) 
 
 def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> None:
     """Populate content topics ONLY for informational sites (no offerings), from
-    content-page headings in the generation language, so a citation self-test can
-    ask real questions about the site instead of falling back to the brand name."""
+    content-page headings and titles in the generation language, so a citation
+    self-test can ask real questions about the site instead of falling back to
+    the brand name. Both the h1 and the title are candidates (a title often
+    phrases the subject the h1 omits), with near-duplicates dropped so two
+    almost identical questions never end up in the kit."""
     if profile.services or profile.products:
         return
     lang = _primary_gen_language(profile)
     seen: dict[str, str] = {}
+
+    def _near_duplicate(candidate: str) -> bool:
+        cand = _tokens(candidate)
+        for existing in seen.values():
+            other = _tokens(existing)
+            if cand <= other or other <= cand:
+                return True
+        return False
+
     for page in pages:
+        if len(seen) >= 8:
+            break
         if page.page_type in _TOPIC_EXCLUDE_PAGE_TYPES:
             continue
         plang = (page.language or "").split("-")[0].lower()
         if plang and plang != lang:
             continue
-        raw = page.h1 or page.title
-        if not raw:
-            continue
-        topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain, lang)
-        if not topic:
-            continue
-        key = topic.lower()
-        if key not in seen:
+        for raw in (page.h1, page.title):
+            if len(seen) >= 8:
+                break
+            if not raw:
+                continue
+            topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain, lang)
+            if not topic:
+                continue
+            key = topic.lower()
+            if key in seen or _near_duplicate(topic):
+                continue
             seen[key] = topic
-        if len(seen) >= 8:
-            break
     profile.topics = list(seen.values())
 
 

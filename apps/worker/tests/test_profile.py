@@ -255,3 +255,42 @@ def test_topics_empty_when_offerings_exist() -> None:
     profile = build_profile([home, svc, content], "acme.example")
     assert profile.services  # has an offering
     assert profile.topics == []  # so no topic fallback
+
+
+def test_topics_use_titles_and_drop_near_duplicates() -> None:
+    home = ExtractedPage(
+        final_url="https://besttravelclimate.com/",
+        page_type="home",
+        language="de",
+        h1="Best Travel Climate",
+    )
+    # h1 and title say the same thing -> collapses to one topic.
+    a = ExtractedPage(
+        final_url="https://besttravelclimate.com/madeira",
+        page_type="other",
+        language="de",
+        h1="Madeira im Oktober",
+        title="Madeira im Oktober | Best Travel Climate",
+    )
+    # Title-only page still contributes a topic.
+    b = ExtractedPage(
+        final_url="https://besttravelclimate.com/kreta",
+        page_type="other",
+        language="de",
+        title="Beste Reisezeit für Kreta | Best Travel Climate",
+    )
+    # h1 and title differ -> both are kept.
+    c = ExtractedPage(
+        final_url="https://besttravelclimate.com/winter",
+        page_type="other",
+        language="de",
+        h1="Warme Reiseziele im Winter",
+        title="Klimadaten im Vergleich",
+    )
+    profile = build_profile([home, a, b, c], "besttravelclimate.com")
+    topics = profile.topics
+    assert "Madeira im Oktober" in topics
+    assert sum(1 for x in topics if x.startswith("Madeira")) == 1  # near-duplicate collapsed
+    assert "Beste Reisezeit für Kreta" in topics  # came from the title alone
+    assert "Warme Reiseziele im Winter" in topics  # 'Winter' is German, not a foreign marker
+    assert "Klimadaten im Vergleich" in topics  # the title added a distinct topic
