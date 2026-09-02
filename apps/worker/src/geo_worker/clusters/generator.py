@@ -63,7 +63,13 @@ def _norm(value: str | None) -> str:
 
 
 def _pick_language(profile: BusinessProfile, override: str | None) -> str:
-    lang = override or next((lg for lg in profile.languages if lg in SUPPORTED_LANGUAGES), "en")
+    # Prefer the dominant content language so questions are in the language the
+    # site is actually in (a mostly-English site should not get German questions).
+    lang = (
+        override
+        or (profile.primary_language if profile.primary_language in SUPPORTED_LANGUAGES else None)
+        or next((lg for lg in profile.languages if lg in SUPPORTED_LANGUAGES), "en")
+    )
     return lang if lang in SUPPORTED_LANGUAGES else "en"
 
 

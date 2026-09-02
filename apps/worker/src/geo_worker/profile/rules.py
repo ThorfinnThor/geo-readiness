@@ -235,13 +235,21 @@ def _resolve_languages(
     pages: list[ExtractedPage], profile: BusinessProfile, evidence: list[EvidenceItem]
 ) -> None:
     langs: set[str] = set()
+    page_lang_counts: Counter[str] = Counter()
     for page in pages:
         if page.language:
-            langs.add(page.language.split("-")[0].lower())
+            base = page.language.split("-")[0].lower()
+            langs.add(base)
+            page_lang_counts[base] += 1
         for hl in page.hreflang:
             if hl and hl.lower() != "x-default":
                 langs.add(hl.split("-")[0].lower())
     profile.languages = sorted(langs)
+    # Dominant content language by page count (most pages win, ties broken
+    # alphabetically for determinism). Derived, not hashed.
+    if page_lang_counts:
+        top = min(page_lang_counts.items(), key=lambda kv: (-kv[1], kv[0]))
+        profile.primary_language = top[0]
     for lang in profile.languages:
         evidence.append(
             EvidenceItem(field_name="language", value=lang, source_type="hreflang", confidence=0.9)
@@ -789,8 +797,85 @@ _TOPIC_EXCLUDE_PAGE_TYPES = frozenset(
 )
 
 
+# Function/common words that betray a topic in the wrong language, so a topic
+# from a stray foreign-language page is not embedded in the site-language question.
+_TOPIC_FOREIGN_MARKERS = {
+    "de": frozenset(
+        {
+            "the",
+            "to",
+            "of",
+            "and",
+            "for",
+            "with",
+            "from",
+            "by",
+            "compared",
+            "best",
+            "how",
+            "what",
+            "which",
+            "climate",
+            "weather",
+            "travel",
+            "finder",
+            "guide",
+            "winter",
+            "warm",
+            "seas",
+            "escape",
+            "vers",
+            "une",
+            "des",
+            "les",
+            "pour",
+            "del",
+            "para",
+            "con",
+            "los",
+            "las",
+            "chaude",
+            "mer",
+        }
+    ),
+    "en": frozenset(
+        {
+            "und",
+            "oder",
+            "für",
+            "über",
+            "die",
+            "der",
+            "das",
+            "wie",
+            "was",
+            "welche",
+            "man",
+            "sollte",
+            "beste",
+            "reise",
+            "reisezeit",
+            "wetter",
+            "klima",
+            "warme",
+            "meer",
+            "vers",
+            "une",
+            "des",
+            "les",
+            "pour",
+            "del",
+            "para",
+            "con",
+        }
+    ),
+}
+
+
 def _primary_gen_language(profile: BusinessProfile) -> str:
-    """The language the cluster generator will use (first supported, en fallback)."""
+    """The language the cluster generator will use for this profile."""
+    if profile.primary_language in ("de", "en"):
+        return profile.primary_language
     for lg in profile.languages:
         base = lg.split("-")[0].lower()
         if base in ("de", "en"):
@@ -798,7 +883,7 @@ def _primary_gen_language(profile: BusinessProfile) -> str:
     return "en"
 
 
-def _clean_topic(raw: str, brand: str | None, canonical_domain: str) -> str | None:
+def _clean_topic(raw: str, brand: str | None, canonical_domain: str, lang: str) -> str | None:
     """A page's subject as a short topic phrase, or None if it is not usable."""
     t = " ".join(raw.split())
     # Drop a trailing separated brand affix ("Madeira in October | BestTravelClimate").
@@ -819,9 +904,16 @@ def _clean_topic(raw: str, brand: str | None, canonical_domain: str) -> str | No
     words = t.split()
     if not (1 <= len(words) <= 6) or len(t) > 60:
         return None
+    # A comma/colon or sentence punctuation marks a heading or a sentence, not a
+    # clean topic ("Methodology, data & limitations", "Warm oder kalt? Die Reise").
+    if any(ch in t for ch in ",:?!") or t.endswith("."):
+        return None
     if not re.search(r"[a-zäöüß]", t.lower()):
         return None
     if set(_tokens(t)) <= _GENERIC_BRAND_TOKENS:  # purely navigational/generic
+        return None
+    # Reject a topic that is clearly in another language than the question.
+    if _tokens(t) & _TOPIC_FOREIGN_MARKERS.get(lang, frozenset()):
         return None
     return t
 
@@ -843,7 +935,7 @@ def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> Non
         raw = page.h1 or page.title
         if not raw:
             continue
-        topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain)
+        topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain, lang)
         if not topic:
             continue
         key = topic.lower()

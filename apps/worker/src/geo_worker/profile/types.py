@@ -33,6 +33,9 @@ class BusinessProfile(BaseModel):
     locations: list[str] = []
     countries: list[str] = []
     languages: list[str] = []
+    # The dominant content language (most pages), used to generate questions in
+    # the language the site is actually in. Derived, not part of the profile hash.
+    primary_language: str = ""
     industries: list[str] = []
     target_audiences: list[str] = []
     # Content topics for informational sites with no extractable offerings, used
