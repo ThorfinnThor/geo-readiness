@@ -182,3 +182,21 @@ def test_legal_name_and_city_from_german_imprint_text() -> None:
     profile = build_profile([home, imprint], "selectyoursauna.com")
     assert profile.legal_name == "SeitenHafen361"
     assert profile.locations == ["Berlin"]
+
+
+def test_imprint_city_trims_trailing_country_and_nav_label() -> None:
+    # A postal-code + city capture over flattened imprint text can pull in the
+    # country line and the next nav heading ("13359 Berlin Germany Contact").
+    # Only the city itself must survive, so cluster prompts read cleanly.
+    home = ExtractedPage(final_url="https://findyouraiscore.com/", page_type="home", language="en")
+    imprint = ExtractedPage(
+        final_url="https://findyouraiscore.com/imprint",
+        page_type="legal",
+        language="en",
+        visible_text=(
+            "Imprint Provider: SeitenHafen361 Some Street 1 13359 Berlin Germany Contact "
+            "info@findyouraiscore.com"
+        ),
+    )
+    profile = build_profile([home, imprint], "findyouraiscore.com")
+    assert profile.locations == ["Berlin"]

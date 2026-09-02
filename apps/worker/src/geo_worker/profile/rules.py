@@ -273,6 +273,69 @@ _LEGAL_NAME_RE = [
 _POSTAL_CITY_RE = re.compile(
     r"\b\d{5}\s+([A-ZÄÖÜ][A-Za-zäöüß.\-]+(?:\s[A-ZÄÖÜ][A-Za-zäöüß.\-]+){0,2})"
 )
+# A postal-code + city capture over flattened imprint text can pull in the
+# country line and the next nav/heading word ("… 10117 Berlin Germany Contact").
+# These trailing tokens are trimmed so the city is just the city ("Berlin").
+_CITY_TRAILING_STOPWORDS = frozenset(
+    {
+        # nav / headings (en + de)
+        "contact",
+        "kontakt",
+        "about",
+        "impressum",
+        "imprint",
+        "datenschutz",
+        "privacy",
+        "home",
+        "startseite",
+        "menu",
+        "legal",
+        "rechtliches",
+        "terms",
+        "agb",
+        "sitemap",
+        "search",
+        "login",
+        "anmelden",
+        "uns",
+        # country names that follow a city in a flattened address
+        "germany",
+        "deutschland",
+        "austria",
+        "österreich",
+        "oesterreich",
+        "switzerland",
+        "schweiz",
+        "france",
+        "frankreich",
+        "italy",
+        "italien",
+        "spain",
+        "spanien",
+        "netherlands",
+        "niederlande",
+        "belgium",
+        "belgien",
+        "usa",
+        "us",
+        "uk",
+        "united",
+        "kingdom",
+        "states",
+        "america",
+        "europe",
+    }
+)
+
+
+def _clean_city(raw: str) -> str:
+    """Trim trailing country/nav tokens leaked into a postal-code city capture."""
+    words = raw.split()
+    while len(words) > 1 and words[-1].lower().strip(".,:-") in _CITY_TRAILING_STOPWORDS:
+        words.pop()
+    return " ".join(words).strip(" .,-")
+
+
 # Heading/marker words that leak into a captured name and must be trimmed.
 _LEGAL_STOPWORDS = frozenset(
     {
@@ -326,7 +389,7 @@ def _city_from_text(pages: list[ExtractedPage]) -> tuple[str, str] | None:
     for page in _legal_pages(pages):
         m = _POSTAL_CITY_RE.search(page.visible_text)
         if m:
-            city = " ".join(m.group(1).split()).strip(" .,-")
+            city = _clean_city(" ".join(m.group(1).split()))
             if 2 <= len(city) <= 40:
                 return city, page.final_url
     return None
