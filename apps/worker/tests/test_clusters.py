@@ -89,3 +89,38 @@ def test_priority_independent_of_call_context() -> None:
     first = {c.cluster_key: c.priority for c in generate_clusters(_profile(), MV, "full")}
     second = {c.cluster_key: c.priority for c in generate_clusters(_profile(), MV, "full")}
     assert first == second
+
+
+def test_humanize_offering_display_only() -> None:
+    # Presentation fixes for prompt text: acronyms re-cased, leading article
+    # dropped. Lowercased generic offerings (the golden case) are untouched.
+    from geo_worker.clusters.generator import _humanize_offering
+
+    assert _humanize_offering("premium ai readiness audit") == "premium AI readiness audit"
+    assert _humanize_offering("the ai search readiness audit") == "AI search readiness audit"
+    assert _humanize_offering("seo audit") == "SEO audit"
+    # No acronym, no article -> unchanged (keeps golden fixtures byte-identical).
+    assert _humanize_offering("solar panels") == "solar panels"
+    assert _humanize_offering("battery storage") == "battery storage"
+
+
+def test_generated_prompts_recase_acronym_offering() -> None:
+    profile = BusinessProfile(
+        canonical_domain="findyouraiscore.com",
+        brand_name="Find Your AI Score",
+        services=["premium ai readiness audit"],
+        evidence=[
+            EvidenceItem(
+                field_name="service",
+                value="premium ai readiness audit",
+                source_type="json_ld",
+                confidence=0.9,
+            )
+        ],
+    )
+    clusters = generate_clusters(profile, MV, "quick", "en")
+    texts = [p.prompt_text for c in clusters for p in c.prompts]
+    assert texts, "expected at least one generated prompt"
+    # The acronym is cased and no lowercased 'ai' token leaks into any prompt.
+    assert any("AI readiness audit" in t for t in texts)
+    assert not any(" ai " in f" {t.lower()} " and " AI " not in t for t in texts)

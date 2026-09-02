@@ -167,14 +167,62 @@ def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
     return specs
 
 
+# Offering names are stored lowercased for stable dedup/keys/hash, which reads
+# oddly when an acronym or a leading article slips into a question ("premium ai
+# readiness audit", "Which the ai search ... should be compared?"). These fixes
+# are presentation-only: applied to the rendered prompt text, never to the
+# cluster key, the profile or the hash, so scoring stays byte-identical.
+_OFFERING_SLOTS = frozenset(
+    {"service", "service_a", "service_b", "product", "product_category", "topic"}
+)
+_OFFERING_ARTICLES = ("the ", "a ", "an ")
+_OFFERING_ACRONYMS = {
+    "ai": "AI",
+    "seo": "SEO",
+    "geo": "GEO",
+    "api": "API",
+    "saas": "SaaS",
+    "b2b": "B2B",
+    "b2c": "B2C",
+    "crm": "CRM",
+    "erp": "ERP",
+    "hr": "HR",
+    "it": "IT",
+    "ux": "UX",
+    "ui": "UI",
+    "kpi": "KPI",
+    "roi": "ROI",
+    "llm": "LLM",
+    "iot": "IoT",
+    "pdf": "PDF",
+    "saas.": "SaaS",
+}
+
+
+def _humanize_offering(value: str) -> str:
+    """Strip a leading article and restore known acronym casing for display."""
+    v = value.strip()
+    low = v.lower()
+    for art in _OFFERING_ARTICLES:
+        if low.startswith(art):
+            v = v[len(art) :].strip()
+            break
+    return " ".join(_OFFERING_ACRONYMS.get(tok.lower(), tok) for tok in v.split())
+
+
+def _display_context(context: dict[str, str]) -> dict[str, str]:
+    return {k: (_humanize_offering(v) if k in _OFFERING_SLOTS else v) for k, v in context.items()}
+
+
 def _render_prompts(
     spec: _Spec, cluster_key: str, template_set: TemplateSet
 ) -> list[GeneratedPrompt]:
     prompts: list[GeneratedPrompt] = []
+    display_context = _display_context(spec.context)
     for template in template_set.templates.get(spec.intent, []):
         if len(prompts) >= MAX_PROMPTS_PER_CLUSTER:
             break
-        text = render_template(template.text, spec.context)
+        text = render_template(template.text, display_context)
         if text is None:
             continue
         prompt_key = hashlib.sha256(f"{cluster_key}|{template.id}".encode()).hexdigest()[:32]
