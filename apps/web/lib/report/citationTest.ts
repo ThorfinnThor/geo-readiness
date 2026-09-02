@@ -166,9 +166,11 @@ export function sampleCitationQuery(report: ReportDocument): string | null {
 
 /** Step 1 (paste first): blinded measurement. The domain is intentionally absent. */
 export function measurementPrompt(queries: CitationQuery[], lang: KitLang): string {
+  const n = queries.length;
   const qlist = queries.map((q, i) => `${i + 1}. ${q.query}`).join("\n");
   if (lang === "de") {
-    return `Du führst einen verblindeten KI-Suche-Zitationstest durch. Du bekommst ${queries.length} unabhängige Nutzerfragen. Die getestete Website ist absichtlich verborgen, versuche nicht, sie zu erraten.
+    const noun = n === 1 ? "1 unabhängige Nutzerfrage" : `${n} unabhängige Nutzerfragen`;
+    return `Du führst einen verblindeten KI-Suche-Zitationstest durch. Du bekommst ${noun}. Die getestete Website ist absichtlich verborgen, versuche nicht, sie zu erraten.
 
 Regeln
 - Behandle jede Frage als eigene, getrennte Suchaufgabe.
@@ -182,7 +184,8 @@ ${qlist}
 
 Beantworte jede Frage normal und füge dann eine Liste „Verwendete Quellen" mit der vollständigen URL jeder Quelle an. Führe die Suchen jetzt durch und behalte die Quellen je Frage. Wir werten sie in der nächsten Nachricht aus.`;
   }
-  return `You are running a blinded AI-search citation test. You will get ${queries.length} independent user questions. The website being tested is intentionally hidden from you, do not try to guess it.
+  const enNoun = n === 1 ? "1 independent user question" : `${n} independent user questions`;
+  return `You are running a blinded AI-search citation test. You will get ${enNoun}. The website being tested is intentionally hidden from you, do not try to guess it.
 
 Rules
 - Treat every question as its own separate search task.
