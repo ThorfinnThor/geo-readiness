@@ -30,6 +30,53 @@ _TYPE_PRIORITY: dict[str, int] = {
 }
 
 
+# Language codes recognised as a locale path prefix ("/de/…", "/en/…").
+_LOCALE_CODES = frozenset(
+    {
+        "de",
+        "en",
+        "fr",
+        "es",
+        "it",
+        "nl",
+        "pt",
+        "pl",
+        "cs",
+        "da",
+        "fi",
+        "sv",
+        "no",
+        "tr",
+        "ru",
+        "ja",
+        "zh",
+        "ko",
+        "ar",
+        "hu",
+        "ro",
+        "el",
+        "bg",
+        "sk",
+        "sl",
+        "hr",
+        "et",
+        "lv",
+        "lt",
+        "uk",
+    }
+)
+# A translated duplicate is still crawlable, but only after everything in the
+# site's primary language. Without this, a four-language site spends most of its
+# page budget on copies of pages the report never scores or asks about.
+_OFF_LOCALE_PENALTY = 100
+
+
+def locale_prefix(url: str) -> str | None:
+    """The locale segment of a URL path ('/de/x' -> 'de'), if it is one."""
+    seg = urlsplit(url).path.strip("/").split("/", 1)[0].lower()
+    return seg if seg in _LOCALE_CODES else None
+
+
 def _canonical_url(url: str) -> str:
     """Drop fragment and trailing slash (except root) for dedup."""
     parts = urlsplit(url)
@@ -44,6 +91,34 @@ class Frontier:
         self._heap: list[tuple[int, int, str, int]] = []  # (-priority, seq, url, depth)
         self._seen: set[str] = set()
         self._seq = 0
+        self._primary_locale: str | None = None
+
+    def _priority_for(self, canon: str) -> int:
+        """Page-type priority (unchanged), minus a penalty for a translated copy."""
+        priority = _TYPE_PRIORITY.get(classify_page(canon, None, {}), 30)
+        loc = locale_prefix(canon)
+        if self._primary_locale and loc and loc != self._primary_locale:
+            priority -= _OFF_LOCALE_PENALTY
+        return priority
+
+    def set_primary_locale(self, code: str | None) -> None:
+        """Fix the site's primary language once known; the first valid value wins.
+
+        Anything already queued (sitemap seeds were enqueued before the first page
+        was fetched) is re-prioritised, so translated copies sink even if they were
+        discovered before the language was known.
+        """
+        if self._primary_locale or not code:
+            return
+        base = code.split("-")[0].lower()
+        if base not in _LOCALE_CODES:
+            return
+        self._primary_locale = base
+        rebuilt = [
+            (-self._priority_for(url), seq, url, depth) for _neg, seq, url, depth in self._heap
+        ]
+        heapq.heapify(rebuilt)
+        self._heap = rebuilt
 
     def __len__(self) -> int:
         return len(self._heap)
@@ -58,8 +133,7 @@ class Frontier:
         if canon in self._seen:
             return False
         self._seen.add(canon)
-        priority = _TYPE_PRIORITY.get(classify_page(canon, None, {}), 30)
-        heapq.heappush(self._heap, (-priority, self._seq, canon, depth))
+        heapq.heappush(self._heap, (-self._priority_for(canon), self._seq, canon, depth))
         self._seq += 1
         return True
 

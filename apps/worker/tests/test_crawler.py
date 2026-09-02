@@ -176,3 +176,38 @@ def test_sitemap_urls_are_seeded() -> None:
     result = _run(site)
     urls = {p.final_url for p in result.pages}
     assert "https://ex.example/from-sitemap" in urls
+
+
+def test_frontier_ranks_translated_copies_last() -> None:
+    from geo_worker.crawler.frontier import Frontier
+
+    f = Frontier()
+    f.set_primary_locale("de")
+    f.enqueue("https://x.example/en/beste-reiseziele/april", 1)
+    f.enqueue("https://x.example/de/beste-reiseziele/april", 1)
+    first, _ = f.pop()
+    assert first.endswith("/de/beste-reiseziele/april")  # primary language wins
+
+
+def test_frontier_reprioritises_queue_once_locale_is_known() -> None:
+    # Sitemap seeds are enqueued before the first page is fetched, so the queue
+    # must be re-ordered when the primary language becomes known.
+    from geo_worker.crawler.frontier import Frontier
+
+    f = Frontier()
+    f.enqueue("https://x.example/fr/guide", 1)
+    f.enqueue("https://x.example/de/guide", 1)
+    f.set_primary_locale("de")
+    first, _ = f.pop()
+    assert first.endswith("/de/guide")
+
+
+def test_frontier_leaves_non_localised_urls_and_type_order_untouched() -> None:
+    from geo_worker.crawler.frontier import Frontier
+
+    f = Frontier()
+    f.set_primary_locale("de")
+    f.enqueue("https://x.example/some/article", 2)  # no locale prefix
+    f.enqueue("https://x.example/impressum", 1)  # legal ranks above 'other'
+    first, _ = f.pop()
+    assert first.endswith("/impressum")  # existing type priority is unchanged

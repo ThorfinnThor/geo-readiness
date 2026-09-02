@@ -11,7 +11,7 @@ from geo_worker.security import CrawlLimits, SSRFBlocked, validate_target
 from geo_worker.security.resolver import Resolver, system_resolver
 
 from .fetcher import FetchError, SafeFetcher
-from .frontier import Frontier
+from .frontier import Frontier, locale_prefix
 from .robots import RobotsPolicy
 from .types import CrawlMetrics, CrawlResult, CrawlStatus, FetchFn, RenderFn
 
@@ -56,6 +56,9 @@ def crawl(
 
     frontier = Frontier()
     frontier.enqueue(start, 0)
+    # A start URL that already carries a locale ("/en/…") fixes the primary
+    # language before sitemap seeding; otherwise the first page settles it below.
+    frontier.set_primary_locale(locale_prefix(start))
     for sm_url in robots.sitemaps:
         _seed_sitemap(fetcher, sm_url, frontier, metrics)
 
@@ -112,6 +115,8 @@ def crawl(
         metrics.pages_fetched += 1
         if url == start:
             result.homepage_reachable = True
+            # The site's own declared language, so translated copies rank last.
+            frontier.set_primary_locale(page.language)
 
         if depth < limits.max_depth:
             for link in page.internal_links:
