@@ -18,6 +18,7 @@ import { TopBar } from "@/components/TopBar";
 import {
   citationQueries,
   evaluationPrompt,
+  kitLanguage,
   measurementPrompt,
   proProtocolMarkdown,
 } from "@/lib/report/citationTest";
@@ -290,12 +291,13 @@ export function FullReport({
         const queries = citationQueries(report);
         if (queries.length === 0) return null;
         const domain = report.meta.canonical_domain;
+        const lang = kitLanguage(report);
         return (
           <Section title="Test it yourself in ChatGPT or Claude">
             <CitationSelfTest
               queries={queries}
-              measurement={measurementPrompt(queries)}
-              evaluation={evaluationPrompt(domain)}
+              measurement={measurementPrompt(queries, lang)}
+              evaluation={evaluationPrompt(domain, lang)}
               protocol={proProtocolMarkdown(report)}
               domain={domain}
             />
