@@ -153,6 +153,7 @@ export default function PricingPage() {
               <Feature>Prioritized fixes, ranked by impact</Feature>
               <Feature>Prompt &amp; topic coverage map with missing requirements</Feature>
               <Feature>Retrieval, citation &amp; answer readiness</Feature>
+              <Feature>A self-test kit to check if ChatGPT &amp; Claude actually cite you</Feature>
               <Feature>Structured data &amp; technical AI accessibility</Feature>
               <Feature>Downloadable report (PDF or Markdown)</Feature>
             </ul>

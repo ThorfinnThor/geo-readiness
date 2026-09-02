@@ -51,6 +51,7 @@ const PREMIUM: string[] = [
   "The full score across all seven components and three readiness stages",
   "Every finding with the exact evidence the audit observed on your pages",
   "A prioritized fix for each issue, plus a paste-ready prompt for your AI coding assistant",
+  "A ready-to-paste kit to test in ChatGPT and Claude whether AI search actually cites you",
   "A downloadable report you can share with your team",
   "A before-and-after comparison when you rescan after making changes",
 ];
