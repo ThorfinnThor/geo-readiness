@@ -68,8 +68,23 @@ export interface CitationQuery {
   query: string;
 }
 
-/** The language the engine generated this scan's questions in (en fallback). */
+/** The language the engine generated this scan's questions in. Detected from the
+ *  actual generated questions (a scan's questions are all one language), because
+ *  the worker generates in the site's dominant language, which need not be the
+ *  first entry in business_profile.languages. Falls back to the profile list. */
 export function kitLanguage(report: ReportDocument): KitLang {
+  const text = report.clusters
+    .map((c) => c.sample_prompt ?? "")
+    .join(" ")
+    .toLowerCase();
+  const de = (
+    text.match(/\b(was|welche|welcher|über|für|wie|sollte|man|anbieter|quellen|erfahren)\b/g) ?? []
+  ).length;
+  const en = (
+    text.match(/\b(what|which|how|should|providers|sources|about|best|learn|know)\b/g) ?? []
+  ).length;
+  if (de > en) return "de";
+  if (en > de) return "en";
   for (const lg of report.business_profile?.languages ?? []) {
     const base = (lg.split("-")[0] ?? "").toLowerCase();
     if (base === "de") return "de";
