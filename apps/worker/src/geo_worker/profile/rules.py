@@ -797,8 +797,8 @@ def _plausible_offering_name(name: str) -> bool:
 def _resolve_offerings(
     pages: list[ExtractedPage], profile: BusinessProfile, evidence: list[EvidenceItem]
 ) -> None:
-    services: dict[str, tuple[str | None, str]] = {}
-    products: dict[str, tuple[str | None, str]] = {}
+    services: dict[str, tuple[str | None, str, str]] = {}
+    products: dict[str, tuple[str | None, str, str]] = {}
 
     def add(bucket: dict, name: str, url: str | None, source: str) -> None:
         name = " ".join(name.split())
@@ -806,7 +806,7 @@ def _resolve_offerings(
             return
         key = name.lower()
         if key not in bucket:
-            bucket[key] = (url, source)
+            bucket[key] = (url, source, name)
 
     for page in pages:
         # From JSON-LD Service / Product nodes.
@@ -1150,7 +1150,7 @@ def _resolve_offering_fallback(
 
 
 def _finalize_offering(
-    bucket: dict[str, tuple[str | None, str]],
+    bucket: dict[str, tuple[str | None, str, str]],
     field_name: str,
     profile: BusinessProfile,
     evidence: list[EvidenceItem],
@@ -1163,7 +1163,8 @@ def _finalize_offering(
     else:
         profile.products = names
     for key in names:
-        url, source = bucket[key]
+        url, source, original = bucket[key]
+        profile.offering_display.setdefault(key, original)
         conf = 0.9 if source == "json_ld" else 0.6 if source == "navigation" else 0.5
         evidence.append(
             EvidenceItem(

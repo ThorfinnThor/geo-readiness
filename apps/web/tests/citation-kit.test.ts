@@ -115,3 +115,33 @@ describe("crawler-language insight", () => {
     expect(crawlLanguageInfo(rep)).toBeNull();
   });
 });
+
+
+describe("citation kit deduplication", () => {
+  it("drops a question whose offering is a fuller form of one already asked", () => {
+    const report: ReportDocument = {
+      ...germanReport([
+        cluster({
+          intent: "comparison",
+          priority: 0.9,
+          sample_prompt: "Welche Anbieter für Karibu Saunahaus Monterey sollte man vergleichen?",
+        }),
+        cluster({
+          intent: "comparison",
+          priority: 0.8,
+          sample_prompt: "Welche Anbieter für Saunahaus Monterey sollte man vergleichen?",
+        }),
+        cluster({
+          intent: "pricing",
+          priority: 0.7,
+          sample_prompt: "Was kostet eine Gartensauna mit Vorraum?",
+        }),
+      ]),
+      business_profile: { ...exampleReport.business_profile, brand_name: "Sauna Shop", languages: ["de"] },
+    };
+    const qs = citationQueries(report);
+    expect(qs).toHaveLength(2); // the shorter duplicate is dropped
+    expect(qs[0]!.query).toContain("Karibu Saunahaus Monterey");
+    expect(qs[1]!.query).toContain("Gartensauna");
+  });
+});

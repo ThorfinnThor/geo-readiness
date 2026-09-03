@@ -4,7 +4,7 @@
   "templates": {
     "category_discovery": [
       { "id": "category_discovery_de_1", "text": "Welche Anbieter gibt es für {service}?", "placeholders": ["service"] },
-      { "id": "category_discovery_de_2", "text": "Welche {product_category}-Anbieter gibt es?", "placeholders": ["product_category"] }
+      { "id": "category_discovery_de_2", "text": "Welche Anbieter für {product_category} gibt es?", "placeholders": ["product_category"] }
     ],
     "recommendation": [
       { "id": "recommendation_de_1", "text": "Welcher Anbieter für {service} ist empfehlenswert?", "placeholders": ["service"] },
@@ -14,7 +14,7 @@
       { "id": "best_of_de_1", "text": "Was sind die besten Anbieter für {service}?", "placeholders": ["service"] }
     ],
     "comparison": [
-      { "id": "comparison_de_1", "text": "Welche {product_category}-Anbieter sollte man vergleichen?", "placeholders": ["product_category"] },
+      { "id": "comparison_de_1", "text": "Welche Anbieter für {product_category} sollte man vergleichen?", "placeholders": ["product_category"] },
       { "id": "comparison_de_2", "text": "Wie unterscheiden sich Anbieter für {service}?", "placeholders": ["service"] }
     ],
     "alternative": [

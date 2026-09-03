@@ -43,6 +43,11 @@ class BusinessProfile(BaseModel):
     # site_type) so it never affects reproducibility, and not serialized in the
     # report, so it does not touch the frozen V1 golden.
     topics: list[str] = []
+    # Original casing of each offering, keyed by its lowercased form. The
+    # lowercased names stay the identity (dedup, keys, hash); this only
+    # restores display casing for generated questions ("karibu saunahaus
+    # monterey" -> "Karibu Saunahaus Monterey"). Derived, not hashed.
+    offering_display: dict[str, str] = {}
     # Primary site archetype (§v2-plan 6); drives per-profile rule applicability.
     site_type: str = "unknown"
     site_type_confidence: float = 0.0

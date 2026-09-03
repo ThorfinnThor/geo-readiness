@@ -133,12 +133,36 @@ function isWellFormed(core: string, brand: string | null, domain: string): boole
   return true;
 }
 
+/** Two questions asking the same thing, because one offering is a fuller form of
+ *  the other ("Karibu Saunahaus Monterey" vs "Saunahaus Monterey"). */
+function nearDuplicate(core: string, accepted: string[]): boolean {
+  const words = (v: string) =>
+    new Set(
+      v
+        .toLowerCase()
+        .replace(/[?.!,:;"'()]/g, " ")
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+  const a = words(core);
+  for (const other of accepted) {
+    const b = words(other);
+    const smaller = a.size <= b.size ? a : b;
+    const larger = a.size <= b.size ? b : a;
+    let shared = 0;
+    for (const w of smaller) if (larger.has(w)) shared += 1;
+    if (smaller.size > 0 && shared === smaller.size) return true;
+  }
+  return false;
+}
+
 /** The neutral test questions, most important first, from the report's clusters. */
 export function citationQueries(report: ReportDocument, limit = 8): CitationQuery[] {
   const brand = report.business_profile?.brand_name ?? null;
   const domain = report.meta.canonical_domain;
   const lang = kitLanguage(report);
   const out: CitationQuery[] = [];
+  const accepted: string[] = [];
   const sorted = [...report.clusters]
     .filter(
       (c) =>
@@ -150,6 +174,8 @@ export function citationQueries(report: ReportDocument, limit = 8): CitationQuer
     const query = neutralize(c.sample_prompt as string, brand, domain, lang);
     const core = query.replace(SEARCH_SUFFIX[lang], "").trim();
     if (!isWellFormed(core, brand, domain)) continue;
+    if (nearDuplicate(core, accepted)) continue;
+    accepted.push(core);
     out.push({
       qid: `Q${String(out.length + 1).padStart(2, "0")}`,
       intent: c.intent,

@@ -25,6 +25,9 @@ MAX_PROMPTS_PER_CLUSTER = 3
 
 SUPPORTED_LANGUAGES = ("de", "en")
 
+# The frozen methodology: its rendered prompts must never change.
+V1_METHODOLOGY = "geo-readiness-v1"
+
 # Structural relevance per intent — how central the intent is to a provider's
 # discoverability. Independent of the site's measured evidence quality.
 _RELEVANCE_BASE: dict[str, float] = {
@@ -225,15 +228,23 @@ def _humanize_offering(value: str) -> str:
     return " ".join(_OFFERING_ACRONYMS.get(tok.lower(), tok) for tok in v.split())
 
 
-def _display_context(context: dict[str, str]) -> dict[str, str]:
-    return {k: (_humanize_offering(v) if k in _OFFERING_SLOTS else v) for k, v in context.items()}
+def _display_context(context: dict[str, str], display: dict[str, str]) -> dict[str, str]:
+    """Offering slots get their original casing back, then the acronym/article
+    tidy-up. Offerings are stored lowercased for stable keys, which reads
+    broken for a proper noun ("karibu saunahaus monterey")."""
+    out: dict[str, str] = {}
+    for key, value in context.items():
+        if key in _OFFERING_SLOTS:
+            value = _humanize_offering(display.get(value.lower(), value))
+        out[key] = value
+    return out
 
 
 def _render_prompts(
-    spec: _Spec, cluster_key: str, template_set: TemplateSet
+    spec: _Spec, cluster_key: str, template_set: TemplateSet, display: dict[str, str]
 ) -> list[GeneratedPrompt]:
     prompts: list[GeneratedPrompt] = []
-    display_context = _display_context(spec.context)
+    display_context = _display_context(spec.context, display)
     for template in template_set.templates.get(spec.intent, []):
         if len(prompts) >= MAX_PROMPTS_PER_CLUSTER:
             break
@@ -260,6 +271,8 @@ def generate_clusters(
     prompt_version: str = "v1",
 ) -> list[GeneratedCluster]:
     """Generate deterministic, capped, prompt-bearing clusters from a profile."""
+    # V1 output is frozen, so the display casing lands in V2 only.
+    display = {} if methodology_version == V1_METHODOLOGY else profile.offering_display
     locale = _pick_language(profile, language)
     taxonomy = load_taxonomy(prompt_version)
     template_set = load_template_set(locale, prompt_version)
@@ -274,7 +287,7 @@ def generate_clusters(
         key = _cluster_key(methodology_version, spec, locale)
         if key in built:
             continue
-        prompts = _render_prompts(spec, key, template_set)
+        prompts = _render_prompts(spec, key, template_set, display)
         if not prompts:
             continue  # nothing renderable → no evidence need to represent
 

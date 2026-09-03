@@ -4,7 +4,7 @@
   "templates": {
     "category_discovery": [
       { "id": "category_discovery_en_1", "text": "Which providers are there for {service}?", "placeholders": ["service"] },
-      { "id": "category_discovery_en_2", "text": "Which {product_category} providers exist?", "placeholders": ["product_category"] }
+      { "id": "category_discovery_en_2", "text": "Which providers for {product_category} exist?", "placeholders": ["product_category"] }
     ],
     "recommendation": [
       { "id": "recommendation_en_1", "text": "Which provider for {service} is recommended?", "placeholders": ["service"] },
@@ -14,7 +14,7 @@
       { "id": "best_of_en_1", "text": "What are the best providers for {service}?", "placeholders": ["service"] }
     ],
     "comparison": [
-      { "id": "comparison_en_1", "text": "Which {product_category} providers should be compared?", "placeholders": ["product_category"] },
+      { "id": "comparison_en_1", "text": "Which providers for {product_category} should be compared?", "placeholders": ["product_category"] },
       { "id": "comparison_en_2", "text": "How do providers for {service} differ?", "placeholders": ["service"] }
     ],
     "alternative": [
