@@ -894,7 +894,10 @@ def _clean_topic(raw: str, brand: str | None, canonical_domain: str, lang: str) 
         t = re.sub(rf"\b{escaped}\b", "", t, flags=re.IGNORECASE)
     t = " ".join(t.split()).strip(" .,-–—|:")
     words = t.split()
-    if not (1 <= len(words) <= 6) or len(t) > 60:
+    # A single word is the site's umbrella subject ("Klima" on a climate site),
+    # never one page's subject, so the question it produces is too broad for the
+    # target page to legitimately qualify as its source. Require a phrase.
+    if not (2 <= len(words) <= 6) or len(t) > 60:
         return None
     # A comma/colon or sentence punctuation marks a heading or a sentence, not a
     # clean topic ("Methodology, data & limitations", "Warm oder kalt? Die Reise").

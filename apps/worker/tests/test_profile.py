@@ -294,3 +294,29 @@ def test_topics_use_titles_and_drop_near_duplicates() -> None:
     assert "Beste Reisezeit für Kreta" in topics  # came from the title alone
     assert "Warme Reiseziele im Winter" in topics  # 'Winter' is German, not a foreign marker
     assert "Klimadaten im Vergleich" in topics  # the title added a distinct topic
+
+
+def test_topics_reject_single_word_umbrella_subject() -> None:
+    # A one-word heading is the site's overall subject, not one page's, so the
+    # question it would produce is too broad for that page to be its source.
+    home = ExtractedPage(
+        final_url="https://besttravelclimate.com/",
+        page_type="home",
+        language="de",
+        h1="Best Travel Climate",
+    )
+    broad = ExtractedPage(
+        final_url="https://besttravelclimate.com/de/klima",
+        page_type="other",
+        language="de",
+        h1="Klima",
+    )
+    specific = ExtractedPage(
+        final_url="https://besttravelclimate.com/de/beste-reiseziele/januar",
+        page_type="other",
+        language="de",
+        h1="Beste Reiseziele im Januar",
+    )
+    profile = build_profile([home, broad, specific], "besttravelclimate.com")
+    assert "Klima" not in profile.topics
+    assert "Beste Reiseziele im Januar" in profile.topics
