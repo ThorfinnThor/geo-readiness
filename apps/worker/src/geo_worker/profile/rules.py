@@ -864,6 +864,17 @@ _TOPIC_FOREIGN_MARKERS = {
 }
 
 
+# Separators used to split a title into brand and subject for topic extraction.
+# Deliberately narrower than _TITLE_SEPARATORS: a bare hyphen must not split
+# "coding-agent", but a spaced dash and the common bullet separators must.
+_TOPIC_SEPARATORS = re.compile(r"\s*[|·•»]\s*|\s+[–—]\s+")
+
+
+# Page types that represent the site entry point, used as the one-pager
+# topic fallback when no separate content page yielded anything.
+_TOPIC_HOME_PAGE_TYPES = frozenset({"home", "index"})
+
+
 def _primary_gen_language(profile: BusinessProfile) -> str:
     """The language the cluster generator will use for this profile."""
     if profile.primary_language in ("de", "en"):
@@ -878,8 +889,11 @@ def _primary_gen_language(profile: BusinessProfile) -> str:
 def _clean_topic(raw: str, brand: str | None, canonical_domain: str, lang: str) -> str | None:
     """A page's subject as a short topic phrase, or None if it is not usable."""
     t = " ".join(raw.split())
-    # Drop a trailing separated brand affix ("Madeira in October | BestTravelClimate").
-    parts = [p.strip() for p in _TITLE_SEPARATORS.split(t) if p.strip()]
+    # Drop the brand affix of a separated title and keep the part that actually
+    # names the subject. Taking the first part blindly picks the brand on a
+    # "Brand — Subject" title ("ATM — Agent Trajectory Marketplace"), so choose
+    # the most substantive remaining part instead.
+    parts = [p.strip() for p in _TOPIC_SEPARATORS.split(t) if p.strip()]
     if len(parts) >= 2:
         core = _domain_core_spaceless(canonical_domain)
         parts = [
@@ -887,11 +901,16 @@ def _clean_topic(raw: str, brand: str | None, canonical_domain: str, lang: str) 
             for p in parts
             if not (brand and _spaceless(p) == _spaceless(brand)) and _spaceless(p) != core
         ]
-        t = parts[0] if parts else t
+        if parts:
+            t = max(parts, key=lambda p: len(p.split()))
     # Strip a standalone brand token, then tidy.
     if brand:
         escaped = re.escape(brand)
         t = re.sub(rf"\b{escaped}\b", "", t, flags=re.IGNORECASE)
+    # A trailing period marks prose or a call to action ("Request buyer access."),
+    # not a label, so judge it before the punctuation is tidied away.
+    if t.rstrip().endswith("."):
+        return None
     t = " ".join(t.split()).strip(" .,-–—|:")
     words = t.split()
     # A single word is the site's umbrella subject ("Klima" on a climate site),
@@ -933,17 +952,13 @@ def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> Non
                 return True
         return False
 
-    for page in pages:
-        if len(seen) >= 8:
-            break
-        if page.page_type in _TOPIC_EXCLUDE_PAGE_TYPES:
-            continue
+    def _consider(page: ExtractedPage) -> None:
         plang = (page.language or "").split("-")[0].lower()
         if plang and plang != lang:
-            continue
+            return
         for raw in (page.h1, page.title):
             if len(seen) >= 8:
-                break
+                return
             if not raw:
                 continue
             topic = _clean_topic(raw, profile.brand_name, profile.canonical_domain, lang)
@@ -953,6 +968,35 @@ def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> Non
             if key in seen or _near_duplicate(topic):
                 continue
             seen[key] = topic
+
+    for page in pages:
+        if len(seen) >= 8:
+            break
+        if page.page_type in _TOPIC_EXCLUDE_PAGE_TYPES:
+            continue
+        _consider(page)
+
+    # One-pager fallback: when no content page yielded a topic, the home page IS
+    # the content page (its only other links are legal pages), so its own subject
+    # is the site's subject. Same quality filters, so a slogan-style h1 is still
+    # rejected and only a usable phrase survives.
+    if not seen:
+        for page in pages:
+            if page.page_type not in _TOPIC_HOME_PAGE_TYPES:
+                continue
+            plang = (page.language or "").split("-")[0].lower()
+            if plang and plang != lang:
+                continue
+            # The title names the subject; a home page h1 is often a call to
+            # action, so prefer the title and take a single topic only.
+            for raw in (page.title, page.h1):
+                topic = _clean_topic(raw or "", profile.brand_name, profile.canonical_domain, lang)
+                if topic:
+                    seen[topic.lower()] = topic
+                    break
+            if seen:
+                break
+
     profile.topics = list(seen.values())
 
 

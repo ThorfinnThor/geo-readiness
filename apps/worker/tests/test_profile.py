@@ -320,3 +320,48 @@ def test_topics_reject_single_word_umbrella_subject() -> None:
     profile = build_profile([home, broad, specific], "besttravelclimate.com")
     assert "Klima" not in profile.topics
     assert "Beste Reiseziele im Januar" in profile.topics
+
+
+def test_one_pager_falls_back_to_the_home_page_subject() -> None:
+    # A one-pager's only other links are legal pages, so the home page IS the
+    # content page. Its title names the subject; the h1 is a call to action and
+    # must not win ("Requestbuyer access.").
+    home = ExtractedPage(
+        final_url="https://getatm.io/",
+        page_type="home",
+        language="en",
+        title="ATM — Agent Trajectory Marketplace",
+        h1="Requestbuyer access.",
+    )
+    terms = ExtractedPage(
+        final_url="https://getatm.io/legal/account-terms",
+        page_type="legal",
+        language="en",
+        h1="Terms",
+    )
+    privacy = ExtractedPage(
+        final_url="https://getatm.io/legal/account-privacy",
+        page_type="legal",
+        language="en",
+        h1="Privacy",
+    )
+    profile = build_profile([home, terms, privacy], "getatm.io")
+    assert profile.topics == ["Agent Trajectory Marketplace"]
+
+
+def test_home_page_is_not_used_when_content_pages_yield_topics() -> None:
+    home = ExtractedPage(
+        final_url="https://besttravelclimate.com/",
+        page_type="home",
+        language="de",
+        title="Best Travel Climate · Wunschklima finden",
+        h1="Finde dein Reiseziel",
+    )
+    content = ExtractedPage(
+        final_url="https://besttravelclimate.com/de/beste-reiseziele/januar",
+        page_type="other",
+        language="de",
+        h1="Beste Reiseziele im Januar",
+    )
+    profile = build_profile([home, content], "besttravelclimate.com")
+    assert profile.topics == ["Beste Reiseziele im Januar"]  # home page not consulted
