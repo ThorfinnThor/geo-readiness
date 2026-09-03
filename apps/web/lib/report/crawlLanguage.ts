@@ -34,7 +34,11 @@ export function crawlLanguageInfo(report: ReportDocument): CrawlLanguageInfo | n
   const bases = [...new Set(langs.map((l) => (l.split("-")[0] ?? "").toLowerCase()).filter(Boolean))];
   if (bases.length < 2) return null; // single-language site: no crawler-language ambiguity
 
-  const crawl = kitLanguage(report); // the language our questions were generated in
+  // Questions are generated in English whatever the site's language, so the
+  // crawl language comes from the profile. Reports written before that field
+  // existed still carry it implicitly: back then the questions WERE in the
+  // crawl language, so detecting it from them is the correct fallback.
+  const crawl = report.business_profile?.crawl_language || kitLanguage(report);
   const others = bases.filter((b) => b !== crawl).map(languageName);
   return { language: languageName(crawl), others };
 }

@@ -90,7 +90,8 @@
     "languages": [
       "en"
     ],
-    "site_type": ""
+    "site_type": "",
+    "crawl_language": ""
   },
   "actions": [
     {

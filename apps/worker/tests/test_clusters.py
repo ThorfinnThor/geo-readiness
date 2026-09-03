@@ -137,10 +137,12 @@ def test_topic_info_clusters_for_content_site() -> None:
     topic_clusters = [c for c in clusters if c.intent == "topic_info"]
     assert topic_clusters, "expected topic_info clusters for a content site"
     texts = [p.prompt_text for c in topic_clusters for p in c.prompts]
-    assert any("Madeira im Oktober" in t for t in texts)
-    assert any("Was sollte man über" in t for t in texts)
-    # Provider-shaped 'Anbieter für' wording must not wrap a content topic.
-    assert not any("Anbieter für Madeira" in t for t in texts)
+    # The question is English even on a German site; the topic keeps its own
+    # wording, since translating it would need a model.
+    assert any(t == "What should you know about Madeira im Oktober?" for t in texts)
+    assert not any("Was sollte man" in t for t in texts)
+    # Provider-shaped wording must not wrap a content topic.
+    assert not any("providers for Madeira" in t for t in texts)
 
 
 # --- Comparison / finder sites -------------------------------------------------
@@ -166,20 +168,21 @@ def _prompts(profile, methodology: str = "geo-readiness-v2") -> list[str]:
 def test_finder_gets_category_decisions_not_provider_questions_on_foreign_skus() -> None:
     texts = _prompts(_sauna_finder_profile("Karibu", "www.karibu.de"))
     # The site does not sell these, so it is never asked which providers to compare.
-    assert not any("sollte man vergleichen" in t for t in texts)
-    # It is asked the category decision it actually answers.
-    assert "Finnische Sauna: Worauf sollte man beim Kauf achten?" in texts
-    assert "Finnische Sauna: Mit welchen Kosten muss man rechnen?" in texts
-    assert "Welche Anbieter für Fasssauna gibt es?" in texts
+    assert not any("should be compared" in t for t in texts)
+    # It is asked the category decision it actually answers. The category keeps
+    # its German name; the question around it is English.
+    assert "Finnische Sauna: what should you look out for when buying?" in texts
+    assert "Finnische Sauna: what costs should you expect?" in texts
+    assert "Which providers for Fasssauna exist?" in texts
     # Price and alternatives for a single model stay — a comparison site owns those.
-    assert "Was kostet Artsauna Fjora L?" in texts
-    assert "Welche Alternativen gibt es zu Artsauna Fjora L?" in texts
+    assert "How much does Artsauna Fjora L cost?" in texts
+    assert "What are the alternatives to Artsauna Fjora L?" in texts
 
 
 def test_shop_selling_its_own_products_keeps_the_provider_questions() -> None:
     texts = _prompts(_sauna_finder_profile("Select Your Sauna", "selectyoursauna.com"))
-    assert "Welche Anbieter für Artsauna Fjora L sollte man vergleichen?" in texts
-    assert "Finnische Sauna: Worauf sollte man beim Kauf achten?" in texts
+    assert "Which providers for Artsauna Fjora L should be compared?" in texts
+    assert "Finnische Sauna: what should you look out for when buying?" in texts
 
 
 def test_v1_output_is_untouched_by_the_catalog_rules() -> None:
@@ -188,6 +191,7 @@ def test_v1_output_is_untouched_by_the_catalog_rules() -> None:
     v1_finder = [c.prompts[0].prompt_text for c in generate_clusters(finder, "geo-readiness-v1")]
     v1_shop = [c.prompts[0].prompt_text for c in generate_clusters(shop, "geo-readiness-v1")]
     assert v1_finder == v1_shop
+    # V1 is frozen: it keeps both the provider questions and the site's language.
     assert any("sollte man vergleichen" in t for t in v1_finder)
     assert not any(t.startswith("Finnische Sauna:") for t in v1_finder)
 
@@ -207,4 +211,26 @@ def test_a_finder_without_readable_categories_keeps_its_questions() -> None:
     profile = build_profile(pages, "selectyoursauna.com")
     assert profile.catalog_mode == "third_party"
     assert profile.product_categories == []
-    assert any("sollte man vergleichen" in t for t in _prompts(profile))
+    assert any("should be compared" in t for t in _prompts(profile))
+
+
+def test_v2_generates_in_english_whatever_language_the_site_is_in() -> None:
+    profile = BusinessProfile(
+        canonical_domain="titas-minihelden-ulm.de",
+        brand_name="Tita's Minihelden",
+        languages=["de"],
+        primary_language="de",
+        services=["kindertagespflege"],
+        locations=["Ulm"],
+    )
+    v2 = generate_clusters(profile, "geo-readiness-v2", "quick", prompt_version="v2")
+    assert {c.language for c in v2} == {"en"}
+    texts = [p.prompt_text for c in v2 for p in c.prompts]
+    assert any(t == "Which providers are there for kindertagespflege in Ulm?" for t in texts)
+    assert not any("Welche" in t for t in texts)
+    # An explicit override cannot reintroduce German either.
+    assert {c.language for c in generate_clusters(profile, "geo-readiness-v2", "quick", "de")} == {
+        "en"
+    }
+    # V1 stays on the site's language, because its output is frozen.
+    assert {c.language for c in generate_clusters(profile, "geo-readiness-v1", "quick")} == {"de"}

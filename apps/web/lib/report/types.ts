@@ -50,6 +50,9 @@ export interface ReportProfile {
   countries: string[];
   languages: string[];
   site_type?: string;
+  // The language our crawl actually retrieved. V2 additive, so reports written
+  // before it existed leave it absent.
+  crawl_language?: string;
 }
 
 export interface ReportMeta {
