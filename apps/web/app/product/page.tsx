@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { FaqSection } from "@/components/content/FaqSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
@@ -69,6 +70,29 @@ function Check() {
     </span>
   );
 }
+
+const PRODUCT_FAQS = [
+  {
+    q: "Does the audit call ChatGPT or any other AI provider?",
+    a: "No. Every score comes from rules applied to what is on your pages, which is why the same site scores the same way twice. Answer engines are non-deterministic, so a live check cannot be reproduced — the citation self-test hands you the prompts to run that check yourself, with the result in front of you rather than buried in a number.",
+  },
+  {
+    q: "How many pages does it read?",
+    a: "A bounded set, chosen the way a crawler would choose: the homepage first, then the pages your own structure points at. The report says how many pages were read and how that affects the confidence rating.",
+  },
+  {
+    q: "Where do the questions in the report come from?",
+    a: "They are generated from your own business profile — what the audit read about who you are, what you offer and where — using versioned rules and no external model. They come out in the language most of your site is written in, and they take the shape that fits your kind of site: category decisions for a comparison site, questions with a place in them for a local business.",
+  },
+  {
+    q: "Can I use the report if I am not technical?",
+    a: "That is who it is written for. Each finding says what is wrong, why an AI system cares, and what to change, and each carries a paste-ready fix you can hand to a developer or an assistant.",
+  },
+  {
+    q: "Does a good score mean AI will mention me?",
+    a: "No, and nothing can promise that. The score measures whether your site is usable as a source. Being usable is a precondition for being quoted, not a guarantee of it.",
+  },
+];
 
 export default function ProductPage() {
   return (
@@ -191,6 +215,8 @@ export default function ProductPage() {
             any AI system will mention you. No tool controls what an AI says.
           </p>
         </section>
+
+        <FaqSection faqs={PRODUCT_FAQS} />
       </main>
       <Footer />
     </>

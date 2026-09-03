@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { GLOSSARY } from "@/lib/content/glossary";
+import { SEGMENTS } from "@/lib/content/segments";
 import { CONTENT } from "@/lib/content/registry";
 import { absoluteUrl } from "@/lib/seo/site";
 
@@ -14,6 +15,10 @@ const MARKETING: { path: string; priority: number; changeFrequency: Freq }[] = [
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
   { path: "/learn", priority: 0.7, changeFrequency: "weekly" },
   { path: "/insights", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/badge", priority: 0.5, changeFrequency: "yearly" },
+  // Legal pages carry real identity signals, so they belong in the index too.
+  { path: "/imprint", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -36,5 +41,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as Freq,
     priority: 0.5,
   }));
-  return [...marketing, ...content, ...glossaryTerms];
+  const segments = SEGMENTS.map((s) => ({
+    url: absoluteUrl(`/for/${s.slug}`),
+    lastModified: new Date(s.updated),
+    changeFrequency: "monthly" as Freq,
+    priority: 0.7,
+  }));
+  return [...marketing, ...content, ...glossaryTerms, ...segments];
 }

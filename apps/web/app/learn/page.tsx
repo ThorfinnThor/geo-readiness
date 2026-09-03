@@ -4,9 +4,9 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
-import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
+import { CONTENT, contentByCategory, type ContentCategory } from "@/lib/content/registry";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
-import { breadcrumbJsonLd } from "@/lib/seo/site";
+import { absoluteUrl, breadcrumbJsonLd } from "@/lib/seo/site";
 
 const LEARN_TITLE = "Learn AI search readiness, in plain language";
 const LEARN_DESC =
@@ -46,10 +46,26 @@ export default function LearnPage() {
     <>
       <TopBar />
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Learn", path: "/learn" },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Learn", path: "/learn" },
+          ]),
+          // The hub as a machine-readable list: an engine gets the whole content
+          // set and its addresses without having to parse the card grid.
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "AI search readiness, in plain language",
+            url: absoluteUrl("/learn"),
+            itemListElement: CONTENT.map((e, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: e.title,
+              url: absoluteUrl(e.slug),
+            })),
+          },
+        ]}
       />
       <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 py-12 sm:py-16">
         <header className="flex flex-col gap-3">

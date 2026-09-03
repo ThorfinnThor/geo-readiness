@@ -192,6 +192,14 @@ export default async function HomePage() {
             We build them from your own business profile, without any external AI, then check page
             by page whether you answer them. Where you don’t, AI search has to rely on someone else.
           </p>
+          <p className="max-w-2xl text-fg-muted">
+            They take the shape of your site, in your site’s language. A comparison site is asked
+            the category decision, not who supplies one model. A local business gets questions with
+            its town in them. A one-pager gets asked about its subject.{" "}
+            <Link href="/for" className="text-accent underline-offset-4 hover:underline">
+              See what that looks like for your kind of site →
+            </Link>
+          </p>
         </div>
         <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40">
           {QUESTIONS.map(([q, cov]) => {
@@ -210,6 +218,54 @@ export default async function HomePage() {
             );
           })}
         </ul>
+      </section>
+
+      {/* The citation self-test — the part a readiness number cannot replace. */}
+      <section className="flex flex-col gap-6 border-t border-border py-16">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Then go and check what AI actually says.
+          </h2>
+          <p className="max-w-2xl text-fg-muted">
+            A readiness score tells you whether your site can be used as a source. It cannot tell
+            you what ChatGPT said this morning — nothing deterministic can, because answer engines
+            give different answers to the same question. So the report hands you the test instead of
+            guessing at the result.
+          </p>
+        </div>
+        <ol className="grid gap-4 sm:grid-cols-3">
+          {[
+            [
+              "01",
+              "Take your questions",
+              "Neutral questions generated from your own profile. Your brand and domain are stripped out, so the model is not told who to look for.",
+            ],
+            [
+              "02",
+              "Paste prompt one",
+              "A blind web search in ChatGPT, Claude or Perplexity. It answers the questions and lists the sources it used, with no idea whose site is being tested.",
+            ],
+            [
+              "03",
+              "Paste prompt two",
+              "Only now does your domain come up: it checks the sources from step one and reports where you were cited, and where a competitor was.",
+            ],
+          ].map(([n, h, d]) => (
+            <li
+              key={n}
+              className="flex flex-col gap-2 rounded-xl border border-border bg-surface/50 p-5"
+            >
+              <span className="font-mono text-xs text-fg-subtle">{n}</span>
+              <span className="font-medium">{h}</span>
+              <span className="text-sm text-fg-muted">{d}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="max-w-2xl text-sm text-fg-subtle">
+          The test is blinded on purpose. Tell a model to look for your site and it will find it —
+          that proves nothing. A miss is not proof a page is weak, and a hit is not a ranking. It is
+          one honest observation, and you can repeat it whenever you like.
+        </p>
       </section>
 
       {/* Seven signals — substance, not pills. */}
@@ -240,10 +296,39 @@ export default async function HomePage() {
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-semibold tracking-tight">What you get</h2>
           <p className="max-w-2xl text-fg-muted">
-            Find Your AI Score is an AI search readiness audit. Enter your domain and get a 0 to 100
-            readiness score for free. The Premium AI Readiness Audit then shows every finding with
-            its evidence, a prioritized, paste-ready fix for each issue, and a downloadable report.
+            Find Your AI Score is an AI search readiness audit. Enter a domain, get a score. No
+            account, no card, no call.
           </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/50 p-5">
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
+              Free
+            </span>
+            <ul className="flex flex-col gap-2 text-sm text-fg-muted">
+              <li>A 0 to 100 readiness score for your domain</li>
+              <li>All seven component scores, and how confident the result is</li>
+              <li>A sample finding, and one of your citation-test questions</li>
+            </ul>
+          </div>
+          <div
+            className="flex flex-col gap-3 rounded-xl border p-5"
+            style={{
+              borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))",
+              background: "color-mix(in srgb, var(--accent) 6%, var(--surface))",
+            }}
+          >
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
+              Premium AI Readiness Audit
+            </span>
+            <ul className="flex flex-col gap-2 text-sm text-fg-muted">
+              <li>Every finding with the evidence behind it, ranked by what to fix first</li>
+              <li>A paste-ready fix prompt per issue, plus one master prompt for all of them</li>
+              <li>The questions AI search asks about your business, with your coverage of each</li>
+              <li>The full AI Citation Self-Test: all questions, both prompts, the pro protocol</li>
+              <li>A downloadable report to hand to whoever does the work</li>
+            </ul>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3">
           <Link

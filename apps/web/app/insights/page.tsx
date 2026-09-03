@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
 import { readinessBenchmark } from "@/lib/scans/insights";
-import { breadcrumbJsonLd } from "@/lib/seo/site";
+import { SITE, absoluteUrl, breadcrumbJsonLd } from "@/lib/seo/site";
 
 const TITLE = "The state of AI search readiness";
 const DESC =
@@ -46,10 +46,49 @@ export default async function InsightsPage() {
     { name: "Insights", path: "/insights" },
   ]);
 
+  // Dataset is the schema for published figures. It states the sample size, the
+  // licence and who produced it, which is what a model needs before it will
+  // quote a number — and what a journalist needs before citing one.
+  const datasetJsonLd = data
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        name: TITLE,
+        description: DESC,
+        url: absoluteUrl("/insights"),
+        license: "https://creativecommons.org/licenses/by/4.0/",
+        isAccessibleForFree: true,
+        creator: { "@type": "Organization", name: SITE.name, url: SITE.url },
+        publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+        temporalCoverage: `../${new Date().toISOString().slice(0, 10)}`,
+        variableMeasured: [
+          {
+            "@type": "PropertyValue",
+            name: "Average AI search readiness score",
+            value: Math.round(data.overallAvg),
+            maxValue: 100,
+            minValue: 0,
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Sites in sample",
+            value: data.sampleSize,
+          },
+          ...data.signals.map((sig) => ({
+            "@type": "PropertyValue",
+            name: `Average score: ${sig.name}`,
+            value: Math.round(sig.avg),
+            maxValue: 100,
+            minValue: 0,
+          })),
+        ],
+      }
+    : null;
+
   return (
     <>
       <TopBar />
-      <JsonLd data={breadcrumb} />
+      <JsonLd data={datasetJsonLd ? [breadcrumb, datasetJsonLd] : breadcrumb} />
       <main className="mx-auto flex max-w-3xl flex-col gap-12 px-6 py-12 sm:py-16">
         <header className="flex flex-col gap-4">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-fg-subtle">
@@ -164,6 +203,25 @@ export default async function InsightsPage() {
               >
                 Run a free scan
               </Link>
+            </section>
+
+            <section className="flex flex-col gap-3 border-t border-border pt-8">
+              <SectionLabel>Using these figures</SectionLabel>
+              <p className="text-sm text-fg-muted">
+                The numbers on this page are free to reuse, including commercially, with
+                attribution and a link back. If you quote them, say when you took them — the sample
+                grows, so the figures move.
+              </p>
+              <p className="rounded-xl border border-border bg-surface-2/50 p-4 font-mono text-xs leading-relaxed text-fg-muted">
+                Find Your AI Score, &ldquo;{TITLE}&rdquo;, n={data.sampleSize.toLocaleString("en-US")}{" "}
+                sites, retrieved{" "}
+                {new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+                . {absoluteUrl("/insights")}
+              </p>
             </section>
 
             <p className="border-t border-border pt-6 text-xs text-fg-subtle">

@@ -10,6 +10,8 @@ const LEARN = [
   { href: "/geo-vs-seo", label: "GEO vs SEO" },
   { href: "/glossary", label: "Glossary" },
   { href: "/insights", label: "Insights" },
+  { href: "/for", label: "By site type" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 const GUIDES = [
@@ -62,6 +64,7 @@ export function Footer() {
             { href: "/about", label: "About" },
             { href: "/contact", label: "Contact" },
             { href: "/pricing", label: "Pricing" },
+            { href: "/badge", label: "Badge" },
             { href: "/imprint", label: "Imprint" },
             { href: "/privacy", label: "Privacy" },
           ]}

@@ -1,4 +1,6 @@
+import { GLOSSARY } from "@/lib/content/glossary";
 import { contentByCategory, type ContentCategory } from "@/lib/content/registry";
+import { SEGMENTS } from "@/lib/content/segments";
 import { SITE, absoluteUrl } from "@/lib/seo/site";
 
 export const dynamic = "force-static";
@@ -26,6 +28,16 @@ export function GET(): Response {
     })
     .join("\n\n");
 
+  // The archetype pages and the glossary terms are their own addressable pages,
+  // so an engine reading this map should get them by name rather than having to
+  // crawl two index pages to discover them.
+  const bySiteType = SEGMENTS.map(
+    (x) => `- [${x.title}](${absoluteUrl(`/for/${x.slug}`)}): ${x.description}`,
+  ).join("\n");
+  const glossary = GLOSSARY.map(
+    (t) => `- [${t.term}](${absoluteUrl(`/glossary/${t.slug}`)}): ${t.def}`,
+  ).join("\n");
+
   const body = `# ${SITE.name}
 
 > ${SITE.description}
@@ -39,9 +51,23 @@ it does not call any AI provider and does not claim or guarantee AI mentions.
 - Home: ${SITE.url}
 - Pricing: ${absoluteUrl("/pricing")}
 - Learn hub: ${absoluteUrl("/learn")}
+- Insights (open data on real scans): ${absoluteUrl("/insights")}
+- FAQ: ${absoluteUrl("/faq")}
 - Contact: ${SITE.email}
 
 ${sections}
+
+## By site type
+
+The audit asks a comparison site different questions than a local business or a
+one-page site. These pages set out the questions, the signals used to recognise
+each archetype, and the failure modes seen most often in real scans.
+
+${bySiteType}
+
+## Glossary
+
+${glossary}
 `;
 
   return new Response(body, {

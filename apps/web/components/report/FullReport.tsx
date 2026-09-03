@@ -251,6 +251,24 @@ export function FullReport({
         </Section>
       )}
 
+      {(() => {
+        const queries = citationQueries(report);
+        if (queries.length === 0) return null;
+        const domain = report.meta.canonical_domain;
+        const lang = kitLanguage(report);
+        return (
+          <Section title="Test it yourself in ChatGPT or Claude">
+            <CitationSelfTest
+              queries={queries}
+              measurement={measurementPrompt(queries, lang)}
+              evaluation={evaluationPrompt(domain, lang)}
+              protocol={proProtocolMarkdown(report)}
+              domain={domain}
+            />
+          </Section>
+        );
+      })()}
+
       <Section title="Full action backlog">
         {report.fix_prompt_master && (
           <div
@@ -309,24 +327,6 @@ export function FullReport({
           ))}
         </ol>
       </Section>
-
-      {(() => {
-        const queries = citationQueries(report);
-        if (queries.length === 0) return null;
-        const domain = report.meta.canonical_domain;
-        const lang = kitLanguage(report);
-        return (
-          <Section title="Test it yourself in ChatGPT or Claude">
-            <CitationSelfTest
-              queries={queries}
-              measurement={measurementPrompt(queries, lang)}
-              evaluation={evaluationPrompt(domain, lang)}
-              protocol={proProtocolMarkdown(report)}
-              domain={domain}
-            />
-          </Section>
-        );
-      })()}
 
       <Section title="Methodology & limitations">
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/50 p-5 text-sm text-fg-muted">

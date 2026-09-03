@@ -22,6 +22,7 @@ export function ArticleLayout({
   updated,
   path,
   faqs = [],
+  parent = { name: "Learn", path: "/learn" },
   children,
 }: {
   title: string;
@@ -31,6 +32,10 @@ export function ArticleLayout({
   updated?: string; // ISO date
   path: string; // site-relative, for canonical + Article url
   faqs?: Faq[];
+  /** The hub this page sits under, for the breadcrumb's middle step. Pages that
+   *  live under a different hub set it here rather than emitting a second
+   *  BreadcrumbList of their own, which would contradict this one. */
+  parent?: { name: string; path: string } | null;
   children: React.ReactNode;
 }) {
   const url = absoluteUrl(path);
@@ -49,15 +54,21 @@ export function ArticleLayout({
     author: org,
     publisher: org,
   };
-  // Home → Learn → this page, so AI engines and SERPs get the site hierarchy.
+  // Home → hub → this page, so AI engines and SERPs get the site hierarchy.
+  const trail = [
+    { name: "Home", path: "/" },
+    ...(parent ? [parent] : []),
+    { name: title, path },
+  ];
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
-      { "@type": "ListItem", position: 2, name: "Learn", item: absoluteUrl("/learn") },
-      { "@type": "ListItem", position: 3, name: title, item: url },
-    ],
+    itemListElement: trail.map((t, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: t.name,
+      item: absoluteUrl(t.path),
+    })),
   };
   const faqJsonLd =
     faqs.length > 0

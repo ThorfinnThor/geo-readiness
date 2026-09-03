@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
+import { FaqSection } from "@/components/content/FaqSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
@@ -52,6 +53,35 @@ function Feature({ children }: { children: React.ReactNode }) {
     </li>
   );
 }
+
+// Buying questions, answered on the page that has to answer them. Rendered
+// visibly and as FAQPage schema by the same component, so the two cannot drift.
+const PRICING_FAQS = [
+  {
+    q: "What do I get for free?",
+    a: "The overall readiness score, all seven component scores and the confidence rating, plus a sample finding and one of the citation-test questions generated for your site. No account, no card.",
+  },
+  {
+    q: "Is this a subscription?",
+    a: "No. The full audit is a one-off payment for that report. There is nothing to cancel.",
+  },
+  {
+    q: "What is in the full audit that is not in the free score?",
+    a: "Every finding with the evidence behind it, a prioritised, paste-ready fix for each issue, the full AI Citation Self-Test with all its questions and both prompts, and a downloadable report you can hand to whoever does the work.",
+  },
+  {
+    q: "Can I share the report with my developer or agency?",
+    a: "Yes. An unlocked report is reachable by its link, so you can send it to whoever is implementing the fixes without buying a second seat.",
+  },
+  {
+    q: "Do I pay again to re-scan after fixing things?",
+    a: "A new scan produces a new report, so yes, unlocking that one is a separate purchase. The free score is always available, which is usually enough to confirm a fix moved the number.",
+  },
+  {
+    q: "What if the audit cannot read my site?",
+    a: "Then that is the finding, and it is the most important one you could get: if our crawler cannot read the page, neither can an AI crawler. The report says what blocked it.",
+  },
+];
 
 export default function PricingPage() {
   return (
@@ -172,6 +202,8 @@ export default function PricingPage() {
             </div>
           </section>
         </div>
+
+        <FaqSection faqs={PRICING_FAQS} />
 
         <p className="text-center text-xs text-fg-subtle">
           This audit measures deterministic website readiness for retrieval, citation and

@@ -124,6 +124,25 @@ export const CONTENT: ContentEntry[] = [
     category: "Guide",
     updated: "2026-08-21",
   },
+  {
+    slug: "/for",
+    title: "AI search readiness by site type",
+    description:
+      "The audit asks a comparison site different questions than a local business or a one-pager. " +
+      "What that means for each kind of site: the questions, what the audit reads, and the " +
+      "failure modes that keep coming back.",
+    category: "Reference",
+    updated: "2026-09-03",
+  },
+  {
+    slug: "/faq",
+    title: "Frequently asked questions",
+    description:
+      "What the audit measures, what it deliberately does not, why it makes no AI-provider calls, " +
+      "and how to read the result. Straight answers, including the uncomfortable ones.",
+    category: "Reference",
+    updated: "2026-09-03",
+  },
 ];
 
 // Maps a readiness component (by its key in the report) to the guide that

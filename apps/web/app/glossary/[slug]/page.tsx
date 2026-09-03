@@ -7,7 +7,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { GLOSSARY, glossaryTerm } from "@/lib/content/glossary";
 import { CONTENT } from "@/lib/content/registry";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
-import { absoluteUrl, breadcrumbJsonLd } from "@/lib/seo/site";
+import { absoluteUrl } from "@/lib/seo/site";
 
 const glossaryMeta = CONTENT.find((c) => c.slug === "/glossary")!;
 
@@ -75,15 +75,9 @@ export default async function GlossaryTermPage({
       category="Glossary"
       updated={glossaryMeta.updated}
       path={path}
+      parent={{ name: "Glossary", path: "/glossary" }}
     >
       <JsonLd data={definedTermJsonLd} />
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Glossary", path: "/glossary" },
-          { name: t.term, path },
-        ])}
-      />
       <p>{t.long}</p>
 
       {related.length > 0 && (
