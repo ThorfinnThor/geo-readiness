@@ -436,3 +436,67 @@ def test_same_brand_treats_variants_as_one_name() -> None:
     assert _same_brand("Tita's Minihelden", "Tita's Minihelden Ulm")  # location suffix
     assert _same_brand("Titas Minihelden Ulm", "Tita's Minihelden Ulm")  # apostrophe
     assert not _same_brand("Tita's Minihelden", "Kita Sonnenschein")  # different brands
+
+
+# --- Comparison / finder sites -------------------------------------------------
+# A site that lists products it does not sell says so in its own Product schema:
+# the offer's seller is the manufacturer and the offer URL points off-domain.
+# Shape taken from a real page on selectyoursauna.com.
+
+
+def _finder_pages(seller: str = "Karibu", offer_host: str = "www.karibu.de") -> list[ExtractedPage]:
+    home = ExtractedPage(
+        final_url="https://selectyoursauna.com/",
+        page_type="home",
+        language="de",
+        title="Select Your Sauna",
+        open_graph={"og:site_name": "Select Your Sauna"},
+        json_ld=[{"@type": "Organization", "name": "Select Your Sauna"}],
+    )
+    products = [
+        ExtractedPage(
+            final_url=f"https://selectyoursauna.com/de/produkte/{slug}/",
+            page_type="product",
+            language="de",
+            json_ld=[
+                {
+                    "@type": "Product",
+                    "name": name,
+                    "brand": {"@type": "Brand", "name": seller},
+                    "category": category,
+                    "offers": [
+                        {
+                            "@type": "Offer",
+                            "url": f"https://{offer_host}/sauna/aussensauna/",
+                            "price": 7999.99,
+                            "seller": {"@type": "Organization", "name": seller},
+                        }
+                    ],
+                }
+            ],
+        )
+        for slug, name, category in (
+            ("monterey", "Karibu Saunahaus Monterey", "Finnische Sauna"),
+            ("fjora-l", "Artsauna Fjora L", "Sauna > Fasssauna"),
+        )
+    ]
+    return [home, *products]
+
+
+def test_products_sold_by_a_third_party_are_flagged() -> None:
+    profile = build_profile(_finder_pages(), "selectyoursauna.com")
+    assert profile.catalog_mode == "third_party"
+    assert profile.third_party_products == ["artsauna fjora l", "karibu saunahaus monterey"]
+    # The breadcrumb category keeps its leaf, which is what a buyer searches for.
+    assert profile.product_categories == ["fasssauna", "finnische sauna"]
+    assert profile.offering_display["finnische sauna"] == "Finnische Sauna"
+
+
+def test_a_shop_selling_its_own_products_is_not_a_finder() -> None:
+    profile = build_profile(
+        _finder_pages(seller="Select Your Sauna", offer_host="selectyoursauna.com"),
+        "selectyoursauna.com",
+    )
+    assert profile.catalog_mode == "own"
+    assert profile.third_party_products == []
+    assert profile.product_categories == ["fasssauna", "finnische sauna"]

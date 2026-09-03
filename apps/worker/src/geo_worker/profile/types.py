@@ -48,6 +48,17 @@ class BusinessProfile(BaseModel):
     # restores display casing for generated questions ("karibu saunahaus
     # monterey" -> "Karibu Saunahaus Monterey"). Derived, not hashed.
     offering_display: dict[str, str] = {}
+    # Products the site lists but does not itself sell — a comparison, finder or
+    # affiliate site. The product's own schema says so: a foreign brand, a
+    # foreign offers.seller, or an offer URL on someone else's domain. Asking
+    # "which providers should be compared for <SKU>" tests the wrong thing for
+    # these, so the generator skips provider-shaped questions on them.
+    third_party_products: list[str] = []
+    # Product.category values, lowercased. A finder/comparison site is cited for
+    # category-level buying decisions ("Finnische Sauna"), not for single SKUs.
+    product_categories: list[str] = []
+    # "" (unknown) | "own" | "third_party".
+    catalog_mode: str = ""
     # Primary site archetype (§v2-plan 6); drives per-profile rule applicability.
     site_type: str = "unknown"
     site_type_confidence: float = 0.0

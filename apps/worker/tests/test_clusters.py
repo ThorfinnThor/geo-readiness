@@ -141,3 +141,52 @@ def test_topic_info_clusters_for_content_site() -> None:
     assert any("Was sollte man über" in t for t in texts)
     # Provider-shaped 'Anbieter für' wording must not wrap a content topic.
     assert not any("Anbieter für Madeira" in t for t in texts)
+
+
+# --- Comparison / finder sites -------------------------------------------------
+
+
+def _sauna_finder_profile(seller: str, offer_host: str):
+    import sys
+
+    sys.path.insert(0, "tests")
+    from geo_worker.profile.rules import build_profile
+    from test_profile import _finder_pages
+
+    return build_profile(_finder_pages(seller=seller, offer_host=offer_host), "selectyoursauna.com")
+
+
+def _prompts(profile, methodology: str = "geo-readiness-v2") -> list[str]:
+    return [
+        c.prompts[0].prompt_text
+        for c in generate_clusters(profile, methodology, "quick", prompt_version="v2")
+    ]
+
+
+def test_finder_gets_category_decisions_not_provider_questions_on_foreign_skus() -> None:
+    texts = _prompts(_sauna_finder_profile("Karibu", "www.karibu.de"))
+    # The site does not sell these, so it is never asked which providers to compare.
+    assert not any("sollte man vergleichen" in t for t in texts)
+    # It is asked the category decision it actually answers.
+    assert "Finnische Sauna: Worauf sollte man beim Kauf achten?" in texts
+    assert "Finnische Sauna: Mit welchen Kosten muss man rechnen?" in texts
+    assert "Welche Anbieter für Fasssauna gibt es?" in texts
+    # Price and alternatives for a single model stay — a comparison site owns those.
+    assert "Was kostet Artsauna Fjora L?" in texts
+    assert "Welche Alternativen gibt es zu Artsauna Fjora L?" in texts
+
+
+def test_shop_selling_its_own_products_keeps_the_provider_questions() -> None:
+    texts = _prompts(_sauna_finder_profile("Select Your Sauna", "selectyoursauna.com"))
+    assert "Welche Anbieter für Artsauna Fjora L sollte man vergleichen?" in texts
+    assert "Finnische Sauna: Worauf sollte man beim Kauf achten?" in texts
+
+
+def test_v1_output_is_untouched_by_the_catalog_rules() -> None:
+    finder = _sauna_finder_profile("Karibu", "www.karibu.de")
+    shop = _sauna_finder_profile("Select Your Sauna", "selectyoursauna.com")
+    v1_finder = [c.prompts[0].prompt_text for c in generate_clusters(finder, "geo-readiness-v1")]
+    v1_shop = [c.prompts[0].prompt_text for c in generate_clusters(shop, "geo-readiness-v1")]
+    assert v1_finder == v1_shop
+    assert any("sollte man vergleichen" in t for t in v1_finder)
+    assert not any(t.startswith("Finnische Sauna:") for t in v1_finder)

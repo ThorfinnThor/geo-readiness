@@ -46,6 +46,13 @@
       { "id": "branded_en_1", "text": "What does {brand} offer?", "placeholders": ["brand"] },
       { "id": "branded_en_2", "text": "Is {brand} recommended?", "placeholders": ["brand"] }
     ],
+    "buying_advice": [
+      { "id": "buying_advice_en_1", "text": "{product_category}: what should you look out for when buying?", "placeholders": ["product_category"] },
+      { "id": "buying_advice_en_2", "text": "{product_category}: which criteria matter most when comparing?", "placeholders": ["product_category"] }
+    ],
+    "category_pricing": [
+      { "id": "category_pricing_en_1", "text": "{product_category}: what costs should you expect?", "placeholders": ["product_category"] }
+    ],
     "topic_info": [
       { "id": "topic_info_en_1", "text": "What should you know about {topic}?", "placeholders": ["topic"] },
       { "id": "topic_info_en_2", "text": "What are the best sources to learn about {topic}?", "placeholders": ["topic"] }

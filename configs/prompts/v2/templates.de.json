@@ -46,6 +46,13 @@
       { "id": "branded_de_1", "text": "Was bietet {brand} an?", "placeholders": ["brand"] },
       { "id": "branded_de_2", "text": "Ist {brand} empfehlenswert?", "placeholders": ["brand"] }
     ],
+    "buying_advice": [
+      { "id": "buying_advice_de_1", "text": "{product_category}: Worauf sollte man beim Kauf achten?", "placeholders": ["product_category"] },
+      { "id": "buying_advice_de_2", "text": "{product_category}: Welche Kriterien sind beim Vergleich wichtig?", "placeholders": ["product_category"] }
+    ],
+    "category_pricing": [
+      { "id": "category_pricing_de_1", "text": "{product_category}: Mit welchen Kosten muss man rechnen?", "placeholders": ["product_category"] }
+    ],
     "topic_info": [
       { "id": "topic_info_de_1", "text": "Was sollte man über {topic} wissen?", "placeholders": ["topic"] },
       { "id": "topic_info_de_2", "text": "Was sind die besten Quellen, um mehr über {topic} zu erfahren?", "placeholders": ["topic"] }

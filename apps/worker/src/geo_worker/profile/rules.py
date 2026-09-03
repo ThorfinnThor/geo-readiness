@@ -794,11 +794,109 @@ def _plausible_offering_name(name: str) -> bool:
     return re.search(r"[a-zäöüß]", low) is not None
 
 
+# --- Catalog mode: does the site sell what it lists, or only compare it? ------
+# A comparison / finder / affiliate site lists Products whose own schema names
+# somebody else as the seller, or links the offer to another domain. That is a
+# general, deterministic signal — no per-domain rules. For such products,
+# provider-shaped questions ("which providers for <SKU> should be compared")
+# test the wrong thing: the site is not a provider of that SKU. Its citation
+# ground is the category decision, which Product.category states outright.
+
+_CATEGORY_SEPARATORS = re.compile(r"\s*[>\u00bb/|\u203a]\s*")
+MAX_PRODUCT_CATEGORIES = 6
+MIN_THIRD_PARTY_PRODUCTS = 2
+
+
+def _as_list(value: object) -> list:
+    if isinstance(value, list):
+        return value
+    return [] if value is None else [value]
+
+
+def _schema_names(value: object) -> list[str]:
+    """Names out of a schema.org value that may be a string, a node, or a list."""
+    out: list[str] = []
+    for item in _as_list(value):
+        if isinstance(item, str) and item.strip():
+            out.append(item.strip())
+        elif isinstance(item, dict):
+            name = item.get("name")
+            if isinstance(name, str) and name.strip():
+                out.append(name.strip())
+    return out
+
+
+def _url_host(url: str) -> str:
+    match = re.match(r"^[a-z][a-z0-9+.-]*://([^/?#]+)", url.strip(), re.I)
+    host = (match.group(1) if match else "").lower().split("@")[-1].split(":")[0]
+    return host[4:] if host.startswith("www.") else host
+
+
+def _same_site_host(host: str, canonical_domain: str) -> bool:
+    domain = canonical_domain.strip().lower()
+    domain = domain[4:] if domain.startswith("www.") else domain
+    return bool(host) and bool(domain) and (host == domain or host.endswith("." + domain))
+
+
+def _is_own_party(name: str, profile: BusinessProfile) -> bool:
+    """Does this seller name refer to the site itself rather than a third party?"""
+    for known in (profile.brand_name, profile.legal_name, *profile.aliases):
+        if known and _same_brand(name, known):
+            return True
+    core = profile.canonical_domain.split(".")[0]
+    return len(core) >= 4 and _spaceless(name).startswith(_spaceless(core))
+
+
+def _product_party_verdict(node: dict, profile: BusinessProfile) -> bool | None:
+    """True = someone else's product, False = the site's own, None = no signal.
+
+    Only the offer decides. A Product.brand naming another manufacturer is a weak
+    signal — a genuine retailer sells other brands too — but a foreign
+    offers.seller, or an offer URL pointing off-domain, says the transaction does
+    not happen here.
+    """
+    sellers: list[str] = []
+    hosts: list[str] = []
+    for offer in _as_list(node.get("offers")):
+        if not isinstance(offer, dict):
+            continue
+        sellers += _schema_names(offer.get("seller"))
+        url = offer.get("url")
+        if isinstance(url, str):
+            host = _url_host(url)
+            if host:
+                hosts.append(host)
+    if sellers:
+        return not any(_is_own_party(name, profile) for name in sellers)
+    if hosts:
+        return not any(_same_site_host(host, profile.canonical_domain) for host in hosts)
+    return None
+
+
+def _clean_category(raw: str, profile: BusinessProfile) -> str | None:
+    """A usable category label out of a Product.category value.
+
+    Breadcrumb forms ("Sauna > Finnische Sauna") keep their leaf, which is the
+    term a buyer actually searches for."""
+    parts = [part.strip() for part in _CATEGORY_SEPARATORS.split(raw) if part.strip()]
+    if not parts:
+        return None
+    value = " ".join(parts[-1].split())
+    if not _plausible_offering_name(value) or not 1 <= len(value.split()) <= 4:
+        return None
+    if profile.brand_name and _same_brand(value, profile.brand_name):
+        return None
+    return value
+
+
 def _resolve_offerings(
     pages: list[ExtractedPage], profile: BusinessProfile, evidence: list[EvidenceItem]
 ) -> None:
     services: dict[str, tuple[str | None, str, str]] = {}
     products: dict[str, tuple[str | None, str, str]] = {}
+    third_party: set[str] = set()
+    own_party: set[str] = set()
+    categories: dict[str, str] = {}
 
     def add(bucket: dict, name: str, url: str | None, source: str) -> None:
         name = " ".join(name.split())
@@ -819,6 +917,14 @@ def _resolve_offerings(
                 add(services, name, page.final_url, "json_ld")
             elif "product" in types:
                 add(products, name, page.final_url, "json_ld")
+                verdict = _product_party_verdict(node, profile)
+                if verdict is not None:
+                    key = " ".join(name.split()).lower()
+                    (third_party if verdict else own_party).add(key)
+                for raw_category in _schema_names(node.get("category")):
+                    category = _clean_category(raw_category, profile)
+                    if category:
+                        categories.setdefault(category.lower(), category)
 
         # From navigation: internal links whose target path classifies as
         # a service/product page.
@@ -839,6 +945,26 @@ def _resolve_offerings(
 
     _finalize_offering(services, "service", profile, evidence, is_service=True)
     _finalize_offering(products, "product", profile, evidence, is_service=False)
+
+    profile.third_party_products = sorted(third_party.intersection(profile.products))
+    # A shop that also lists its own offers stays "own": mixed evidence is not a
+    # finder. Only foreign-seller evidence with none of our own flips the mode.
+    if len(profile.third_party_products) >= MIN_THIRD_PARTY_PRODUCTS and not own_party:
+        profile.catalog_mode = "third_party"
+    elif profile.products:
+        profile.catalog_mode = "own"
+
+    profile.product_categories = sorted(categories)[:MAX_PRODUCT_CATEGORIES]
+    for key in profile.product_categories:
+        profile.offering_display.setdefault(key, categories[key])
+        evidence.append(
+            EvidenceItem(
+                field_name="product_category",
+                value=key,
+                source_type="json_ld",
+                confidence=0.9,
+            )
+        )
 
 
 # Content topics (fallback for informational sites with no offerings).

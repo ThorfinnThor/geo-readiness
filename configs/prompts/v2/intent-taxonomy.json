@@ -14,6 +14,8 @@
     { "key": "integration", "commercial_intent": 0.6, "branded": false },
     { "key": "combined_service", "commercial_intent": 0.75, "branded": false },
     { "key": "branded", "commercial_intent": 0.5, "branded": true },
-    { "key": "topic_info", "commercial_intent": 0.4, "branded": false }
+    { "key": "topic_info", "commercial_intent": 0.4, "branded": false },
+    { "key": "buying_advice", "commercial_intent": 0.75, "branded": false },
+    { "key": "category_pricing", "commercial_intent": 0.8, "branded": false }
   ]
 }

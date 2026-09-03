@@ -46,6 +46,10 @@ _RELEVANCE_BASE: dict[str, float] = {
     "branded": 0.40,
     # Informational fallback for content sites with no offerings.
     "topic_info": 0.90,
+    # Category-level decision questions. A comparison/finder site earns its
+    # citations here, not on a single third-party SKU.
+    "buying_advice": 0.92,
+    "category_pricing": 0.84,
 }
 
 
@@ -98,7 +102,7 @@ def _evidence_lookup(profile: BusinessProfile) -> dict[tuple[str, str], float]:
     return out
 
 
-def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
+def _candidate_specs(profile: BusinessProfile, *, frozen_v1: bool) -> list[_Spec]:
     specs: list[_Spec] = []
     services = profile.services
     products = profile.products
@@ -107,6 +111,10 @@ def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
     primary = (
         profile.industries[:1]
         or services[:1]
+        # A catalog has no services; its category is a far better subject for the
+        # "best providers for X" / "trustworthy provider for X" questions than
+        # the brand, which the citation kit strips out anyway.
+        or ([] if frozen_v1 else profile.product_categories[:1])
         or ([profile.brand_name] if profile.brand_name else [])
     )
     primary_topic = primary[0] if primary else None
@@ -138,9 +146,15 @@ def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
                 )
             )
 
+    # Products the site lists but does not sell (a comparison/finder site): asking
+    # which PROVIDERS to compare for that SKU tests whether the site is a seller
+    # of it, which it never claims to be. Price and alternatives are questions a
+    # comparison site does own, so those stay.
+    third_party = set() if frozen_v1 else set(profile.third_party_products)
     for p in products:
         ev = [("product", p.lower())]
-        specs.append(_Spec("comparison", {"product_category": p}, product=p, evidence_keys=ev))
+        if p.lower() not in third_party:
+            specs.append(_Spec("comparison", {"product_category": p}, product=p, evidence_keys=ev))
         specs.append(_Spec("alternative", {"product": p}, product=p, evidence_keys=ev))
         specs.append(_Spec("pricing", {"service": p}, product=p, evidence_keys=ev))
 
@@ -174,6 +188,15 @@ def _candidate_specs(profile: BusinessProfile) -> list[_Spec]:
                 evidence_keys=[("brand_name", profile.brand_name.lower())],
             )
         )
+
+    # Category-level decision questions from Product.category. What a catalog —
+    # and above all a comparison site — is actually asked in an AI search is the
+    # buying decision for the category, not the provider of one SKU.
+    if not frozen_v1:
+        for c in profile.product_categories:
+            ev = [("product_category", c.lower())]
+            for intent in ("buying_advice", "category_pricing", "category_discovery"):
+                specs.append(_Spec(intent, {"product_category": c}, topic=c, evidence_keys=ev))
 
     # Informational fallback: content sites with no offerings get topic questions
     # about what the site actually covers, instead of only brand-name clusters.
@@ -272,7 +295,8 @@ def generate_clusters(
 ) -> list[GeneratedCluster]:
     """Generate deterministic, capped, prompt-bearing clusters from a profile."""
     # V1 output is frozen, so the display casing lands in V2 only.
-    display = {} if methodology_version == V1_METHODOLOGY else profile.offering_display
+    frozen_v1 = methodology_version == V1_METHODOLOGY
+    display = {} if frozen_v1 else profile.offering_display
     locale = _pick_language(profile, language)
     taxonomy = load_taxonomy(prompt_version)
     template_set = load_template_set(locale, prompt_version)
@@ -280,7 +304,7 @@ def generate_clusters(
     max_clusters = FULL_MAX_CLUSTERS if scan_type == "full" else QUICK_MAX_CLUSTERS
 
     built: dict[str, GeneratedCluster] = {}
-    for spec in _candidate_specs(profile):
+    for spec in _candidate_specs(profile, frozen_v1=frozen_v1):
         intent = taxonomy.by_key(spec.intent)
         if intent is None:
             continue

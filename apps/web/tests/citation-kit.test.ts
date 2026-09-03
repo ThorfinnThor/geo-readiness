@@ -145,3 +145,40 @@ describe("citation kit deduplication", () => {
     expect(qs[1]!.query).toContain("Gartensauna");
   });
 });
+
+describe("citation kit for a comparison site", () => {
+  it("keeps the colon-form category questions intact", () => {
+    const report: ReportDocument = {
+      ...germanReport([
+        cluster({
+          intent: "buying_advice",
+          priority: 0.83,
+          sample_prompt: "Fasssauna: Worauf sollte man beim Kauf achten?",
+        }),
+        cluster({
+          intent: "category_pricing",
+          priority: 0.81,
+          sample_prompt: "Finnische Sauna: Mit welchen Kosten muss man rechnen?",
+        }),
+        cluster({
+          intent: "buying_advice",
+          priority: 0.78,
+          sample_prompt: "Finnische Sauna: Worauf sollte man beim Kauf achten?",
+        }),
+      ]),
+      business_profile: {
+        ...exampleReport.business_profile,
+        brand_name: "Select Your Sauna",
+        languages: ["de"],
+      },
+      meta: { ...exampleReport.meta, canonical_domain: "selectyoursauna.com" },
+    };
+    const qs = citationQueries(report);
+    expect(qs).toHaveLength(3);
+    expect(qs[0]!.query).toContain("Fasssauna: Worauf sollte man beim Kauf achten?");
+    expect(qs[1]!.query).toContain("Finnische Sauna: Mit welchen Kosten muss man rechnen?");
+    // Two categories asking the same thing are distinct questions, not duplicates.
+    expect(qs[2]!.query).toContain("Finnische Sauna: Worauf sollte man beim Kauf achten?");
+    expect(qs.every((q) => q.query.includes("Durchsuche das Web"))).toBe(true);
+  });
+});
