@@ -25,13 +25,6 @@ MAX_PROMPTS_PER_CLUSTER = 3
 
 SUPPORTED_LANGUAGES = ("de", "en")
 
-# V2 generates every question in English, whatever language the site is written
-# in: the product is English end to end, and a report that mixes an English
-# interface with German questions reads as a bug. The nouns inside a question
-# still come from the site (a German service keeps its German name) because
-# translating them would need a model, and scoring stays rule-based.
-GENERATION_LANGUAGE = "en"
-
 # The frozen methodology: its rendered prompts must never change.
 V1_METHODOLOGY = "geo-readiness-v1"
 
@@ -77,7 +70,6 @@ def _norm(value: str | None) -> str:
 
 
 def _pick_language(profile: BusinessProfile, override: str | None) -> str:
-    """The site's own language. V1 only — V2 always generates in English."""
     # Prefer the dominant content language so questions are in the language the
     # site is actually in (a mostly-English site should not get German questions).
     lang = (
@@ -310,7 +302,7 @@ def generate_clusters(
     # V1 output is frozen, so the display casing lands in V2 only.
     frozen_v1 = methodology_version == V1_METHODOLOGY
     display = {} if frozen_v1 else profile.offering_display
-    locale = _pick_language(profile, language) if frozen_v1 else GENERATION_LANGUAGE
+    locale = _pick_language(profile, language)
     taxonomy = load_taxonomy(prompt_version)
     template_set = load_template_set(locale, prompt_version)
     evidence = _evidence_lookup(profile)

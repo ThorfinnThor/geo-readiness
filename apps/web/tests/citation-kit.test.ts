@@ -182,36 +182,3 @@ describe("citation kit for a comparison site", () => {
     expect(qs.every((q) => q.query.includes("Durchsuche das Web"))).toBe(true);
   });
 });
-
-describe("crawl language after English-only generation", () => {
-  it("reads the crawl language from the profile, not from the question language", () => {
-    // A German site now gets English questions, so inferring the crawl language
-    // from them would report English and be wrong.
-    const report: ReportDocument = {
-      ...germanReport([
-        cluster({ intent: "best_of", sample_prompt: "What are the best providers for saunas?" }),
-      ]),
-      business_profile: {
-        ...exampleReport.business_profile,
-        brand_name: "Select Your Sauna",
-        languages: ["de", "en"],
-        crawl_language: "de",
-      },
-    };
-    expect(kitLanguage(report)).toBe("en"); // the questions really are English
-    expect(crawlLanguageInfo(report)!.language).toBe("German");
-    expect(crawlLanguageInfo(report)!.others).toEqual(["English"]);
-  });
-
-  it("falls back to the question language for reports written before the field existed", () => {
-    const report = germanReport([
-      cluster({ intent: "best_of", sample_prompt: "Was sind die besten Anbieter für Saunen?" }),
-    ]);
-    const legacy: ReportDocument = {
-      ...report,
-      business_profile: { ...report.business_profile, languages: ["de", "en"] },
-    };
-    expect(legacy.business_profile.crawl_language).toBeUndefined();
-    expect(crawlLanguageInfo(legacy)!.language).toBe("German");
-  });
-});

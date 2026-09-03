@@ -147,11 +147,6 @@ class ReportProfile(BaseModel):
     languages: list[str]
     # V2 additive: detected site archetype (§v2-plan 6). Empty for V1.
     site_type: str = ""
-    # V2 additive: the dominant language our crawl actually retrieved. Questions
-    # are generated in English regardless, so the report can no longer infer this
-    # from them — a multilingual site still needs to be told which version a
-    # language-agnostic crawler lands on. Empty for V1.
-    crawl_language: str = ""
 
 
 class ReportMeta(BaseModel):
@@ -568,7 +563,6 @@ def build_report(scan: ScanResult) -> ReportDocument:
         countries=scan.profile.countries,
         languages=scan.profile.languages,
         site_type=scan.profile.site_type if is_v2 else "",
-        crawl_language=scan.profile.primary_language if is_v2 else "",
     )
 
     meta = ReportMeta(

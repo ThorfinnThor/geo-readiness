@@ -114,7 +114,7 @@ export function FullReport({
             {cl.others.join(", ")} content, but a crawler lands on the default. If you expect a
             different language to be cited, that is a real gap: make sure the version you want indexed
             is the one crawlers reach (a clear default language and an <code>x-default</code> hreflang
-            help). The questions below are generated in English whatever language your site is in.
+            help). The questions below are in {cl.language} for the same reason.
           </div>
         );
       })()}
