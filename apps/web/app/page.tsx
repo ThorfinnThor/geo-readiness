@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
 import { SignalInsights } from "@/components/marketing/SignalInsights";
+import { Testimonials } from "@/components/marketing/Testimonials";
 import { MobileMenu } from "@/components/MobileMenu";
 import { ScanCounter } from "@/components/ScanCounter";
 import { ScanForm } from "@/components/scan/ScanForm";
@@ -178,6 +179,8 @@ export default async function HomePage() {
           <Inspector />
         </section>
       </main>
+
+      <Testimonials />
 
       {/* The unique bit: the actual questions the engine generates. */}
       <section className="flex flex-col gap-6 border-t border-border py-16">
