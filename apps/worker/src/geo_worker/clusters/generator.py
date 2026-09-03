@@ -150,7 +150,12 @@ def _candidate_specs(profile: BusinessProfile, *, frozen_v1: bool) -> list[_Spec
     # which PROVIDERS to compare for that SKU tests whether the site is a seller
     # of it, which it never claims to be. Price and alternatives are questions a
     # comparison site does own, so those stay.
-    third_party = set() if frozen_v1 else set(profile.third_party_products)
+    # Only suppress them when the categories give the kit something better to ask
+    # instead: a finder we cannot read a category from keeps its old questions
+    # rather than ending up with an emptier kit.
+    third_party = (
+        set(profile.third_party_products) if not frozen_v1 and profile.product_categories else set()
+    )
     for p in products:
         ev = [("product", p.lower())]
         if p.lower() not in third_party:

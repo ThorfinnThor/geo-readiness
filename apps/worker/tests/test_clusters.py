@@ -190,3 +190,21 @@ def test_v1_output_is_untouched_by_the_catalog_rules() -> None:
     assert v1_finder == v1_shop
     assert any("sollte man vergleichen" in t for t in v1_finder)
     assert not any(t.startswith("Finnische Sauna:") for t in v1_finder)
+
+
+def test_a_finder_without_readable_categories_keeps_its_questions() -> None:
+    # Suppressing the provider questions with nothing to replace them would leave
+    # a thinner kit, so the swap only happens when categories are readable.
+    import sys
+
+    sys.path.insert(0, "tests")
+    from geo_worker.profile.rules import build_profile
+    from test_profile import _finder_pages
+
+    pages = _finder_pages()
+    for page in pages[1:]:
+        page.json_ld[0].pop("category")
+    profile = build_profile(pages, "selectyoursauna.com")
+    assert profile.catalog_mode == "third_party"
+    assert profile.product_categories == []
+    assert any("sollte man vergleichen" in t for t in _prompts(profile))
