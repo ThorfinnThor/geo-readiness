@@ -365,3 +365,74 @@ def test_home_page_is_not_used_when_content_pages_yield_topics() -> None:
     )
     profile = build_profile([home, content], "besttravelclimate.com")
     assert profile.topics == ["Beste Reiseziele im Januar"]  # home page not consulted
+
+
+def _childcare_page() -> ExtractedPage:
+    # A real local business: a schema.org LocalBusiness SUBTYPE, which contains
+    # none of the "organization/localbusiness/business" substrings.
+    return ExtractedPage(
+        final_url="https://titas-minihelden-ulm.de/",
+        page_type="home",
+        language="de",
+        title="Tagesmutter in Ulm | Kindertagespflege Tita's Minihelden",
+        h1="Liebevolle Kindertagespflege für kleine Minihelden.",
+        open_graph={"og:site_name": "Tita's Minihelden Ulm"},
+        json_ld=[
+            {
+                "@type": "ChildCare",
+                "name": "Tita's Minihelden",
+                "telephone": "+49 700 000000",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "Erminger Weg 88",
+                    "postalCode": "89077",
+                    "addressLocality": "Ulm",
+                    "addressCountry": "DE",
+                },
+            }
+        ],
+    )
+
+
+def test_local_business_subtype_yields_address() -> None:
+    profile = build_profile([_childcare_page()], "titas-minihelden-ulm.de")
+    assert profile.locations == ["Ulm"]
+    assert profile.countries == ["DE"]
+
+
+def test_brand_variants_do_not_blank_out_the_brand() -> None:
+    # "Tita's Minihelden" (schema) vs "Tita's Minihelden Ulm" (site identity) are
+    # the same brand, so they must not read as an ambiguous pair.
+    profile = build_profile([_childcare_page()], "titas-minihelden-ulm.de")
+    assert profile.brand_name is not None
+    assert profile.needs_confirmation is False
+
+
+def test_offering_read_from_title_for_a_local_business() -> None:
+    profile = build_profile([_childcare_page()], "titas-minihelden-ulm.de")
+    # The location and the brand affix are stripped off the title segments.
+    assert profile.services == ["Kindertagespflege", "Tagesmutter"]
+    assert profile.topics == []  # offerings win, so the topic fallback stays off
+
+
+def test_offering_fallback_skips_sites_without_business_identity() -> None:
+    # No address/phone in schema -> a content site, which must keep the topic path
+    # instead of turning its tagline into a fake service.
+    page = ExtractedPage(
+        final_url="https://example.test/",
+        page_type="home",
+        language="en",
+        title="Acme — Agent Trajectory Marketplace",
+        json_ld=[{"@type": "WebSite", "name": "Acme"}],
+    )
+    profile = build_profile([page], "example.test")
+    assert profile.services == []
+    assert profile.topics == ["Agent Trajectory Marketplace"]
+
+
+def test_same_brand_treats_variants_as_one_name() -> None:
+    from geo_worker.profile.rules import _same_brand
+
+    assert _same_brand("Tita's Minihelden", "Tita's Minihelden Ulm")  # location suffix
+    assert _same_brand("Titas Minihelden Ulm", "Tita's Minihelden Ulm")  # apostrophe
+    assert not _same_brand("Tita's Minihelden", "Kita Sonnenschein")  # different brands

@@ -184,8 +184,52 @@ def _type_list(node: dict) -> list[str]:
     return []
 
 
+# Nodes that are never the business itself, so the shape fallback below must
+# not mistake them for one.
+_NON_ORG_TYPES = frozenset(
+    {
+        "person",
+        "website",
+        "webpage",
+        "breadcrumblist",
+        "article",
+        "blogposting",
+        "product",
+        "service",
+        "offer",
+        "faqpage",
+        "itemlist",
+        "imageobject",
+        "videoobject",
+        "review",
+        "aggregaterating",
+        "searchaction",
+        "collectionpage",
+    }
+)
+# Real-world business details. A named node carrying any of these IS the business.
+_ORG_SHAPE_KEYS = frozenset(
+    {"address", "telephone", "openinghoursspecification", "geo", "areaserved"}
+)
+
+
 def _is_org_type(node: dict) -> bool:
-    return any(marker in t.lower() for t in _type_list(node) for marker in _ORG_TYPE_MARKERS)
+    """True for the node describing the business.
+
+    A schema.org LocalBusiness subtype (ChildCare, Dentist, Restaurant, Plumber,
+    LegalService, …) contains none of the substrings in _ORG_TYPE_MARKERS, so a
+    name match alone silently drops the address of most small local sites. Fall
+    back to the node's shape: a named node with real-world business details.
+    """
+    types = [t.lower() for t in _type_list(node)]
+    if any(marker in t for t in types for marker in _ORG_TYPE_MARKERS):
+        return True
+    if not types or any(t in _NON_ORG_TYPES for t in types):
+        return False
+    name = node.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return False
+    return bool({k.lower() for k in node} & _ORG_SHAPE_KEYS)
 
 
 def _title_suffix(title: str | None) -> str | None:
@@ -213,6 +257,7 @@ def build_profile(
 
     _resolve_brand(pages, org_nodes, canonical_domain, confirmed_name, profile, evidence)
     _resolve_offerings(pages, profile, evidence)
+    _resolve_offering_fallback(pages, org_nodes, profile, evidence)
 
     profile.evidence = evidence
     profile.profile_hash = _profile_hash(profile)
@@ -582,6 +627,18 @@ def _brand_candidates(
     return candidates
 
 
+def _same_brand(a: str, b: str) -> bool:
+    """Two candidate names for one brand: one contains the other, or they differ
+    only in spacing/punctuation ("Titas Minihelden" vs "Tita's Minihelden")."""
+    ta, tb = _tokens(a), _tokens(b)
+    if not ta or not tb:
+        return False
+    if ta <= tb or tb <= ta:
+        return True
+    sa, sb = _spaceless(a), _spaceless(b)
+    return bool(sa) and bool(sb) and (sa.startswith(sb) or sb.startswith(sa))
+
+
 def _resolve_brand(
     pages: list[ExtractedPage],
     org_nodes: list[tuple[dict, ExtractedPage]],
@@ -607,7 +664,14 @@ def _resolve_brand(
     candidates = _brand_candidates(pages, org_nodes, canonical_domain)
     ranked = sorted(candidates.values(), key=lambda c: (-c.score, c.name))
     best = ranked[0] if ranked else None
-    second = ranked[1] if len(ranked) > 1 else None
+    # Only a genuinely DIFFERENT name is a rival. Variants of the same brand
+    # ("Tita's Minihelden" / "Tita's Minihelden Ulm" / "Titas Minihelden Ulm")
+    # would otherwise sit within the ambiguity margin and blank out a brand that
+    # is not actually in doubt.
+    second = next(
+        (c for c in ranked[1:] if best is not None and not _same_brand(best.name, c.name)),
+        None,
+    )
 
     ambiguous = (
         best is not None
@@ -998,6 +1062,91 @@ def _resolve_topics(pages: list[ExtractedPage], profile: BusinessProfile) -> Non
                 break
 
     profile.topics = list(seen.values())
+
+
+# Words linking an offering to a place in a title ("Tagesmutter in Ulm").
+_LOCATION_CONNECTORS = ("in", "im", "für", "bei", "aus", "near", "for")
+
+
+def _brand_variants(profile: BusinessProfile) -> list[str]:
+    """The brand, plus the brand without a trailing location ("Tita's Minihelden
+    Ulm" -> "Tita's Minihelden"), so a title affix is stripped either way."""
+    out: list[str] = []
+    brand = (profile.brand_name or "").strip()
+    if not brand:
+        return out
+    out.append(brand)
+    for loc in profile.locations:
+        stripped = re.sub(rf"\s*\b{re.escape(loc)}\b\s*$", "", brand, flags=re.IGNORECASE).strip()
+        if stripped and stripped != brand:
+            out.append(stripped)
+    return sorted(out, key=len, reverse=True)
+
+
+def _offering_from_title_part(part: str, profile: BusinessProfile) -> str | None:
+    """One title segment reduced to a bare offering name, or None."""
+    t = " ".join(part.split())
+    for variant in _brand_variants(profile):
+        t = re.sub(rf"\b{re.escape(variant)}\b", "", t, flags=re.IGNORECASE)
+    # "Tagesmutter in Ulm" -> "Tagesmutter": the place is already a location.
+    for loc in profile.locations:
+        connectors = "|".join(_LOCATION_CONNECTORS)
+        t = re.sub(rf"\s*\b(?:{connectors})\s+{re.escape(loc)}\b", "", t, flags=re.IGNORECASE)
+        t = re.sub(rf"\s*\b{re.escape(loc)}\b\s*$", "", t, flags=re.IGNORECASE)
+    t = " ".join(t.split()).strip(" .,-–—|:&")
+    if not t or not (1 <= len(t.split()) <= 4):
+        return None
+    if not _plausible_offering_name(t):
+        return None
+    if set(_tokens(t)) <= _GENERIC_BRAND_TOKENS:
+        return None
+    return t
+
+
+def _resolve_offering_fallback(
+    pages: list[ExtractedPage],
+    org_nodes: list[tuple[dict, ExtractedPage]],
+    profile: BusinessProfile,
+    evidence: list[EvidenceItem],
+) -> None:
+    """Read the offering off the home page title when nothing else found one.
+
+    A small local business often has no Service/Product schema and no service
+    pages because everything lives on one page, which left it with no offering
+    at all. Gated to sites whose schema carries real business identity
+    (address/phone/opening hours), so content sites keep the topic path.
+    """
+    if profile.services or profile.products:
+        return
+    if not any({k.lower() for k in node} & _ORG_SHAPE_KEYS for node, _ in org_nodes):
+        return
+    home = next(
+        (p for p in pages if p.page_type in _TOPIC_HOME_PAGE_TYPES and p.title),
+        None,
+    )
+    if home is None or not home.title:
+        return
+
+    found: list[str] = []
+    for part in _TOPIC_SEPARATORS.split(home.title):
+        cand = _offering_from_title_part(part, profile)
+        if cand and cand.lower() not in {f.lower() for f in found}:
+            found.append(cand)
+        if len(found) >= 3:
+            break
+    if not found:
+        return
+    profile.services = sorted(found, key=str.lower)
+    for name in profile.services:
+        evidence.append(
+            EvidenceItem(
+                field_name="service",
+                value=name.lower(),
+                source_url=home.final_url,
+                source_type="title",
+                confidence=0.4,
+            )
+        )
 
 
 def _finalize_offering(
