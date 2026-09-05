@@ -233,6 +233,10 @@ body {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
+  /* A bare URL used as link text has no spaces to break at, so on a narrow
+     screen it pushes the whole page sideways. Break it rather than let one
+     source citation give every content page a horizontal scrollbar. */
+  overflow-wrap: anywhere;
 }
 .content-prose ul,
 .content-prose ol {

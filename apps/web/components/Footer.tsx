@@ -11,6 +11,7 @@ const LEARN = [
   { href: "/glossary", label: "Glossary" },
   { href: "/insights", label: "Insights" },
   { href: "/for", label: "By site type" },
+  { href: "/ai-crawlers", label: "AI crawlers" },
   { href: "/faq", label: "FAQ" },
 ];
 
@@ -18,6 +19,8 @@ const GUIDES = [
   { href: "/guides/entity-clarity", label: "Entity clarity" },
   { href: "/guides/sourceability", label: "Sourceability" },
   { href: "/guides/structured-data", label: "Structured data" },
+  { href: "/how-to-get-cited-by-chatgpt", label: "Get cited by ChatGPT" },
+  { href: "/why-is-my-site-not-in-ai-answers", label: "Not in AI answers?" },
   { href: "/learn", label: "All guides" },
 ];
 

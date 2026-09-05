@@ -143,6 +143,44 @@ export const CONTENT: ContentEntry[] = [
     category: "Reference",
     updated: "2026-09-03",
   },
+  {
+    slug: "/ai-crawlers",
+    title: "AI crawlers: every user agent, and what blocking each one costs you",
+    description:
+      "The AI bots that read your site, taken from each vendor's own documentation: what every " +
+      "user-agent token does, which ones ignore robots.txt, and why blocking the training bots " +
+      "is a different decision from blocking the ones that put you in answers.",
+    category: "Reference",
+    updated: "2026-09-05",
+  },
+  {
+    slug: "/is-chatgpt-reading-my-website",
+    title: "Is ChatGPT reading my website? How to check",
+    description:
+      "Four different OpenAI bots can touch your site, and they answer four different questions. " +
+      "How to find out which of them reach you, using your own logs, your robots.txt and a free scan.",
+    category: "Explainer",
+    updated: "2026-09-05",
+  },
+  {
+    slug: "/how-to-get-cited-by-chatgpt",
+    title: "How to get cited by ChatGPT",
+    description:
+      "Nobody can guarantee a citation, and anyone who says otherwise is selling something. What " +
+      "you can do is make your page the easiest one to quote. Here is what that takes, and how to " +
+      "check whether it worked.",
+    category: "Guide",
+    updated: "2026-09-05",
+  },
+  {
+    slug: "/why-is-my-site-not-in-ai-answers",
+    title: "Why is my site not showing up in AI answers?",
+    description:
+      "The causes, in the order they actually occur: blocked, unreadable, unclear, unspecific, " +
+      "or simply not what was asked. Work down the list and stop at the first one that is true of you.",
+    category: "Guide",
+    updated: "2026-09-05",
+  },
 ];
 
 // Maps a readiness component (by its key in the report) to the guide that
