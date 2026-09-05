@@ -10,10 +10,10 @@ describe("sitemap", () => {
 
   it("lists every content, glossary and site-type page exactly once", () => {
     expect(new Set(urls).size).toBe(urls.length);
-    for (const e of CONTENT) expect(urls).toContain(`https://findyouraiscore.com${e.slug}`);
+    for (const e of CONTENT) expect(urls).toContain(`https://www.findyouraiscore.com${e.slug}`);
     for (const t of GLOSSARY)
-      expect(urls).toContain(`https://findyouraiscore.com/glossary/${t.slug}`);
-    for (const s of SEGMENTS) expect(urls).toContain(`https://findyouraiscore.com/for/${s.slug}`);
+      expect(urls).toContain(`https://www.findyouraiscore.com/glossary/${t.slug}`);
+    for (const s of SEGMENTS) expect(urls).toContain(`https://www.findyouraiscore.com/for/${s.slug}`);
   });
 
   it("never lists a per-scan or internal route, which robots.txt disallows", () => {

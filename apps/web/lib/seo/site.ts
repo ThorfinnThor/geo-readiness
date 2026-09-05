@@ -5,7 +5,14 @@ export const SITE = {
   name: "Find Your AI Score",
   shortName: "findyouraiscore",
   // Production URL. Override per environment via NEXT_PUBLIC_APP_URL.
-  url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://findyouraiscore.com").replace(/\/$/, ""),
+  //
+  // MUST be the host that actually serves 200. Vercel is configured with www as
+  // the primary domain and 308-redirects the apex to it, so a canonical (or a
+  // sitemap entry, or the robots Host line) pointing at the apex names a URL
+  // that redirects — which Search Console files under "Page with redirect, not
+  // indexed". If the primary domain is ever switched to the apex, change this
+  // with it; the two must not disagree.
+  url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.findyouraiscore.com").replace(/\/$/, ""),
   // Contact address used in the imprint / privacy pages.
   email: "info@findyouraiscore.com",
   description:
