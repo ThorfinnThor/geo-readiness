@@ -21,6 +21,16 @@ const SIGNALS: [string, string][] = [
   ["Technical Access", "Can crawlers actually read the page at all?"],
 ];
 
+// An illustration of the mistake the checker exists to catch, using the real
+// tokens: the training bot blocked on purpose, the search bot blocked by
+// accident alongside it.
+const CRAWLER_SAMPLE: [string, "allowed" | "blocked", string][] = [
+  ["OAI-SearchBot", "blocked", "You are out of ChatGPT's answers. Almost nobody means this."],
+  ["GPTBot", "blocked", "Out of OpenAI's training data. Costs you nothing in search."],
+  ["PerplexityBot", "allowed", "Perplexity can find and link you."],
+  ["Claude-SearchBot", "allowed", "Claude can source answers from you."],
+];
+
 const QUESTIONS: [string, number][] = [
   ["Which solar installers serve Austin, TX?", 95],
   ["Which battery storage system is right for a small business?", 88],
@@ -172,6 +182,17 @@ export default async function HomePage() {
             </p>
           </div>
 
+          <p className="text-sm text-fg-muted">
+            Not ready for a full scan?{" "}
+            <Link
+              href="/ai-crawler-check"
+              className="font-medium text-accent underline underline-offset-4"
+            >
+              Check which AI crawlers can reach your site
+            </Link>{" "}
+            &mdash; it reads your robots.txt in a second. Nothing to sign up for.
+          </p>
+
           <ScanCounter />
         </section>
 
@@ -266,6 +287,64 @@ export default async function HomePage() {
           that proves nothing. A miss is not proof a page is weak, and a hit is not a ranking. It is
           one honest observation, and you can repeat it whenever you like.
         </p>
+      </section>
+
+      {/* The free tool, given room where the reader now knows what is at stake. */}
+      <section className="flex flex-col gap-6 border-t border-border py-16">
+        <div className="grid items-start gap-8 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex min-w-0 flex-col gap-3">
+            <span className="font-mono text-xs uppercase tracking-[0.22em] text-fg-subtle">
+              Free tool
+            </span>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              First, check that they can reach you at all.
+            </h2>
+            <p className="max-w-xl text-fg-muted">
+              Thirteen documented AI crawlers read the web for the major answer engines, and they do
+              different jobs. Blocking <code className="font-mono text-sm">GPTBot</code> keeps you
+              out of OpenAI&rsquo;s training data and costs you nothing. Blocking{" "}
+              <code className="font-mono text-sm">OAI-SearchBot</code> removes you from
+              ChatGPT&rsquo;s answers entirely. Most &ldquo;block AI crawlers&rdquo; snippets
+              circulating online do both.
+            </p>
+            <p className="max-w-xl text-fg-muted">
+              The checker reads your live robots.txt and tells you which side of that line you are
+              on. No account, no email, no scan.
+            </p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link
+                href="/ai-crawler-check"
+                className="inline-flex min-h-[44px] items-center rounded-lg px-4 text-sm font-semibold text-[color:var(--accent-fg)] shadow-lg transition-transform hover:scale-[1.02]"
+                style={{ background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}
+              >
+                Check your crawlers →
+              </Link>
+              <Link
+                href="/ai-crawlers"
+                className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-4 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+              >
+                The full reference
+              </Link>
+            </div>
+          </div>
+          <ul className="flex min-w-0 flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40 font-mono text-xs">
+            {CRAWLER_SAMPLE.map(([token, verdict, meaning]) => (
+              <li key={token} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
+                <span className="font-semibold text-fg">{token}</span>
+                <span
+                  className="ml-auto shrink-0 rounded px-2 py-0.5 text-[0.7rem] font-semibold uppercase"
+                  style={{
+                    color: verdict === "allowed" ? "var(--excellent)" : "var(--weak)",
+                    backgroundColor: "color-mix(in srgb, currentColor 12%, transparent)",
+                  }}
+                >
+                  {verdict}
+                </span>
+                <span className="w-full text-fg-subtle">{meaning}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       {/* Seven signals — substance, not pills. */}

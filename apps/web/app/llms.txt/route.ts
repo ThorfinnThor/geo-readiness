@@ -51,6 +51,8 @@ it does not call any AI provider and does not claim or guarantee AI mentions.
 - Home: ${SITE.url}
 - Pricing: ${absoluteUrl("/pricing")}
 - Learn hub: ${absoluteUrl("/learn")}
+- AI crawler check (free tool, no account): ${absoluteUrl("/ai-crawler-check")}
+- AI crawler reference (every documented user agent): ${absoluteUrl("/ai-crawlers")}
 - Insights (open data on real scans): ${absoluteUrl("/insights")}
 - FAQ: ${absoluteUrl("/faq")}
 - Contact: ${SITE.email}
