@@ -182,16 +182,23 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <p className="text-sm text-fg-muted">
-            Not ready for a full scan?{" "}
+          {/* A second, lighter door. Someone who will not hand over a domain for a
+              full scan will still spend five seconds on a robots.txt check, and
+              the check ends by pointing at the scan. */}
+          <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface/50 p-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-sm font-medium">Or start smaller, in five seconds</span>
+              <span className="text-sm text-fg-muted">
+                See which AI crawlers your robots.txt lets in. No scan, no signup.
+              </span>
+            </div>
             <Link
               href="/ai-crawler-check"
-              className="font-medium text-accent underline underline-offset-4"
+              className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-lg border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-surface-2 sm:ml-auto"
             >
-              Check which AI crawlers can reach your site
-            </Link>{" "}
-            &mdash; it reads your robots.txt in a second. Nothing to sign up for.
-          </p>
+              Free crawler check →
+            </Link>
+          </div>
 
           <ScanCounter />
         </section>

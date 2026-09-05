@@ -181,6 +181,16 @@ export const CONTENT: ContentEntry[] = [
     category: "Guide",
     updated: "2026-09-05",
   },
+  {
+    slug: "/should-i-block-ai-crawlers",
+    title: "Should you block AI crawlers?",
+    description:
+      "A real decision with real costs on both sides, and it is not one decision but two: whether " +
+      "your work trains their models, and whether you appear in their answers. Who should say no, " +
+      "who should say yes, and what it costs either way.",
+    category: "Guide",
+    updated: "2026-09-05",
+  },
 ];
 
 // Maps a readiness component (by its key in the report) to the guide that

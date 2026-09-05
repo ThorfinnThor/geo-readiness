@@ -203,6 +203,11 @@ export default function Page() {
 
       <h2>Three policies, as copy-paste robots.txt</h2>
       <p>
+        Which one is right depends on what you sell, not on how you feel about AI.{" "}
+        <Link href="/should-i-block-ai-crawlers">Should you block AI crawlers?</Link> works through
+        it case by case.
+      </p>
+      <p>
         Pick the one that matches what you actually want. Put it in the <code>robots.txt</code> at
         the root of your domain, and keep whatever rules you already have for ordinary search
         engines.
