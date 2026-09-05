@@ -15,6 +15,7 @@ const MARKETING: { path: string; priority: number; changeFrequency: Freq }[] = [
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
   { path: "/learn", priority: 0.7, changeFrequency: "weekly" },
   { path: "/insights", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/ai-crawler-check", priority: 0.9, changeFrequency: "monthly" },
   { path: "/badge", priority: 0.5, changeFrequency: "yearly" },
   // Legal pages carry real identity signals, so they belong in the index too.
   { path: "/imprint", priority: 0.3, changeFrequency: "yearly" },

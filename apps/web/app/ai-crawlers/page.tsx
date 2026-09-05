@@ -137,6 +137,13 @@ export default function Page() {
         silently matches nothing.
       </p>
 
+      <p>
+        <Link href="/ai-crawler-check">
+          <strong>Check your own domain against this list &rarr;</strong>
+        </Link>{" "}
+        The free checker reads your live robots.txt and tells you which of these you are letting in.
+      </p>
+
       <h2>The one distinction that matters</h2>
       <p>
         <strong>Search bots decide whether you can appear in an answer. Training bots decide

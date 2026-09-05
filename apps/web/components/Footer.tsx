@@ -12,6 +12,7 @@ const LEARN = [
   { href: "/insights", label: "Insights" },
   { href: "/for", label: "By site type" },
   { href: "/ai-crawlers", label: "AI crawlers" },
+  { href: "/ai-crawler-check", label: "AI crawler check" },
   { href: "/faq", label: "FAQ" },
 ];
 

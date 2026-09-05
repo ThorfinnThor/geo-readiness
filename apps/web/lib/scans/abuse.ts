@@ -27,5 +27,10 @@ function slidingLimiter(maxPerWindow: number, windowMs: number) {
 /** Anonymous scan submissions: 8 per 10 minutes per IP. */
 export const checkScanRateLimit = slidingLimiter(8, 10 * 60 * 1000);
 
+/** Public AI-crawler checks: 20 per 10 minutes per IP. Looser than a scan
+ *  because the work is one small GET, tight enough that the endpoint is not
+ *  usable as a general-purpose fetch proxy. */
+export const checkCrawlerCheckRateLimit = slidingLimiter(20, 10 * 60 * 1000);
+
 /** Promo-code redemption attempts: 10 per 10 minutes per IP (brute-force guard). */
 export const checkPromoRateLimit = slidingLimiter(10, 10 * 60 * 1000);
