@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "verified_on": "2026-09-05",
+  "_note": "Machine-relevant facts about the documented AI crawlers, shared by the Python worker and the TypeScript web app so the report and the public checker can never disagree. Prose lives with the web app; tokens live here. Deliberately outside configs/methodology and configs/prompts, so it is not part of the methodology hash.",
+  "crawlers": [
+    { "token": "OAI-SearchBot", "company": "OpenAI", "purpose": "search", "obeys_robots": true },
+    { "token": "GPTBot", "company": "OpenAI", "purpose": "training", "obeys_robots": true },
+    { "token": "ChatGPT-User", "company": "OpenAI", "purpose": "user", "obeys_robots": false },
+    { "token": "OAI-AdsBot", "company": "OpenAI", "purpose": "ads", "obeys_robots": true },
+    { "token": "Claude-SearchBot", "company": "Anthropic", "purpose": "search", "obeys_robots": true },
+    { "token": "ClaudeBot", "company": "Anthropic", "purpose": "training", "obeys_robots": true },
+    { "token": "Claude-User", "company": "Anthropic", "purpose": "user", "obeys_robots": true },
+    { "token": "PerplexityBot", "company": "Perplexity", "purpose": "search", "obeys_robots": true },
+    { "token": "Perplexity-User", "company": "Perplexity", "purpose": "user", "obeys_robots": false },
+    { "token": "Google-Extended", "company": "Google", "purpose": "training", "obeys_robots": true },
+    { "token": "Applebot", "company": "Apple", "purpose": "search", "obeys_robots": true },
+    { "token": "Applebot-Extended", "company": "Apple", "purpose": "training", "obeys_robots": true },
+    { "token": "CCBot", "company": "Common Crawl", "purpose": "training", "obeys_robots": true }
+  ]
+}

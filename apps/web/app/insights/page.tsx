@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { TopBar } from "@/components/TopBar";
 import { ogImageUrl } from "@/lib/seo/content-metadata";
-import { readinessBenchmark } from "@/lib/scans/insights";
+import { crawlerBenchmark, readinessBenchmark } from "@/lib/scans/insights";
 import { SITE, absoluteUrl, breadcrumbJsonLd } from "@/lib/seo/site";
 
 const TITLE = "The state of AI search readiness";
@@ -40,6 +40,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default async function InsightsPage() {
   const data = await readinessBenchmark();
+  const crawlers = await crawlerBenchmark();
 
   const breadcrumb = breadcrumbJsonLd([
     { name: "Home", path: "/" },
@@ -204,6 +205,75 @@ export default async function InsightsPage() {
                 Run a free scan
               </Link>
             </section>
+
+            {crawlers && (
+              <section className="flex flex-col gap-3">
+                <SectionLabel>Who sites let read them</SectionLabel>
+                <p className="text-fg-muted">
+                  Read from the robots.txt of{" "}
+                  <strong className="text-fg">
+                    {crawlers.sampleSize.toLocaleString("en-US")} sites
+                  </strong>{" "}
+                  scanned here.{" "}
+                  <strong className="text-fg">
+                    {Math.round((100 * crawlers.blockingSearchBots) / crawlers.sampleSize)}%
+                  </strong>{" "}
+                  block at least one of the crawlers that decide whether they can appear in an AI
+                  answer at all &mdash; a decision very few of them will have made deliberately,
+                  since the tokens that opt out of model training are different ones.{" "}
+                  {crawlers.splitPolicy > 0 && (
+                    <>
+                      Another{" "}
+                      <strong className="text-fg">
+                        {Math.round((100 * crawlers.splitPolicy) / crawlers.sampleSize)}%
+                      </strong>{" "}
+                      block training while staying in the answers, which is the split policy done
+                      correctly.
+                    </>
+                  )}
+                </p>
+                <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface/40">
+                  {crawlers.rows.map((r) => {
+                    const pct = Math.round((100 * r.blocked) / crawlers.sampleSize);
+                    const max = Math.max(1, ...crawlers.rows.map((x) => x.blocked));
+                    return (
+                      <li key={r.token} className="flex items-center gap-4 px-5 py-3">
+                        <span className="w-40 shrink-0 truncate font-mono text-xs font-semibold">
+                          {r.token}
+                        </span>
+                        <span className="hidden w-24 shrink-0 text-xs text-fg-subtle sm:block">
+                          {r.purpose === "search" ? "answers" : r.purpose}
+                        </span>
+                        <span
+                          className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2"
+                          aria-hidden
+                        >
+                          <span
+                            className="block h-full rounded-full"
+                            style={{
+                              width: `${Math.round((100 * r.blocked) / max)}%`,
+                              background:
+                                r.purpose === "search" ? "var(--weak)" : "var(--fg-subtle)",
+                            }}
+                          />
+                        </span>
+                        <span className="w-20 shrink-0 text-right font-mono text-sm tabular-nums text-fg-muted">
+                          {pct}%
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="text-xs text-fg-subtle">
+                  Percentage of scanned sites whose robots.txt blocks that user agent at the site
+                  root. Counts sites, never names them. Check your own with the{" "}
+                  <Link href="/ai-crawler-check" className="underline underline-offset-2">
+                    free crawler check
+                  </Link>
+                  .
+                </p>
+              </section>
+            )}
 
             <section className="flex flex-col gap-3 border-t border-border pt-8">
               <SectionLabel>Using these figures</SectionLabel>

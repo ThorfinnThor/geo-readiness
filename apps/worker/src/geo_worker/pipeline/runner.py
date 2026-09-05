@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 from geo_worker.actions import Action
@@ -41,6 +41,8 @@ class ScanResult:
     robots_skipped: int = 0
     homepage_reachable: bool = True
     robots_blocked_core: bool = False
+    # Documented AI crawlers this site's robots.txt lets in, token -> allowed.
+    ai_crawler_access: dict[str, bool] = field(default_factory=dict)
 
 
 def _limits_for(scan_type: str) -> CrawlLimits:
@@ -129,4 +131,5 @@ def run_pipeline(
         robots_skipped=crawl_result.metrics.robots_skipped,
         homepage_reachable=crawl_result.homepage_reachable,
         robots_blocked_core=crawl_result.robots_blocked_core,
+        ai_crawler_access=crawl_result.ai_crawler_access,
     )

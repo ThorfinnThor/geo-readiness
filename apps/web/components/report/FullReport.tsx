@@ -10,6 +10,7 @@ import {
   severityColor,
 } from "@/components/report/shared";
 import { CitationSelfTest } from "@/components/report/CitationSelfTest";
+import { AiCrawlerAccess } from "@/components/report/AiCrawlerAccess";
 import { CopyPromptButton } from "@/components/report/CopyPromptButton";
 import { ReportExport } from "@/components/report/ReportExport";
 import { ScanComparison } from "@/components/report/ScanComparison";
@@ -162,6 +163,10 @@ export function FullReport({
           </ul>
         </Section>
       )}
+
+      <Section title="Who is allowed to read this site">
+        <AiCrawlerAccess report={report} />
+      </Section>
 
       <Section title="Business profile">
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl border border-border bg-surface/50 p-5 text-sm sm:grid-cols-3">

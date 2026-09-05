@@ -1,0 +1,75 @@
+{
+  "version": "1",
+  "_note": "Shared robots.txt cases run by BOTH the Python worker suite and the TypeScript web suite. The report and the public checker must give a site the same answer, so the two implementations are pinned to the same expectations here rather than trusted to stay in step.",
+  "cases": [
+    {
+      "name": "no robots.txt at all",
+      "robots": "",
+      "expect": { "GPTBot": "allowed", "OAI-SearchBot": "allowed" }
+    },
+    {
+      "name": "blanket wildcard block",
+      "robots": "User-agent: *\nDisallow: /",
+      "expect": { "GPTBot": "blocked", "OAI-SearchBot": "blocked", "CCBot": "blocked" }
+    },
+    {
+      "name": "the agent's own group beats the wildcard",
+      "robots": "User-agent: *\nDisallow: /\n\nUser-agent: GPTBot\nAllow: /",
+      "expect": { "GPTBot": "allowed", "PerplexityBot": "blocked" }
+    },
+    {
+      "name": "tokens match exactly, never as a substring",
+      "robots": "User-agent: Claude-SearchBot\nDisallow: /",
+      "expect": { "Claude-SearchBot": "blocked", "Claude-User": "allowed", "ClaudeBot": "allowed" }
+    },
+    {
+      "name": "token matching is case-insensitive",
+      "robots": "user-AGENT: gptbot\ndisallow: /",
+      "expect": { "GPTBot": "blocked" }
+    },
+    {
+      "name": "an empty Disallow imposes nothing",
+      "robots": "User-agent: *\nDisallow:",
+      "expect": { "GPTBot": "allowed" }
+    },
+    {
+      "name": "Allow wins when both govern the root",
+      "robots": "User-agent: *\nDisallow: /\nAllow: /",
+      "expect": { "GPTBot": "allowed" }
+    },
+    {
+      "name": "a path-level Disallow does not block the site",
+      "robots": "User-agent: *\nDisallow: /admin\nDisallow: /cart",
+      "expect": { "GPTBot": "allowed", "OAI-SearchBot": "allowed" }
+    },
+    {
+      "name": "consecutive user-agent lines share one group",
+      "robots": "User-agent: GPTBot\nUser-agent: CCBot\nDisallow: /",
+      "expect": { "GPTBot": "blocked", "CCBot": "blocked", "OAI-SearchBot": "allowed" }
+    },
+    {
+      "name": "comments are ignored",
+      "robots": "# nope\nUser-agent: * # everyone\nDisallow: / # all of it",
+      "expect": { "GPTBot": "blocked" }
+    },
+    {
+      "name": "rules before any user-agent line apply to nothing",
+      "robots": "Disallow: /\nUser-agent: *\nAllow: /",
+      "expect": { "GPTBot": "allowed" }
+    },
+    {
+      "name": "the real split policy: in the answers, out of the training",
+      "robots": "User-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: Claude-SearchBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n\nUser-agent: ClaudeBot\nDisallow: /\n\nUser-agent: CCBot\nDisallow: /\n\nUser-agent: Google-Extended\nDisallow: /",
+      "expect": {
+        "OAI-SearchBot": "allowed",
+        "Claude-SearchBot": "allowed",
+        "PerplexityBot": "allowed",
+        "GPTBot": "blocked",
+        "ClaudeBot": "blocked",
+        "CCBot": "blocked",
+        "Google-Extended": "blocked",
+        "Applebot": "allowed"
+      }
+    }
+  ]
+}

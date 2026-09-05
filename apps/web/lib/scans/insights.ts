@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 
+import { CRAWLERS } from "@/lib/content/crawlers";
 import { query } from "@/lib/db";
 
 // Aggregate readiness across the sites people have scanned here. Like the
@@ -15,6 +16,15 @@ export type SignalAverage = { key: string; name: string; avg: number };
 export type SignalInsights = { sampleSize: number; signals: SignalAverage[] };
 
 export type SignalBenchmark = { key: string; name: string; avg: number; weakShare: number };
+export type CrawlerBlockRate = { token: string; company: string; purpose: string; blocked: number };
+export type CrawlerBenchmark = {
+  sampleSize: number;
+  /** Sites blocking at least one crawler that decides AI-answer inclusion. */
+  blockingSearchBots: number;
+  /** Sites blocking training but no search bot — the deliberate split policy. */
+  splitPolicy: number;
+  rows: CrawlerBlockRate[];
+};
 export type ScoreBucket = { label: string; min: number; max: number; count: number };
 export type ReadinessBenchmark = {
   sampleSize: number;
@@ -138,5 +148,64 @@ export async function readinessBenchmark(): Promise<ReadinessBenchmark | null> {
     return { sampleSize: reports.length, overallAvg, signals, buckets };
   } catch {
     return null;
+  }
+}
+
+/**
+ * How often real sites block each documented AI crawler, from the robots.txt of
+ * every site scanned here. Deduped to the latest scan per domain, and only
+ * published once the sample is large enough to mean something.
+ *
+ * Aggregate only: this counts sites, never names them, and no domain is ever
+ * tied to a verdict.
+ */
+export async function crawlerBenchmark(): Promise<CrawlerBenchmark | null> {
+  try {
+    const rows = await query<{ access: Record<string, boolean> | null }>(
+      `SELECT DISTINCT ON (pr.canonical_domain)
+              r.content_json->'crawl'->'ai_crawler_access' AS access
+       FROM reports r
+       JOIN scans s ON s.id = r.scan_id
+       JOIN projects pr ON pr.id = s.project_id
+       WHERE r.content_json->'crawl'->'ai_crawler_access' IS NOT NULL
+       ORDER BY pr.canonical_domain, r.created_at DESC`,
+    );
+
+    const sites = rows.map((r) => r.access).filter((a): a is Record<string, boolean> => {
+      return Boolean(a) && Object.keys(a!).length > 0;
+    });
+    if (sites.length < MIN_SITES) return null;
+
+    const searchTokens = CRAWLERS.filter((c) => c.purpose === "search").map((c) => c.token);
+    const trainingTokens = CRAWLERS.filter((c) => c.purpose === "training").map((c) => c.token);
+    const blockedIn = (site: Record<string, boolean>, tokens: string[]) =>
+      tokens.some((t) => site[t] === false);
+
+    const counts = new Map<string, number>();
+    let blockingSearchBots = 0;
+    let splitPolicy = 0;
+    for (const site of sites) {
+      for (const [token, allowed] of Object.entries(site)) {
+        if (allowed === false) counts.set(token, (counts.get(token) ?? 0) + 1);
+      }
+      const search = blockedIn(site, searchTokens);
+      const training = blockedIn(site, trainingTokens);
+      if (search) blockingSearchBots += 1;
+      if (training && !search) splitPolicy += 1;
+    }
+
+    return {
+      sampleSize: sites.length,
+      blockingSearchBots,
+      splitPolicy,
+      rows: CRAWLERS.map((c) => ({
+        token: c.token,
+        company: c.company,
+        purpose: c.purpose,
+        blocked: counts.get(c.token) ?? 0,
+      })).sort((a, b) => b.blocked - a.blocked || a.token.localeCompare(b.token)),
+    };
+  } catch {
+    return null; // DB unavailable — the page renders without this section.
   }
 }

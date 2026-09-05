@@ -196,6 +196,10 @@ class ReportCrawl(BaseModel):
     homepage_reachable: bool
     robots_blocked_core: bool
     valid_response_ratio: float
+    # Which documented AI crawlers this site's robots.txt lets in, token ->
+    # allowed at the root. Read off the robots.txt already fetched for the
+    # crawl. Lives inside the V2-only crawl block, so V1 output is untouched.
+    ai_crawler_access: dict[str, bool] = {}
 
 
 class ReportDocument(BaseModel):
@@ -482,6 +486,7 @@ def build_report(scan: ScanResult) -> ReportDocument:
             homepage_reachable=scan.homepage_reachable,
             robots_blocked_core=scan.robots_blocked_core,
             valid_response_ratio=round(valid_ratio, 4),
+            ai_crawler_access=scan.ai_crawler_access,
         )
         if is_v2
         else None

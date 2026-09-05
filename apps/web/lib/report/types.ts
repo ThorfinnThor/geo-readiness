@@ -117,4 +117,7 @@ export interface ReportCrawl {
   homepage_reachable: boolean;
   robots_blocked_core: boolean;
   valid_response_ratio: number;
+  /** Documented AI crawler token -> allowed at the site root. Absent on reports
+   *  written before the check existed. */
+  ai_crawler_access?: Record<string, boolean>;
 }

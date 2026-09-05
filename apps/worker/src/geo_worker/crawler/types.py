@@ -52,3 +52,7 @@ class CrawlResult:
     metrics: CrawlMetrics = field(default_factory=CrawlMetrics)
     homepage_reachable: bool = False
     robots_blocked_core: bool = False
+    # Which documented AI crawlers this site's robots.txt lets in, token -> may
+    # crawl the root. Read from the same robots.txt already fetched for our own
+    # crawl, so it costs no extra request.
+    ai_crawler_access: dict[str, bool] = field(default_factory=dict)

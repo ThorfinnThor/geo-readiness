@@ -10,6 +10,7 @@ from geo_worker.extraction import extract_page
 from geo_worker.security import CrawlLimits, SSRFBlocked, validate_target
 from geo_worker.security.resolver import Resolver, system_resolver
 
+from .ai_agents import crawler_access
 from .fetcher import FetchError, SafeFetcher
 from .frontier import Frontier, locale_prefix
 from .robots import RobotsPolicy
@@ -52,7 +53,8 @@ def crawl(
     parts = urlsplit(start)
     origin = f"{parts.scheme}://{parts.netloc}"
 
-    robots = _load_robots(fetcher, origin, metrics)
+    robots, robots_text = _load_robots(fetcher, origin, metrics)
+    ai_access = crawler_access(robots_text)
 
     frontier = Frontier()
     frontier.enqueue(start, 0)
@@ -62,7 +64,7 @@ def crawl(
     for sm_url in robots.sitemaps:
         _seed_sitemap(fetcher, sm_url, frontier, metrics)
 
-    result = CrawlResult(status=CrawlStatus.completed, metrics=metrics)
+    result = CrawlResult(status=CrawlStatus.completed, metrics=metrics, ai_crawler_access=ai_access)
     cancelled = False
 
     while frontier and metrics.pages_fetched < limits.max_pages:
@@ -132,14 +134,23 @@ def crawl(
     return result
 
 
-def _load_robots(fetcher: SafeFetcher, origin: str, metrics: CrawlMetrics) -> RobotsPolicy:
+def _load_robots(
+    fetcher: SafeFetcher, origin: str, metrics: CrawlMetrics
+) -> tuple[RobotsPolicy, str | None]:
+    """The policy for our own crawl, plus the raw text so the AI-crawler
+    verdicts can be read off the same fetch."""
     try:
         outcome = fetcher.fetch(f"{origin}/robots.txt")
     except (SSRFBlocked, FetchError):
-        return RobotsPolicy.allow_all()
+        return RobotsPolicy.allow_all(), None
     if outcome.response.status_code == 200:
-        return RobotsPolicy.parse(_decode(outcome.response.body))
-    return RobotsPolicy.allow_all()
+        text = _decode(outcome.response.body)
+        return RobotsPolicy.parse(text), text
+    # A 404 is a real answer — no rules, everything allowed — and is treated as
+    # such rather than as a failure to read.
+    if outcome.response.status_code in (404, 410):
+        return RobotsPolicy.allow_all(), ""
+    return RobotsPolicy.allow_all(), None
 
 
 def _seed_sitemap(
