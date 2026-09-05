@@ -18,6 +18,11 @@ export interface PreviewDoc {
   issueSeverities: string[];
   sampleAction: ReportAction | null;
   sampleCitationQuery: string | null;
+  /** Who may read the site, from its robots.txt. Free on purpose: the public
+   *  crawler check hands this to anyone for any domain, so paywalling it in the
+   *  owner's own report would be indefensible. Just the verdicts — the rest of
+   *  the crawl block stays behind the boundary. */
+  aiCrawlerAccess: Record<string, boolean> | null;
   disclaimer: string;
 }
 
@@ -38,6 +43,7 @@ export function toPreviewDoc(report: ReportDocument): PreviewDoc {
     issueSeverities: remaining.map((a) => a.severity),
     sampleAction,
     sampleCitationQuery: sampleCitationQuery(report),
+    aiCrawlerAccess: report.crawl?.ai_crawler_access ?? null,
     disclaimer: report.disclaimer,
   };
 }

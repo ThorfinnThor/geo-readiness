@@ -3,6 +3,7 @@ import { Suspense } from "react";
 // component scores, and which categories need improvement. The prioritized fixes
 // are represented by content-free locked placeholders — the real issue text is
 // never sent to an unpaid browser (see lib/report/preview.toPreviewDoc).
+import { AiCrawlerAccess } from "@/components/report/AiCrawlerAccess";
 import { ComponentCard, LevelChip, OverallHeader, severityColor } from "@/components/report/shared";
 import { ActionCard } from "@/components/report/ActionCard";
 import { PaywallCTA } from "@/components/report/PaywallCTA";
@@ -102,6 +103,16 @@ export function PreviewReport({ preview, reportId }: { preview: PreviewDoc; repo
             ))}
           </div>
         </section>
+
+        {/* Free on purpose: the public crawler check gives anyone this answer for
+            any domain, so charging the owner for it on their own site would be
+            indefensible. It is also the precondition for every other signal. */}
+        {preview.aiCrawlerAccess && (
+          <section className="flex flex-col gap-3">
+            <SectionLabel>Who is allowed to read this site</SectionLabel>
+            <AiCrawlerAccess access={preview.aiCrawlerAccess} />
+          </section>
+        )}
 
         {/* Visible: WHERE the problems are — the categories, not the fixes. */}
         <section className="flex flex-col gap-3">

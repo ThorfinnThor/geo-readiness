@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { CRAWLERS, PURPOSE_LABEL, type CrawlerPurpose } from "@/lib/content/crawlers";
-import type { ReportDocument } from "@/lib/report/types";
 
 const ORDER: CrawlerPurpose[] = ["search", "training", "user", "ads"];
 
@@ -10,8 +9,7 @@ const ORDER: CrawlerPurpose[] = ["search", "training", "user", "ads"];
  * fetched. Access sits underneath every other signal: a page nothing may fetch
  * cannot be understood, quoted or cited however good it is.
  */
-export function AiCrawlerAccess({ report }: { report: ReportDocument }) {
-  const access = report.crawl?.ai_crawler_access;
+export function AiCrawlerAccess({ access }: { access?: Record<string, boolean> }) {
   if (!access || Object.keys(access).length === 0) return null;
 
   const known = CRAWLERS.filter((c) => c.token in access);

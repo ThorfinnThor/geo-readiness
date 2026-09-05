@@ -165,7 +165,7 @@ export function FullReport({
       )}
 
       <Section title="Who is allowed to read this site">
-        <AiCrawlerAccess report={report} />
+        <AiCrawlerAccess access={report.crawl?.ai_crawler_access} />
       </Section>
 
       <Section title="Business profile">
